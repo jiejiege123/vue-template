@@ -1,21 +1,12 @@
 export default {
   route: {
     dashboard: '首页',
-    documentation: '文档',
     guide: '引导页',
-    permission: '权限测试页',
-    rolePermission: '角色权限',
-    pagePermission: '页面权限',
-    directivePermission: '指令权限',
     icons: '图标',
     components: '组件',
     tinymce: '富文本编辑器',
-    markdown: 'Markdown',
-    jsonEditor: 'JSON 编辑器',
     dndList: '列表拖拽',
     splitPane: 'Splitpane',
-    avatarUpload: '头像上传',
-    dropzone: 'Dropzone',
     sticky: 'Sticky',
     countTo: 'Count To',
     componentMixin: '小组件',
@@ -24,24 +15,13 @@ export default {
     dragSelect: '拖拽 Select',
     dragKanban: '可拖拽看板',
     charts: '图表',
-    keyboardChart: '键盘图表',
     lineChart: '折线图',
     mixChart: '混合图表',
     example: '综合实例',
-    nested: '路由嵌套',
-    menu1: '菜单1',
-    'menu1-1': '菜单 1-1',
-    'menu1-2': '菜单 1-2',
-    'menu1-2-1': '菜单 1-2-1',
-    'menu1-2-2': '菜单 1-2-2',
-    'menu1-3': '菜单 1-3',
-    menu2: '菜单 2',
+
     Table: 'Table',
-    dynamicTable: '动态 Table',
     dragTable: '拖拽 Table',
     inlineEditTable: 'Table 内编辑',
-    complexTable: '综合 Table',
-    tab: 'Tab',
     form: '表单',
     createArticle: '创建文章',
     editArticle: '编辑文章',
@@ -49,15 +29,11 @@ export default {
     errorPages: '错误页面',
     page401: '401',
     page404: '404',
-    errorLog: '错误日志',
     excel: 'Excel',
     exportExcel: '导出 Excel',
     selectExcel: '导出 已选择项',
     mergeHeader: '导出 多级表头',
     uploadExcel: '上传 Excel',
-    zip: 'Zip',
-    pdf: 'PDF',
-    exportZip: 'Export Zip',
     theme: '换肤',
     clipboardDemo: 'Clipboard',
     i18n: '国际化',
@@ -81,20 +57,7 @@ export default {
     thirdparty: '第三方登录',
     thirdpartyTips: '本地不能模拟，请结合自己业务进行模拟！！！'
   },
-  documentation: {
-    documentation: '文档',
-    github: 'Github 地址'
-  },
-  permission: {
-    addRole: '新增角色',
-    editPermission: '编辑权限',
-    roles: '你的权限',
-    switchRoles: '切换权限',
-    tips: '在某些情况下，不适合使用 v-permission。例如：Element-UI 的 el-tab 或 el-table-column 以及其它动态渲染 dom 的场景。你只能通过手动设置 v-if 来实现。',
-    delete: '删除',
-    confirm: '确定',
-    cancel: '取消'
-  },
+
   guide: {
     description: '引导页对于一些第一次进入项目的人很有用，你可以简单介绍下项目的功能。本 Demo 是基于',
     button: '打开引导'
@@ -102,11 +65,9 @@ export default {
   components: {
     documentation: '文档',
     tinymceTips: '富文本是管理后台一个核心的功能，但同时又是一个有很多坑的地方。在选择富文本的过程中我也走了不少的弯路，市面上常见的富文本都基本用过了，最终权衡了一下选择了Tinymce。更详细的富文本比较和介绍见',
-    dropzoneTips: '由于我司业务有特殊需求，而且要传七牛 所以没用第三方，选择了自己封装。代码非常的简单，具体代码你可以在这里看到 @/components/Dropzone',
     stickyTips: '当页面滚动到预设的位置会吸附在顶部',
     backToTopTips1: '页面滚动到指定位置会在右下角出现返回顶部按钮',
     backToTopTips2: '可自定义按钮的样式、show/hide、出现的高度、返回的位置 如需文字提示，可在外部使用Element的el-tooltip元素',
-    imageUploadTips: '由于我在使用时它只有vue@1版本，而且和mockjs不兼容，所以自己改造了一下，如果大家要使用的话，优先还是使用官方版本。'
   },
   table: {
     dynamicTips1: '固定表头, 按照表头顺序排序',
@@ -147,13 +108,7 @@ export default {
     selectedExport: '导出已选择项',
     placeholder: '请输入文件名(默认excel-list)'
   },
-  zip: {
-    export: '导出',
-    placeholder: '请输入文件名(默认file)'
-  },
-  pdf: {
-    tips: '这里使用   window.print() 来实现下载pdf的功能'
-  },
+
   theme: {
     change: '换肤',
     documentation: '换肤文档',
