@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-11-02 09:00:14
+ * @LastEditTime: 2020-11-02 16:23:49
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\main.js
+ */
 import Vue from 'vue'
 
 import Cookies from 'js-cookie'
@@ -8,6 +16,8 @@ import Element from 'element-ui'
 import './styles/element-variables.scss'
 
 import '@/styles/index.scss' // global css
+import './assets/css/layout.scss'
+// import '@/icons/iconfont.js'
 
 import App from './App'
 import store from './store'

@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-11-02 09:00:14
+ * @LastEditTime: 2020-11-02 16:03:03
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\permission.js
+ */
 import router from './router'
 import store from './store'
 import { Message } from 'element-ui'
@@ -18,7 +26,7 @@ router.beforeEach(async(to, from, next) => {
   document.title = getPageTitle(to.meta.title)
 
   // determine whether the user has logged in
-  const hasToken = getToken()
+  const hasToken = getToken() // 判断是否已经登录
 
   if (hasToken) {
     if (to.path === '/login') {
@@ -34,13 +42,15 @@ router.beforeEach(async(to, from, next) => {
         try {
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { roles } = await store.dispatch('user/getInfo')
+          const { roles } = await store.dispatch('user/getInfo') // 用户信息里面就包含了 用户角色
 
+          // 后端根据登录的用户 获取到用户权限
+          const routesRes = await store.dispatch('user/getRouters', roles)
           // generate accessible routes map based on roles
-          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-
+          const accessRoutes = await store.dispatch('permission/generateRoutes', routesRes) // 根据角色 去获取菜单和按钮权限
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
+          // router.options.routes = accessRoutes
 
           // hack method to ensure that addRoutes is complete
           // set the replace: true, so the navigation will not leave a history record

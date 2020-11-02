@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-11-02 09:00:14
+ * @LastEditTime: 2020-11-02 12:08:55
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\utils\request.js
+ */
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
@@ -6,7 +14,7 @@ import { getToken } from '@/utils/auth'
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-  // withCredentials: true, // send cookies when cross-domain requests
+  withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
 
