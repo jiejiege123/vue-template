@@ -19,6 +19,9 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
+  if (to.path !== '/404') {
+    localStorage.setItem('router', to.path)
+  }
   // start progress bar
   NProgress.start()
 
@@ -50,11 +53,12 @@ router.beforeEach(async(to, from, next) => {
           const accessRoutes = await store.dispatch('permission/generateRoutes', routesRes) // 根据角色 去获取菜单和按钮权限
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
-          // router.options.routes = accessRoutes
-
           // hack method to ensure that addRoutes is complete
           // set the replace: true, so the navigation will not leave a history record
-          next({ ...to, replace: true })
+          const toPath = localStorage.getItem('router')
+          next({ path: toPath || '/' })
+
+          // next({ ...to, replace: true })
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
