@@ -14,6 +14,7 @@
         type="primary"
         size="small") 新增
       el-button(
+        plain
         type="danger"
         size="small") 删除
     el-table.flex1(
@@ -67,6 +68,7 @@
             size="small") 编辑
           el-button(
             v-if="showDel"
+            plain
             type="danger"
             @click.stop="deleted(scope.row)"
             size="small") 删除

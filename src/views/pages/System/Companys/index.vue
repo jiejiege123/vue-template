@@ -16,7 +16,15 @@
     :operateWidth='280'
     :tableData='tableData'
     :columns="tableColumn")
-
+    template(v-slot:operation="{row}")
+      el-button(
+        type="primary"
+        @click.stop="viewRow(row)"
+        size="small") 用户
+      el-button(
+        type="primary"
+        @click.stop="viewRow(row)"
+        size="small") 角色
 </template>
 <script >
 import Query from '@/components/Query'
