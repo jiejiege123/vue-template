@@ -1,39 +1,42 @@
 <template lang="pug">
-  div.layout-row.query-laywarp
-    .query-item(v-for="item in queryShow" :key="item.id")
-      div.layout-row.align-center.mb_10(v-if="item.queryType === queryType")
-        span(:style="{width: width, textAlign:'right'}" ) {{item.label}}：
-        el-select(
-          v-if="item.type === 'select'"
-          v-model="query[item.prop]"
-          :placeholder="item.holder"
-          filterable
-          style="padding-right:15px; width:160px"
-          size="small"
-          clearable)
-          el-option(
-            v-for="(list,index) in item.dics"
-            :key="index"
-            :label="list.label"
-            :value="list.value")
-        el-input(
-          v-else
-          v-model="query[item.prop]"
-          :placeholder="item.holder"
-          size="small"
-          clearable)
-    div.layout-row.align-center.mb_10(style="margin-left: auto")
-      el-button(
-        size="small"
-        @click='reset') 重置
-      el-button(
-        type="primary"
-        size="small"
-        @click='search') 查询
-      div.ml_10(@click="queryType = !queryType")
-        span.el-dropdown-link
-          | {{queryType?'高级查询':'通用查询'}}
-          i.el-icon--right(:class="[queryType?'el-icon-arrow-down':'el-icon-arrow-up']")
+  div.layout-row__between.query-laywarp(ref="queryRef")
+    el-row.width100(:gutter="10")
+      el-col.query-item(v-for="(item,index) in queryShow" :key="index" :span="span" )
+        div.layout-row.align-center.mb_10(v-if="item.queryType === queryType")
+          span(:style="{width: width, textAlign:'right'}" ) {{item.label}}：
+          el-select(
+            v-if="item.type === 'select'"
+            v-model="query[item.prop]"
+            :placeholder="item.holder"
+            filterable
+            style="padding-right:15px; width:160px"
+            size="small"
+            clearable)
+            el-option(
+              v-for="(list,index) in item.dics"
+              :key="index"
+              :label="list.label"
+              :value="list.value")
+          el-input(
+            v-else
+            v-model="query[item.prop]"
+            :placeholder="item.holder"
+            size="small"
+            clearable)
+      el-col(:span="span" :offset="queryHandleOffset")
+        .layout-row.align-center.mb_10(style="text-align: right;justify-content: flex-end;")
+          el-button(
+            size="small"
+            @click='reset') 重置
+          el-button(
+            v-loading="btnLoading"
+            type="primary"
+            size="small"
+            @click='search') 查询
+          div.ml_10(@click="queryTypeChange" v-if="hasAdvQuery")
+            span.el-dropdown-link
+              | {{queryType?'通用查询':'高级查询'}}
+              i.el-icon--right(:class="[queryType?'el-icon-arrow-down':'el-icon-arrow-up']")
 </template>
 <script>
 export default {
@@ -48,12 +51,23 @@ export default {
     width: {
       type: String,
       default: '120px'
+    },
+    btnLoading: {
+      type: Boolean,
+      default: false
+    },
+    hasAdvQuery: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       query: {},
-      queryType: true
+      queryType: false,
+      span: 8,
+      queryHandleOffset: 1,
+      elRow: []
     }
   },
   computed: {
@@ -62,27 +76,65 @@ export default {
     }
   },
   mounted() {
-
+    this.$nextTick(() => {
+      this.span = this.computeSpan(that.$refs.queryRef.offsetWidth)
+      this.computeElRow()
+    })
+    const that = this
+    window.onresize = () => {
+      return (() => {
+        console.log(that.$refs.queryRef.offsetWidth)
+        this.span = this.computeSpan(that.$refs.queryRef.offsetWidth)
+        console.log(this.span)
+        this.computeElRow()
+      })()
+    }
   },
   methods: {
-    search() {
-
-    },
-    reset() {
-      if (this.queryType) {
-
-      } else {
-
+    computeSpan(queryRefWidth) {
+      if (queryRefWidth > 1600) {
+        return 24 / 6
+      } else if (queryRefWidth < 1600) {
+        return 24 / 4
       }
     },
-    handleQueryType(e) {
-      console.log(this.queryType)
-      console.log(e)
+    computeElRow() {
+      const yue = (this.queryShow.length + 1) % (24 / this.span)
+      if (yue === 0) {
+        this.queryHandleOffset = 0
+      } else {
+        this.queryHandleOffset = 24 - yue * this.span
+      }
+    },
+    queryTypeChange() {
+      this.queryType = !this.queryType
+      this.computeElRow()
+    },
+    search() {
+      // 只传当前queryType相符合的数据
+      const query = {}
+      this.queryShow.forEach(n => {
+        if (n.queryType === this.queryType) {
+          query[n.prop] = this.query[n.prop] || null
+        }
+      })
+      this.$emit('onSearch', query)
+    },
+    reset() {
+      for (const key in this.query) {
+        // eslint-disable-next-line no-prototype-builtins
+        if (this.query.hasOwnProperty(key)) {
+          if (this.queryShow.find(n => n.prop === key)) {
+            this.$set(this.query, [key], '')
+          }
+        }
+      }
     }
   }
 }
 </script>
 <style lang="scss" scoped>
+// 1024 1280
 .query-laywarp{
   flex-wrap: wrap;
   // justify-content: flex-start;

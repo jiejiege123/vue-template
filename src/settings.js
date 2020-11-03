@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-11-02 09:00:14
+ * @LastEditTime: 2020-11-03 14:44:21
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\settings.js
+ */
 module.exports = {
   title: 'Vue Element Admin',
 
@@ -5,7 +13,7 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether show the settings right-panel
    */
-  showSettings: true,
+  showSettings: false,
 
   /**
    * @type {boolean} true | false
@@ -17,13 +25,13 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether fix the header
    */
-  fixedHeader: false,
+  fixedHeader: true,
 
   /**
    * @type {boolean} true | false
    * @description Whether show the logo in sidebar
    */
-  sidebarLogo: false,
+  sidebarLogo: true,
 
   /**
    * @type {boolean} true | false
