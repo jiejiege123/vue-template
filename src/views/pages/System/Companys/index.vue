@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-03 16:40:12
+ * @LastEditTime: 2020-11-04 17:02:55
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -13,7 +13,9 @@
       Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
   edit-table-form(
     :loading='loading'
-    :operateWidth='280'
+    operateWidth='280'
+    :dics="dics"
+    :formRules="formRules"
     :tableData='tableData'
     :columns="tableColumn")
     template(v-slot:operation="{row}")
@@ -61,35 +63,76 @@ export default {
         {
           prop: 'comId',
           label: '单位ID',
-          width: 120
+          width: 120,
+          tableOnly: true
         },
         {
           prop: 'subCom',
           label: '所属单位',
-          minWidth: 300
+          minWidth: 300,
+          type: 'cascader'
+        },
+        {
+          prop: 'comName',
+          label: '单位名称',
+          formOnly: true,
+          editAble: true
         },
         {
           prop: 'comType',
           label: '单位属性',
-          width: 130
+          width: 130,
+          default: 1,
+          type: 'select'
         },
         {
           prop: 'subNum',
           label: '下级数量',
-          width: 80
+          width: 80,
+          tableOnly: true
         },
 
         {
           prop: 'showIndex',
           label: '显示排序',
-          width: 80
+          width: 80,
+          default: '0',
+          inputFilter: "value=value.replace(/[^\\d]/g,'')",
+          editAble: true
         },
         {
           prop: 'createTime',
           label: '创建时间',
-          width: 160
+          width: 160,
+          tableOnly: true
         }
-      ]
+      ],
+      formRules: {
+        subCom: [{ required: true, message: '请选择上级单位', trigger: 'change' }],
+        comName: [
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+        comType: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
+        showIndex: [{ required: true, message: '请输入排序显示', trigger: 'blur' }]
+      },
+      dics: {
+        subCom: [],
+        comType: [
+          {
+            value: 1,
+            label: '进销商'
+          },
+          {
+            value: 2,
+            label: '工程商'
+          },
+          {
+            value: 3,
+            label: '业主单位'
+          }
+        ]
+      }
 
     }
   },
@@ -109,7 +152,6 @@ export default {
       this.getDataList()
     },
     getDataList() {
-      console.log('123')
       this.tableData = [
         {
           comId: '1223',
@@ -128,9 +170,6 @@ export default {
           createTime: '2020-11-03 14:33'
         }
       ]
-      setTimeout(() => {
-        this.$refs.reftable.doLayout()
-      }, 200)
     }
   }
 }

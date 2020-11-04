@@ -19,7 +19,8 @@ label {
 
 html {
   height: 100%;
-  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
 }
 
 #app {
@@ -29,7 +30,8 @@ html {
 *,
 *:before,
 *:after {
-  box-sizing: inherit;
+  -moz-box-sizing: inherit;
+       box-sizing: inherit;
 }
 
 .no-padding {
@@ -144,7 +146,13 @@ aside {
   width: 100%;
   text-align: right;
   padding-right: 20px;
+  -webkit-transition: 600ms ease position;
+  -o-transition: 600ms ease position;
+  -moz-transition: 600ms ease position;
   transition: 600ms ease position;
+  background: -webkit-linear-gradient(left, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
+  background: -moz-linear-gradient(left, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
+  background: -o-linear-gradient(left, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
   background: linear-gradient(90deg, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
 
   .subtitle {
@@ -188,4 +196,20 @@ aside {
 
 .multiselect--active {
   z-index: 1000 !important;
+}
+
+
+.default-input{
+  ::v-deep .is-disabled{
+    .el-input__inner{
+      background-color: #fff;
+      border-color: #e4e7ed;
+      color: #606266;
+    }
+    .el-textarea__inner{
+      background-color: #fff;
+      border-color: #e4e7ed;
+      color: #606266;
+    }
+  }
 }

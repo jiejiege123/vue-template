@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-02 11:21:00
+ * @LastEditTime: 2020-11-04 09:23:22
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\api\user.js
@@ -10,13 +10,22 @@ import request from '@/utils/request'
 
 export function login(data) {
   return request({
-    // url: '/account/login',
-    url: '/vue-element-admin/user/login',
+    url: '/api/account/login',
+    // url: '/vue-element-admin/user/login',
     method: 'post',
-    data
+    data,
+    headers: { 'Content-Type': 'application/json', 'Accept': 'text/plain' }
   })
 }
-
+// export function login(params) {
+//   const data = JSON.stringify(params)
+//   return request({
+//     url: '/Accounts/Login',
+//     method: 'post',
+//     data,
+//     headers: { 'Content-Type': 'application/json' }
+//   })
+// }
 export function getInfo(token) {
   return request({
     url: '/vue-element-admin/user/info',
@@ -27,7 +36,7 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/account/logout',
+    url: '/api/account/logout',
     method: 'post'
   })
 }

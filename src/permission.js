@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-02 16:03:03
+ * @LastEditTime: 2020-11-04 10:40:57
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\permission.js
@@ -45,16 +45,11 @@ router.beforeEach(async(to, from, next) => {
         try {
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { roles } = await store.dispatch('user/getInfo') // 用户信息里面就包含了 用户角色
-
-          // 后端根据登录的用户 获取到用户权限
-          const routesRes = await store.dispatch('user/getRouters', roles)
-          // generate accessible routes map based on roles
+          const { RoleIds } = await store.dispatch('user/getInfo') // 用户信息里面就包含了 用户角色
+          const routesRes = await store.dispatch('user/getRouters', RoleIds)
           const accessRoutes = await store.dispatch('permission/generateRoutes', routesRes) // 根据角色 去获取菜单和按钮权限
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
-          // hack method to ensure that addRoutes is complete
-          // set the replace: true, so the navigation will not leave a history record
           const toPath = localStorage.getItem('router')
           next({ path: toPath || '/' })
 

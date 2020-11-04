@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-11-02 09:00:14
+ * @LastEditTime: 2020-11-04 09:59:41
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\store\getters.js
+ */
 const getters = {
   sidebar: state => state.app.sidebar,
   language: state => state.app.language,
@@ -10,6 +18,7 @@ const getters = {
   name: state => state.user.name,
   introduction: state => state.user.introduction,
   roles: state => state.user.roles,
+  userInfo: state => state.user.userInfo,
   permission_routes: state => state.permission.routes,
   errorLogs: state => state.errorLog.logs
 }
