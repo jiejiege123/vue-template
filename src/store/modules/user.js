@@ -140,48 +140,54 @@ const actions = {
           [{
             'Id': '975247111765495809',
             'Name': '系统管理',
-            'ParentId': null,
-            'Type': 4,
             'Url': 'System',
+            'Type': 4,
             'Icon': 'sys',
-            'SortCode': 999,
-            'Children': [{
-              'Id': '1151029042405838848',
-              'Name': '企业管理',
-              'ParentId': '975247111765495809',
-              'Type': 1,
-              'Url': 'Companys',
-              'Icon': null,
-              'SortCode': 2,
-              'Children': []
-            }, {
-              'Id': '975247111769690113',
-              'Name': '用户管理',
-              'ParentId': '976092881406267392',
-              'Type': 1,
-              'Url': 'User',
-              'Icon': null,
-              'SortCode': 20,
-              'Children': []
-            }, {
-              'Id': '975247111769690114',
-              'Name': '角色管理',
-              'ParentId': '976094018385612800',
-              'Type': 1,
-              'Url': 'Role',
-              'Icon': null,
-              'SortCode': 33,
-              'Children': []
-            }, {
-              'Id': '975247111769690117',
-              'Name': '权限管理',
-              'ParentId': '976094340222947328',
-              'Type': 1,
-              'Url': 'Permission',
-              'Icon': null,
-              'SortCode': 39,
-              'Children': []
-            }]
+            'Children': [
+              {
+                'Id': '1151029042405838848',
+                'Name': '企业管理',
+                'Url': 'Companys',
+                'Type': 1,
+                'Icon': null,
+                'Children': [{
+                  'Id': '1131029042405838848',
+                  'Type': 2,
+                  'Name': '企业下级',
+                  'Url': 'SystemSub',
+                  'Icon': null,
+                  'Children': [],
+                  'btns': ['CompanySub01']
+                }],
+                'btns': ['Company01', 'Company02', 'Company03']
+              }, {
+                'Id': '975247111769690113',
+                'Name': '用户管理',
+                'ParentId': '976092881406267392',
+                'Type': 1,
+                'Url': 'User',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': []
+              }, {
+                'Id': '975247111769690114',
+                'Name': '角色管理',
+                'ParentId': '976094018385612800',
+                'Type': 1,
+                'Url': 'Role',
+                'Icon': null,
+                'SortCode': 33,
+                'Children': []
+              }, {
+                'Id': '975247111769690117',
+                'Name': '权限管理',
+                'ParentId': '976094340222947328',
+                'Type': 1,
+                'Url': 'Permission',
+                'Icon': null,
+                'SortCode': 39,
+                'Children': []
+              }]
           }]
         )
       } else {

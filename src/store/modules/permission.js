@@ -45,7 +45,8 @@ import Layout from '@/layout'
 
 const state = {
   routes: [],
-  addRoutes: []
+  addRoutes: [],
+  btnsPermission: []
 }
 
 const mutations = {
@@ -68,49 +69,37 @@ const actions = {
       // commit('SET_ROUTES', accessedRoutes)
       // resolve(accessedRoutes)
       const addRoutes = []
+      const btnsPermission = []
       // 将数组写成路由标准路由格式
-      routesRes.map(n => {
-        const childrenComponents = []
-        n.Children = n.Children || []
-        n.Children.map(nC => {
-          let comp
-          try { comp = require(`@/views/pages/${n.Url}/${nC.Url}/index.vue`) } catch (e) {
-            console.log(e)
-          }
-          if (comp && comp.default) {
-            childrenComponents.push(
-              {
-                path: nC.Url,
-                name: 'nc' + nC.Id,
-                component: (res) => require([`@/views/pages/${n.Url}/${nC.Url}/index.vue`], res),
-                // component: () => import(`@/views/pages/${n.Url}/${nC.Url}/index.vue`),
-                meta: { title: nC.Name }
-              }
-            )
-          } else {
-            childrenComponents.push(
-              {
-                path: nC.Url,
-                name: 'nc' + nC.Id,
-                component: view404,
-                meta: { title: nC.Name }
-              }
-            )
-          }
-        })
-        addRoutes.push(
-          {
-            path: `/${n.Url}`,
-            alwaysShow: true,
-            component: Layout,
-            redirect: `/${n.Url}/${n.Children[0].Url}`,
-            name: 'c' + n.Id,
-            meta: { title: n.Name, icon: n.Icon },
-            children: childrenComponents
-          }
-        )
-      })
+      // 应该使用递归来写
+
+      // function calleArr(array) {
+      //   array.forEach(n => {
+      //     addRoutes.push({
+      //       path: `/${n.Url}`,
+      //       hidden: false, // 侧边栏隐藏
+      //       redirect: `/${n.Url}/${n.Children[0].Url}`,
+      //       alwaysShow: true, // 总是显示根路由
+      //       component: Layout,
+      //       name: n.Id, // 必填 且不重名
+      //       meta: {
+      //         title: n.Name,
+      //         icon: n.Icon,
+      //         noCache: false, // 不缓存
+      //         breadcrumb: true, // 面包屑
+      //         affix: false, // tags-view 固定
+      //         activeMenu: '' // 路由条件高亮
+      //       },
+      //       children: childrenComponents
+      //     })
+      //     if (n.Children.length > 0) {
+      //       calleArr(n.Children)
+      //     }
+      //   })
+      // }
+      // calleArr(routesRes)
       commit('SET_ROUTES', addRoutes)
+      console.log(btnsPermission)
       resolve(state.routes)
     })
   }
