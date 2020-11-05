@@ -1,25 +1,26 @@
 /*
  * @Author: your name
  * @Date: 2020-11-03 12:15:16
- * @LastEditTime: 2020-11-03 12:16:02
- * @LastEditors: your name
+ * @LastEditTime: 2020-11-05 17:07:45
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\api\com.js
  */
 import request from '@/utils/request'
 
-export function getCompany(params) {
+export function getCompany(data) {
   return request({
-    url: '/vue-element-admin/com/getCompany',
-    method: 'get',
-    params
+    url: '/api/company/search',
+    method: 'post',
+    data
   })
 }
 
-export function getInfo(token) {
+// 添加公司
+export function addCom(data) {
   return request({
-    url: '/vue-element-admin/user/info',
-    method: 'get',
-    params: { token }
+    url: '/api/company/add',
+    method: 'post',
+    data
   })
 }

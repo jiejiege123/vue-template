@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-04 09:21:29
+ * @LastEditTime: 2020-11-05 18:10:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\main.js
@@ -30,6 +30,7 @@ import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
 
+// eslint-disable-next-line no-unused-vars
 import has from '@/directive/btnsPermission'
 /**
  * If you don't want to use mock-server

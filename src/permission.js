@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-04 10:40:57
+ * @LastEditTime: 2020-11-05 09:56:59
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\permission.js

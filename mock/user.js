@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-02 17:05:35
+ * @LastEditTime: 2020-11-05 09:46:00
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\mock\user.js
@@ -18,16 +18,30 @@ const tokens = {
 
 const users = {
   'admin-token': {
-    roles: ['admin'],
-    introduction: 'I am a super administrator',
+    RoleIds: ['admin'],
+    introduction: '',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    name: 'Super Admin'
+    name: 'Super Admin',
+    token: 'afasfdasdf',
+    user: {
+      Name: 'Super Admin',
+      HeadIcon: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+      Description: 'I am a super administrator',
+      RoleIds: ['admin']
+    }
   },
   'editor-token': {
-    roles: ['editor'],
+    RoleIds: ['editor'],
     introduction: 'I am an editor',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    name: 'Normal Editor'
+    name: 'Normal Editor',
+    token: 'afasfdasdf',
+    user: {
+      Name: 'Normal Editor',
+      HeadIcon: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+      Description: 'I am an editor',
+      RoleIds: ['editor']
+    }
   }
 }
 
@@ -50,7 +64,7 @@ module.exports = [
 
       return {
         code: 20000,
-        data: token
+        Data: users[token.token]
       }
     }
   },

@@ -29,7 +29,7 @@
             size="small"
             @click='reset') 重置
           el-button(
-            v-loading="btnLoading"
+            :loading="btnLoading"
             type="primary"
             size="small"
             @click='search') 查询

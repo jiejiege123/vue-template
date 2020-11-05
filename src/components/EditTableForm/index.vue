@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-04 19:28:58
+ * @LastEditTime: 2020-11-05 17:37:40
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -11,11 +11,13 @@
     .operate(v-if="hasOutOperat")
       slot(name="outOperate")
       el-button(
+        v-has="has01"
         type="primary"
         size="small"
         @click='addRow') 新增
       el-button(
         plain
+        v-has="has02"
         type="danger"
         size="small"
         :disabled="batchDelDisAble"
@@ -65,12 +67,14 @@
             size="small") 查看
           el-button(
             v-if="showEdit"
-            type="primary"
+            type="success"
+            v-has="has03"
             plain
             @click.stop="editRow(scope.row)"
             size="small") 编辑
           el-button(
             v-if="showDel"
+            v-has="has02"
             plain
             type="danger"
             @click.stop="deleted(scope.row)"
@@ -94,6 +98,7 @@
       :close-on-click-modal="false"
       :append-to-body="true")
       el-form.default-input(
+        v-loading="formLoading"
         :model='ruleForm'
         :class="{'inline': inline}"
         ref='ruleForm'
@@ -168,7 +173,7 @@
               v-else-if="item.type==='textarea'"
               type='textarea',
               :placeholder="item.holder"
-              :style="formStyle"
+              :style="[formStyle, item.formStyle]"
               :autosize='{ minRows: 2, maxRows: 4}'
               v-model='ruleForm[item.prop]')
             div(v-else-if="item.type === 'img'")
@@ -177,8 +182,12 @@
                 :src='ruleForm[item.prop] | filterImg'
                 style="margin:10px; cursor: pointer")
               el-upload.avatar-uploader(
+                v-else-if='!ruleForm[item.prop] && (dialogType==="view")')
+                i.el-icon-picture-outline.avatar-uploader-icon
+              el-upload.avatar-uploader(
                 v-else
                 :action='action'
+                :headers="headers"
                 :show-file-list='false'
                 :on-success='(value)=> handleFileSuccess(item.prop, value)'
                 :before-upload='beforeAvatarUpload')
@@ -187,6 +196,7 @@
             el-upload.upload-demo(
               v-else-if='item.type === "upload"'
               :action="action"
+              :headers="headers"
               :on-success='(value)=> handleFileSuccess(item.prop, value)'
               :before-upload='beforeFileUpload'
               :limit='1')
@@ -195,7 +205,7 @@
             el-input(
               v-else
               v-model='ruleForm[item.prop]'
-              :style="formStyle"
+              :style="[formStyle, item.formStyle]"
               :oninput="item.inputFilter"
               :placeholder="item.holder"
               )
@@ -205,6 +215,8 @@
 </template>
 <script>
 import { randomPassword } from '@/utils'
+import { getToken } from '@/utils/auth'
+
 export default {
   name: 'EditTableForm',
   filters: {
@@ -275,7 +287,7 @@ export default {
     },
     showView: {
       type: Boolean,
-      default: false
+      default: true
     },
     showEdit: {
       type: Boolean,
@@ -284,6 +296,18 @@ export default {
     showDel: {
       type: Boolean,
       default: true
+    },
+    has01: {
+      type: String,
+      default: ''
+    },
+    has02: {
+      type: String,
+      default: ''
+    },
+    has03: {
+      type: String,
+      default: ''
     },
     // 分页
     hasPages: {
@@ -334,8 +358,11 @@ export default {
           width: '280px'
         }
       }
+    },
+    formLoading: {
+      type: Boolean,
+      default: false
     }
-
   },
   data() {
     return {
@@ -357,12 +384,19 @@ export default {
     formColumns() {
       if (this.dialogType === 'update') {
         return this.columnsSub.filter(n => n.editAble === true)
+      } else if (this.dialogType === 'add') {
+        return this.columnsSub.filter(n => !n.tableOnly && !n.addDisable)
       } else {
         return this.columnsSub.filter(n => !n.tableOnly)
       }
     },
     action() {
-      return `${process.env.VUE_APP_BASE_API}/Basic/UploadImage`
+      return `${process.env.VUE_APP_BASE_API}/api/common/photo/upload/single`
+    },
+    headers() {
+      return {
+        Authorization: 'Bearer ' + getToken()
+      }
     }
   },
   watch: {
@@ -469,7 +503,6 @@ export default {
       this.formColumns.map(n => {
         ruleForm[n.prop] = n.default || ''
       })
-      console.log(ruleForm)
       this.ruleForm = Object.assign({}, ruleForm)
       this.title = '添加'
       this.dialogType = 'add'
@@ -505,6 +538,13 @@ export default {
           type: 'info',
           message: '已取消删除'
         })
+      })
+    },
+    submitForm() {
+      this.$emit('onSubmitForm', this.ruleForm, (ok) => {
+        if (ok) {
+          this.visible = false
+        } else { return }
       })
     }
   }
@@ -595,5 +635,25 @@ export default {
   text-align: right;
   width: 100%;
   padding-right: 50px;
+}
+.add-dialog{
+  ::v-deep .el-dialog__body{
+    height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+}
+.default-input{
+  ::v-deep .is-disabled {
+    .el-input__inner{
+      background-color: #fff;
+      border-color: #e4e7ed;
+      color: #606266;
+    }
+    .el-textarea__inner{
+      background-color: #fff;
+      border-color: #e4e7ed;
+      color: #606266;
+    }
+  }
 }
 </style>

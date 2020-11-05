@@ -45,9 +45,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ Username: username.trim(), Password: password, VCode: '1123' }).then(response => {
         const { Data } = response
-
         commit('SET_TOKEN', Data.token)
         setToken(Data.token)
+
         if (!Data.user.RoleIds) {
           Data.user.RoleIds = ['admin']
         }
@@ -78,29 +78,6 @@ const actions = {
       } else {
         reject('getInfo error')
       }
-
-      // getInfo(state.token).then(response => {
-      //   const { data } = response
-
-      //   if (!data) {
-      //     reject('Verification failed, please Login again.')
-      //   }
-
-      //   const { roles, name, avatar, introduction } = data
-
-      //   // roles must be a non-empty array
-      //   if (!roles || roles.length <= 0) {
-      //     reject('getInfo: roles must be a non-null array!')
-      //   }
-
-      //   commit('SET_ROLES', roles)
-      //   commit('SET_NAME', name)
-      //   commit('SET_AVATAR', avatar)
-      //   commit('SET_INTRODUCTION', introduction)
-      //   resolve(data)
-      // }).catch(error => {
-      //   reject(error)
-      // })
     })
   },
 
@@ -137,58 +114,53 @@ const actions = {
     return new Promise((resolve, reject) => {
       if (roles) {
         resolve(
-          [{
-            'Id': '975247111765495809',
-            'Name': '系统管理',
-            'Url': 'System',
-            'Type': 4,
-            'Icon': 'sys',
-            'Children': [
-              {
-                'Id': '1151029042405838848',
-                'Name': '企业管理',
-                'Url': 'Companys',
-                'Type': 1,
-                'Icon': null,
-                'Children': [{
-                  'Id': '1131029042405838848',
-                  'Type': 2,
-                  'Name': '企业下级',
-                  'Url': 'SystemSub',
+          [
+            {
+              'Id': '975247111765495809',
+              'Name': '系统管理',
+              'Url': 'System',
+              'Type': 4,
+              'Icon': 'sys',
+              'Children': [
+                {
+                  'Id': '1151029042405838848',
+                  'Name': '企业管理',
+                  'ParentId': '975247111765495809',
+                  'Url': 'Companys',
+                  'Type': 1,
                   'Icon': null,
                   'Children': [],
-                  'btns': ['CompanySub01']
-                }],
-                'btns': ['Company01', 'Company02', 'Company03']
-              }, {
-                'Id': '975247111769690113',
-                'Name': '用户管理',
-                'ParentId': '976092881406267392',
-                'Type': 1,
-                'Url': 'User',
-                'Icon': null,
-                'SortCode': 20,
-                'Children': []
-              }, {
-                'Id': '975247111769690114',
-                'Name': '角色管理',
-                'ParentId': '976094018385612800',
-                'Type': 1,
-                'Url': 'Role',
-                'Icon': null,
-                'SortCode': 33,
-                'Children': []
-              }, {
-                'Id': '975247111769690117',
-                'Name': '权限管理',
-                'ParentId': '976094340222947328',
-                'Type': 1,
-                'Url': 'Permission',
-                'Icon': null,
-                'SortCode': 39,
-                'Children': []
-              }]
-          }]
+                  'Btns': ['Company01', 'Company02', 'Company03']
+                }, {
+                  'Id': '975247111769690113',
+                  'Name': '用户管理',
+                  'ParentId': '976092881406267392',
+                  'Type': 1,
+                  'Url': 'User',
+                  'Icon': null,
+                  'SortCode': 20,
+                  'Children': []
+                }, {
+                  'Id': '975247111769690114',
+                  'Name': '角色管理',
+                  'ParentId': '976094018385612800',
+                  'Type': 1,
+                  'Url': 'Role',
+                  'Icon': null,
+                  'SortCode': 33,
+                  'Children': []
+                }, {
+                  'Id': '975247111769690117',
+                  'Name': '权限管理',
+                  'ParentId': '976094340222947328',
+                  'Type': 1,
+                  'Url': 'Permission',
+                  'Icon': null,
+                  'SortCode': 39,
+                  'Children': []
+                }]
+            }
+          ]
         )
       } else {
         reject('getRouters error')

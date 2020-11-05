@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-04 09:59:41
- * @LastEditors: your name
+ * @LastEditTime: 2020-11-05 09:19:19
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\store\getters.js
  */
@@ -20,6 +20,7 @@ const getters = {
   roles: state => state.user.roles,
   userInfo: state => state.user.userInfo,
   permission_routes: state => state.permission.routes,
-  errorLogs: state => state.errorLog.logs
+  errorLogs: state => state.errorLog.logs,
+  btns: state => state.permission.btns
 }
 export default getters

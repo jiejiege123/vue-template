@@ -1,15 +1,15 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-04 19:33:42
+ * @LastEditTime: 2020-11-05 17:22:24
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\utils\request.js
  */
 import axios from 'axios'
+import store from '@/store'
 // import { MessageBox, Message } from 'element-ui'
 import { Message } from 'element-ui'
-import store from '@/store'
 import { getToken } from '@/utils/auth'
 
 // create an axios instance
@@ -83,12 +83,23 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    console.error('err:' + error) // for debug
+    const err = error + ''
+    if (err.indexOf('403') > 0) {
+      Message({
+        message: '登录超时，请重新登录！',
+        type: 'error',
+        duration: 5 * 1000
+      })
+
+      store.dispatch('user/resetToken')
+    } else {
+      Message({
+        message: error.message,
+        type: 'error',
+        duration: 5 * 1000
+      })
+    }
     return Promise.reject(error)
   }
 )
