@@ -24,3 +24,19 @@ export function addCom(data) {
     data
   })
 }
+// 编辑公司
+export function updateCom(data) {
+  return request({
+    url: '/api/company/update',
+    method: 'post',
+    data
+  })
+}
+// 删除公司
+export function delCom(params) {
+  return request({
+    url: '/api/company/deltet',
+    method: 'get',
+    params
+  })
+}

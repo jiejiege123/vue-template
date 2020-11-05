@@ -1,6 +1,7 @@
 <template>
   <div class="dashboard-container">
     <component :is="currentRole" />
+    <el-input v-model="input" />
   </div>
 </template>
 
@@ -14,7 +15,8 @@ export default {
   components: { adminDashboard, editorDashboard },
   data() {
     return {
-      currentRole: 'adminDashboard'
+      currentRole: 'adminDashboard',
+      input: ''
     }
   },
   computed: {

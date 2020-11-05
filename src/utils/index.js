@@ -371,3 +371,16 @@ export function  randomPassword(size) {
   }
   return createPassword
 }
+
+/**
+ * @description: 验证手机号
+ * @param {type}
+ * @return:
+ */
+export function checkPhone(phone) {
+  if (!(/^1[3456789]\d{9}$/.test(phone)) && !(/0\d{2,3}-\d{7,8}/.test(phone))) {
+    return false
+  } else {
+    return true
+  }
+}

@@ -124,7 +124,7 @@ const actions = {
               'Children': [
                 {
                   'Id': '1151029042405838848',
-                  'Name': '企业管理',
+                  'Name': '单位管理',
                   'ParentId': '975247111765495809',
                   'Url': 'Companys',
                   'Type': 1,
@@ -132,9 +132,9 @@ const actions = {
                   'Children': [],
                   'Btns': ['Company01', 'Company02', 'Company03']
                 }, {
-                  'Id': '975247111769690113',
+                  'Id': '975247111769690115',
                   'Name': '用户管理',
-                  'ParentId': '976092881406267392',
+                  'ParentId': '975247111765495809',
                   'Type': 1,
                   'Url': 'User',
                   'Icon': null,
@@ -143,7 +143,7 @@ const actions = {
                 }, {
                   'Id': '975247111769690114',
                   'Name': '角色管理',
-                  'ParentId': '976094018385612800',
+                  'ParentId': '975247111765495809',
                   'Type': 1,
                   'Url': 'Role',
                   'Icon': null,
@@ -152,7 +152,7 @@ const actions = {
                 }, {
                   'Id': '975247111769690117',
                   'Name': '权限管理',
-                  'ParentId': '976094340222947328',
+                  'ParentId': '975247111765495809',
                   'Type': 1,
                   'Url': 'Permission',
                   'Icon': null,

@@ -17,6 +17,7 @@
         @click='addRow') 新增
       el-button(
         plain
+        v-if="showBatchDel"
         v-has="has02"
         type="danger"
         size="small"
@@ -75,6 +76,7 @@
           el-button(
             v-if="showDel"
             v-has="has02"
+            :disabled="scope.row.delDisabled"
             plain
             type="danger"
             @click.stop="deleted(scope.row)"
@@ -276,6 +278,10 @@ export default {
     disOperated: {
       type: Boolean,
       default: false
+    },
+    showBatchDel: {
+      type: Boolean,
+      default: true
     },
     showSelection: {
       type: Boolean,
@@ -541,7 +547,7 @@ export default {
       })
     },
     submitForm() {
-      this.$emit('onSubmitForm', this.ruleForm, (ok) => {
+      this.$emit('onSubmitForm', this.ruleForm, this.dialogType, (ok) => {
         if (ok) {
           this.visible = false
         } else { return }

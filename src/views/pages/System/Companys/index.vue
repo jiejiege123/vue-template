@@ -25,29 +25,33 @@
     has02="Company02"
     has03="Company03"
     :formStyle={width: '220px'}
+    :showSelection="false"
+    :showBatchDel="false"
     @onHandleCurrentChange="handleCurrentChange"
     @onHandleSizeChange="handleSizeChange"
     @onSubmitForm="onSubmitForm"
+    @onDeleted="onDeleted"
     :formLoading="formLoading"
     :formRules="formRules"
     :tableData='tableData'
     :columns="tableColumn")
     template(v-slot:operation="{row}")
       el-button(
-        plain
-        @click.stop="viewRow(row)"
+        @click.stop="goUser(row)"
         size="small") 用户
       el-button(
-        plain
         @click.stop="viewRow(row)"
         size="small") 角色
+  router-view
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getCompany, addCom } from '@/api/com'
+import { getCompany, addCom, delCom, updateCom } from '@/api/com'
+import { checkPhone } from '@/utils/index'
+import { mapGetters } from 'vuex'
 export default {
-  name: 'Index',
+  name: 'Companys',
   components: {
     Query,
     EditTableForm
@@ -56,10 +60,20 @@ export default {
 
   },
   data() {
+    var isPhone = (rule, value, callback) => {
+      if (value) {
+        if (!checkPhone(value)) {
+          callback(new Error('请输入正确的电话号码'))
+        } else {
+          callback()
+        }
+      }
+    }
     return {
       /**
        * 查询
        */
+      input: '',
       queryList: [
         {
           label: '单位名称',
@@ -189,7 +203,7 @@ export default {
         ],
         comType: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
         showIndex: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
-        comtel: []
+        comtel: [{ validator: isPhone, trigger: 'blur' }]
       },
       dics: {
         pcode: [],
@@ -215,6 +229,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['userInfo'])
   },
   created() {
     this.onSearch({ com: '' })
@@ -247,6 +262,12 @@ export default {
         this.$nextTick(() => {
           this.loading = false
         })
+        const data = res.Data.Models
+        data.forEach(n => {
+          if (n.comcode === this.userInfo.comcode) {
+            n.delDisabled = true
+          }
+        })
         this.tableData = res.Data.Models
         this.$set(this.dics, 'pcode', res.Data.Models)
         this.total = res.Data.TotalCount
@@ -255,12 +276,18 @@ export default {
         this.loading = false
       })
     },
-    onSubmitForm(ruleForm, cb) {
+    onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
-      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType).label
-      params.pcodename = this.tableData.find(n => n.comcode === params.pcode).comname
+      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType) ? this.dics.comType.find(n => n.value === params.comType).label : ''
+      params.pcodename = this.tableData.find(n => n.comcode === params.pcode) ? this.tableData.find(n => n.comcode === params.pcode).comname : ''
       this.formLoading = true
-      addCom(params).then(res => {
+      let methods
+      if (dialogType === 'add') {
+        methods = addCom
+      } else {
+        methods = updateCom
+      }
+      methods(params).then(res => {
         console.log(res)
         this.formLoading = true
         cb(true)
@@ -268,6 +295,25 @@ export default {
         this.$message.error(err)
         this.formLoading = false
       })
+    },
+    onDeleted(row) {
+      const params = {
+        cid: row.id
+      }
+      delCom(params).then(res => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+        this.getDataList()
+      }).catch(err => {
+        console.error(err)
+      })
+    },
+    goUser(row) {
+      // this.$router.push(
+      //   { path: 'System/Companys/Companys/User' }
+      // )
     }
   }
 }

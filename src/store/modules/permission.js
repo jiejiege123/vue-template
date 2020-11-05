@@ -8,7 +8,6 @@
  */
 import { constantRoutes } from '@/router'
 import Layout from '@/layout'
-
 /**
  * Use meta.role to determine if the current user has permission
  * @param roles
@@ -88,22 +87,23 @@ const actions = {
           } else {
             path = fatherUrl + `/${n.Url}`
             let comp
-            try { comp = require(`@/views/pages${fatherUrl}/${n.Url}/index.vue`) } catch (e) {
+            try { comp = require(`@/views/pages${path}/index.vue`) } catch (e) {
               console.log(e)
             }
             if (comp && comp.default) {
-              component = (res) => require([`@/views/pages${fatherUrl}/${n.Url}/index.vue`], res)
+              component = (res) => require([`@/views/pages${path}/index.vue`], res)
             } else {
               component = view404
             }
           }
+
           pushAraay.push({
             path: path,
             hidden: false, // 侧边栏隐藏
-            redirect: n.Children[0] ? `${fatherUrl}/${n.Url}/${n.Children[0].Url}` : '',
+            redirect: n.Children[0] ? `${path}/${n.Children[0].Url}` : '',
             alwaysShow: false, // 总是显示根路由
             component: component,
-            name: n.Id, // 必填 且不重名
+            name: n.Url, // 必填 且不重名
             meta: {
               title: n.Name,
               icon: n.Icon,
