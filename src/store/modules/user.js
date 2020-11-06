@@ -129,36 +129,41 @@ const actions = {
                   'Url': 'Companys',
                   'Type': 1,
                   'Icon': null,
-                  'Children': [],
+                  'Children': [
+                    {
+                      'Id': '975247111769690115',
+                      'Name': '用户管理',
+                      'ParentId': '1151029042405838848',
+                      'Type': 1,
+                      'Url': 'User',
+                      'Icon': null,
+                      'SortCode': 20,
+                      'Children': [],
+                      'Btns': ['User01', 'User02', 'User03']
+                    }, {
+                      'Id': '975247111769690114',
+                      'Name': '角色管理',
+                      'ParentId': '1151029042405838848',
+                      'Type': 1,
+                      'Url': 'Role',
+                      'Icon': null,
+                      'SortCode': 33,
+                      'Children': [],
+                      'Btns': ['Role01', 'Role02', 'Role03']
+                    }
+                  ],
                   'Btns': ['Company01', 'Company02', 'Company03']
                 }, {
                   'Id': '975247111769690115',
-                  'Name': '用户管理',
+                  'Name': '其他管理',
                   'ParentId': '975247111765495809',
                   'Type': 1,
-                  'Url': 'User',
+                  'Url': 'Other',
                   'Icon': null,
                   'SortCode': 20,
                   'Children': []
-                }, {
-                  'Id': '975247111769690114',
-                  'Name': '角色管理',
-                  'ParentId': '975247111765495809',
-                  'Type': 1,
-                  'Url': 'Role',
-                  'Icon': null,
-                  'SortCode': 33,
-                  'Children': []
-                }, {
-                  'Id': '975247111769690117',
-                  'Name': '权限管理',
-                  'ParentId': '975247111765495809',
-                  'Type': 1,
-                  'Url': 'Permission',
-                  'Icon': null,
-                  'SortCode': 39,
-                  'Children': []
-                }]
+                }
+              ]
             }
           ]
         )

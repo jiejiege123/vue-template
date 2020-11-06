@@ -1,55 +1,56 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-05 17:45:10
+ * @LastEditTime: 2020-11-06 19:53:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
 -->
 <template lang="pug">
-.content.layout-column
-  .header.layout-row__between
-    .query
-      Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
-  edit-table-form(
-    :loading='loading'
-    :inline="true"
-    operateWidth='360'
-    :hasPages="false"
-    :currentPage="currentPage"
-    :total="total"
-    :pageSize="pageSize"
-    :dics="dics"
-    dialogWidth='800px'
-    has01="Company01"
-    has02="Company02"
-    has03="Company03"
-    :formStyle={width: '220px'}
-    :showSelection="false"
-    :showBatchDel="false"
-    @onHandleCurrentChange="handleCurrentChange"
-    @onHandleSizeChange="handleSizeChange"
-    @onSubmitForm="onSubmitForm"
-    @onDeleted="onDeleted"
-    :formLoading="formLoading"
-    :formRules="formRules"
-    :tableData='tableData'
-    :columns="tableColumn")
-    template(v-slot:operation="{row}")
-      el-button(
-        @click.stop="goUser(row)"
-        size="small") 用户
-      el-button(
-        @click.stop="viewRow(row)"
-        size="small") 角色
-  router-view
+div(style="width:100%; height:100%")
+  .content.layout-column(v-if="showss")
+    .header.layout-row__between
+      .query
+        Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
+    edit-table-form(
+      :loading='loading'
+      :inline="true"
+      operateWidth='360'
+      :hasPages="false"
+      :currentPage="currentPage"
+      :total="total"
+      :pageSize="pageSize"
+      :dics="dics"
+      dialogWidth='800px'
+      has01="Company01"
+      has02="Company02"
+      has03="Company03"
+      :formStyle={width: '220px'}
+      :showSelection="false"
+      :showBatchDel="false"
+      @onHandleCurrentChange="handleCurrentChange"
+      @onHandleSizeChange="handleSizeChange"
+      @onSubmitForm="onSubmitForm"
+      @onDeleted="onDeleted"
+      :formLoading="formLoading"
+      :formRules="formRules"
+      :tableData='tableData'
+      :columns="tableColumn")
+      template(v-slot:operation="{row}")
+        el-button(
+          @click.stop="goUser(row)"
+          size="small") 用户
+        el-button(
+          @click.stop="viewRow(row)"
+          size="small") 角色
+  router-view(v-else)
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getCompany, addCom, delCom, updateCom } from '@/api/com'
 import { checkPhone } from '@/utils/index'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState, mapMutations } from 'vuex'
 export default {
   name: 'Companys',
   components: {
@@ -225,18 +226,22 @@ export default {
       currentPage: 1,
       pageSize: 9000,
       total: 0,
-      formLoading: false
+      formLoading: false,
+      showss: true
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    ...mapState('showSup', ['showComSup'])
   },
   created() {
     this.onSearch({ com: '' })
+    this.setShowComSup(false)
   },
   mounted() {
   },
   methods: {
+    ...mapMutations('showSup', ['setShowComSup']),
     handleCurrentChange(e) {
       this.currentPage = e
       this.getDataList()
@@ -311,9 +316,14 @@ export default {
       })
     },
     goUser(row) {
-      // this.$router.push(
-      //   { path: 'System/Companys/Companys/User' }
-      // )
+      this.showss = false
+      console.log(this.showss)
+      // this.showComSup = false
+      // this.setShowComSup(false)
+      // console.log(this.showComSup)
+      this.$router.push(
+        { path: this.$route.path + '/User' }
+      )
     }
   }
 }

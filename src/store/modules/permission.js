@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-05 09:56:51
+ * @LastEditTime: 2020-11-06 19:40:23
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\store\modules\permission.js
@@ -79,7 +79,7 @@ const actions = {
           if (n.Btns) {
             btns = btns.concat(n.Btns)
           }
-          let path, component
+          let path, component, hidden
           // 找到上一级的 item
           if (n.Type === 4) {
             path = `/${n.Url}`
@@ -97,10 +97,16 @@ const actions = {
             }
           }
 
+          if (n.Url === 'User' || n.Url === 'Role') {
+            hidden = true
+          } else {
+            hidden = false
+          }
+
           pushAraay.push({
             path: path,
-            hidden: false, // 侧边栏隐藏
-            redirect: n.Children[0] ? `${path}/${n.Children[0].Url}` : '',
+            hidden: hidden, // 侧边栏隐藏
+            redirect: n.Children.length === 1 ? `${path}/${n.Children[0].Url}` : '',
             alwaysShow: false, // 总是显示根路由
             component: component,
             name: n.Url, // 必填 且不重名

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-05 17:37:40
+ * @LastEditTime: 2020-11-06 16:33:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -453,11 +453,11 @@ export default {
     },
     // 上传成功
     handleFileSuccess(prop, res, file) {
-      if (res.Status === 101) {
-        this.$message.error(res.Msg)
-      } else {
-        const url = res.Data.url
+      if (res.Status === 200) {
+        const url = res.Data
         this.$set(this.ruleForm, prop, url)
+      } else {
+        this.$message.error(res.Msg)
         // this.$emit('onFileSuccess', prop, url)
       }
     },
