@@ -384,3 +384,44 @@ export function checkPhone(phone) {
     return true
   }
 }
+
+/**
+ * @description 获取两个数之间的随机数
+ * @param {Number} maxNum 最大数
+ * @param {Number} minNum 最小数
+ * @param {Number} decimalNum 如果生成的是带有小数的随机数，则指定随机数的小数点后的位数
+ */
+export function randomNum(maxNum, minNum, decimalNum) {
+  var max = 0
+  var min = 0
+  minNum <= maxNum ? (min = minNum, max = maxNum) : (min = maxNum, max = minNum)
+  switch (arguments.length) {
+    case 1:
+      return Math.floor(Math.random() * (max + 1))
+    case 2:
+      return Math.floor(Math.random() * (max - min + 1) + min)
+    case 3:
+      return (Math.random() * (max - min) + min).toFixed(decimalNum)
+    default:
+      return Math.random()
+  }
+}
+
+/**
+ * @description 嵌套数组查找符合的item
+ * @param {Array} arr 操作的数组
+ * @param {Function} fn 过滤的方法
+ * @param {Array} result 过滤的结果
+ * @param {String} children 数组嵌套的字段
+ */
+export function findItem(arr, fn, result, children) {
+  arr.forEach(item => {
+    if (item[children] && item[children].length > 0) {
+      findItem(item[children], fn, result, children)
+    } else {
+      if (fn(item)) {
+        result.push(item)
+      }
+    }
+  })
+}

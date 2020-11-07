@@ -14,6 +14,7 @@
 <script>
 import { generateTitle } from '@/utils/i18n'
 import pathToRegexp from 'path-to-regexp'
+import { findItem } from '@/utils/index'
 
 export default {
   data() {
@@ -37,14 +38,27 @@ export default {
     generateTitle,
     getBreadcrumb() {
       // only show routes with meta.title
+      // console.log(this.$router)
       let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
       const first = matched[0]
+
+      // 查找包含他的tagviews 然后放在前一个 但是在this.$router找不到 路由时需要存到 Localstorage 中
 
       if (!this.isDashboard(first)) {
         matched = [{ path: '/dashboard', meta: { title: 'dashboard' }}].concat(matched)
       }
-
+      let breadcrumbItem
+      matched.forEach(n => {
+        if (n.meta.breadcrumbItem) {
+          breadcrumbItem = n.meta.breadcrumbItem
+        }
+      })
+      if (breadcrumbItem) {
+        matched.splice(-1, 0, breadcrumbItem)
+      }
+      console.log(matched)
       this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
+      console.log(this.levelList)
     },
     isDashboard(route) {
       const name = route && route.name

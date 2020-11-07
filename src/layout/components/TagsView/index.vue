@@ -69,7 +69,11 @@ export default {
   methods: {
     generateTitle, // generateTitle by vue-i18n
     isActive(route) {
-      return route.path === this.$route.path
+      if (route.meta.activeTags) {
+        return route.path === this.$route.path || route.meta.activeTags.includes(this.$route.path)
+      } else {
+        return route.path === this.$route.path
+      }
     },
     isAffix(tag) {
       return tag.meta && tag.meta.affix

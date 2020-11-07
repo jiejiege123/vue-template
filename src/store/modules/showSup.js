@@ -12,6 +12,7 @@ const state = {
 
 const mutations = {
   setShowComSup(state, payload) {
+    localStorage.setItem('showComSup', payload)
     state.showComSup = payload
   }
 }
@@ -19,7 +20,6 @@ const mutations = {
 const actions = {
 
 }
-
 export default {
   namespaced: true,
   state,

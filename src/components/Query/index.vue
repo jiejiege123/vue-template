@@ -39,6 +39,7 @@
               i.el-icon--right(:class="[queryType?'el-icon-arrow-down':'el-icon-arrow-up']")
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'QueryTemplate',
   props: {
@@ -73,21 +74,24 @@ export default {
   computed: {
     queryShow() {
       return this.queryList.filter(item => item.queryType === this.queryType)
-    }
+    },
+    ...mapState('showSup', ['showComSup'])
+
   },
   mounted() {
-    this.$nextTick(() => {
-      this.span = this.computeSpan(that.$refs.queryRef.offsetWidth)
-      this.computeElRow()
-    })
-    const that = this
-    window.onresize = () => {
-      return (() => {
-        console.log(that.$refs.queryRef.offsetWidth)
+    if (this.showComSup) {
+      this.$nextTick(() => {
         this.span = this.computeSpan(that.$refs.queryRef.offsetWidth)
-        console.log(this.span)
         this.computeElRow()
-      })()
+      })
+      const that = this
+      window.onresize = () => {
+        return (() => {
+          console.log(that.$refs.queryRef.offsetWidth)
+          this.span = this.computeSpan(that.$refs.queryRef.offsetWidth)
+          this.computeElRow()
+        })()
+      }
     }
   },
   methods: {

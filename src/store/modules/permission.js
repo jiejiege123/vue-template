@@ -8,6 +8,8 @@
  */
 import { constantRoutes } from '@/router'
 import Layout from '@/layout'
+
+import { findItem } from '@/utils/index'
 /**
  * Use meta.role to determine if the current user has permission
  * @param roles
@@ -79,7 +81,7 @@ const actions = {
           if (n.Btns) {
             btns = btns.concat(n.Btns)
           }
-          let path, component, hidden
+          let path, component, hidden, activeMenu, noCache, noTagView, activeTags
           // 找到上一级的 item
           if (n.Type === 4) {
             path = `/${n.Url}`
@@ -96,27 +98,46 @@ const actions = {
               component = view404
             }
           }
-
+          const breadcrumbItem = []
           if (n.Url === 'User' || n.Url === 'Role') {
             hidden = true
+            activeMenu = '/System/Companys'
+            noCache = true
+            noTagView = true
+            findItem(addRoutes, item => {
+              return item.name === 'Companys'
+            }, breadcrumbItem, 'children')
           } else {
             hidden = false
+            noCache = false
+            activeMenu = ''
+            noTagView = false
+          }
+
+          if (n.Url === 'Companys') {
+            activeTags = '/System/Role,/System/User'
+          } else {
+            activeTags = ''
           }
 
           pushAraay.push({
             path: path,
             hidden: hidden, // 侧边栏隐藏
-            redirect: n.Children.length === 1 ? `${path}/${n.Children[0].Url}` : '',
+            redirect: n.Children[0] ? `${path}/${n.Children[0].Url}` : '',
             alwaysShow: false, // 总是显示根路由
             component: component,
             name: n.Url, // 必填 且不重名
+
             meta: {
+              breadcrumbItem: breadcrumbItem[0],
               title: n.Name,
               icon: n.Icon,
-              noCache: false, // 不缓存
+              noCache: noCache, // 不缓存
               breadcrumb: true, // 面包屑
               affix: false, // tags-view 固定
-              activeMenu: '' // 路由条件高亮
+              noTagView: noTagView, // tags-view 默认显示
+              activeTags: activeTags, // tags-view 不显示 的高亮tag
+              activeMenu: activeMenu // 路由条件高亮
             },
             children: []
           })
@@ -125,7 +146,9 @@ const actions = {
           }
         })
       }
+
       calleArr(routesRes, '', addRoutes)
+      localStorage.setItem('roters', addRoutes)
       commit('SET_ROUTES', addRoutes)
       commit('SET_BTNS', btns)
       resolve(state.routes)

@@ -8,7 +8,7 @@
 -->
 <template lang="pug">
 div(style="width:100%; height:100%")
-  .content.layout-column(v-if="showss")
+  .content.layout-column
     .header.layout-row__between
       .query
         Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
@@ -41,16 +41,15 @@ div(style="width:100%; height:100%")
           @click.stop="goUser(row)"
           size="small") 用户
         el-button(
-          @click.stop="viewRow(row)"
+          @click.stop="goRole(row)"
           size="small") 角色
-  router-view(v-else)
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getCompany, addCom, delCom, updateCom } from '@/api/com'
 import { checkPhone } from '@/utils/index'
-import { mapGetters, mapState, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 export default {
   name: 'Companys',
   components: {
@@ -231,17 +230,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo']),
-    ...mapState('showSup', ['showComSup'])
+    ...mapGetters(['userInfo'])
   },
   created() {
     this.onSearch({ com: '' })
-    this.setShowComSup(false)
+  },
+  activated() {
+    // 保持半缓存
   },
   mounted() {
   },
   methods: {
-    ...mapMutations('showSup', ['setShowComSup']),
     handleCurrentChange(e) {
       this.currentPage = e
       this.getDataList()
@@ -316,14 +315,14 @@ export default {
       })
     },
     goUser(row) {
-      this.showss = false
-      console.log(this.showss)
       // this.showComSup = false
-      // this.setShowComSup(false)
-      // console.log(this.showComSup)
       this.$router.push(
-        { path: this.$route.path + '/User' }
+        { path: '/System/User' }
       )
+    },
+    goRole(row) {
+      this.$router.push(
+        { path: '/System/Role' })
     }
   }
 }
