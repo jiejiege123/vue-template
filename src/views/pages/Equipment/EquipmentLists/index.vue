@@ -11,22 +11,25 @@ div(style="width:100%; height:100%")
   .content.layout-column
     .header.layout-row__between
       .query
-        Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
+        Query(:queryList="queryList"
+        :dics="dics"
+        :hasAdvQuery='true'  :btnLoading="loading" @onSearch="onSearch")
     edit-table-form(
       :loading='loading'
       :inline="true"
-      operateWidth='360'
-      :hasPages="false"
+      operateWidth='220'
+      :hasPages="true"
       :currentPage="currentPage"
       :total="total"
       :pageSize="pageSize"
       :dics="dics"
+      :showIndex="true"
       dialogWidth='800px'
       has01="Company01"
       has02="Company02"
       has03="Company03"
       :formStyle={width: '220px'}
-      :showSelection="false"
+      :showSelection="true"
       :showBatchDel="false"
       @onHandleCurrentChange="handleCurrentChange"
       @onHandleSizeChange="handleSizeChange"
@@ -36,24 +39,35 @@ div(style="width:100%; height:100%")
       :formRules="formRules"
       :tableData='tableData'
       :columns="tableColumn")
-      template(v-slot:operation="{row}")
-        el-button(
-          @click.stop="goUser(row)"
-          size="small") 用户
-        el-button(
-          @click.stop="goRole(row)"
-          size="small") 角色
+      template(v-slot:outOperate)
+        el-dropdown.ml_10()
+          el-button(type="primary" size="small")
+            | 更多菜单
+            i.el-icon-arrow-down.el-icon--right
+          el-dropdown-menu.more-opeareat(slot="dropdown")
+            el-dropdown-item(style="width:120px") 修改设备
+            el-dropdown-item(style="width:120px") 删除设备
+            el-dropdown-item(style="width:120px") 设备过户
+            el-dropdown-item(style="width:120px") 批量导入
+            el-dropdown-item(style="width:120px") 导出设备
+            el-dropdown-item(style="width:120px") 事件记录
+            el-dropdown-item(style="width:120px") 故障记录
+            el-dropdown-item(style="width:120px") 设备日志
+            el-dropdown-item(style="width:120px") 打印编码
+            el-dropdown-item(style="width:120px") 设为个人模式
+            el-dropdown-item(style="width:120px") 设为工程模式
+            el-dropdown-item(style="width:120px") 状态复位
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getCompany, addCom, delCom, updateCom } from '@/api/com'
+import { getEquiList, addCom, delCom, updateCom } from '@/api/equipment.js'
 import { getDicsByName } from '@/api/commom'
 
 import { checkPhone } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
-  name: 'Companys',
+  name: 'EquipmentLists',
   components: {
     Query,
     EditTableForm
@@ -78,10 +92,91 @@ export default {
       input: '',
       queryList: [
         {
-          label: '单位名称',
-          prop: 'com',
-          holder: '请输入单位名称',
+          label: 'IMEI',
+          prop: 'IMEI',
+          holder: '请输入IMEI号码',
           queryType: false
+        },
+        {
+          label: '所属单位',
+          prop: 'comcode',
+          holder: '请选择公司',
+          type: 'select',
+          queryType: true
+        },
+        {
+          label: '单位限制',
+          prop: 'CompanyLimit',
+          type: 'select',
+          default: 0,
+          queryType: true
+        },
+        {
+          label: '批次',
+          prop: 'piciid',
+          holder: '请选择批次',
+          type: 'select',
+          queryType: true
+        },
+        {
+          label: '模式',
+          default: '',
+          prop: 'mode',
+          holder: '请选择模式',
+          type: 'select',
+          queryType: true
+        },
+        {
+          label: '类型',
+          prop: 'devicetype',
+          holder: '请选择类型',
+          type: 'select',
+          queryType: true
+        },
+        {
+          label: '设备型号',
+          prop: 'xinhaoid',
+          holder: '请选择公司',
+          type: 'select',
+          queryType: true
+        },
+        {
+          label: '建筑物',
+          prop: 'jzwid',
+          holder: '请选择公司',
+          type: 'select',
+          queryType: true
+        },
+        {
+          label: '安装点',
+          prop: 'azdid',
+          holder: '请选择公司',
+          type: 'select',
+          queryType: true
+        },
+        {
+          label: '设备状态',
+          prop: 'devicevalue',
+          default: '',
+          holder: '请选择公司',
+          type: 'select',
+          queryType: true
+        },
+        {
+          label: '绑定状态',
+          prop: 'bangding',
+          holder: '请选择公司',
+          type: 'select',
+          default: '',
+          queryType: true
+        },
+        {
+          label: '库存状态',
+          prop: 'kcvalue',
+          holder: '请选择公司',
+          type: 'select',
+          default: '',
+          queryType: true
         }
       ],
       query: {},
@@ -89,112 +184,45 @@ export default {
        * 表格
        */
       loading: false,
-      tableData: [],
+      tableData: [
+        {
+
+        }
+      ],
       tableColumn: [
         {
-          prop: 'comcode',
-          label: '单位ID',
-          width: 120,
-          tableOnly: true
+          label: 'IMEI',
+          prop: 'IMEI'
         },
         {
-          prop: 'pcode',
-          label: '上级单位',
-          type: 'cascader',
-          formOnly: true,
-          showAllLevels: false,
-          props: {
-            label: 'comname',
-            value: 'comcode',
-            emitPath: false,
-            checkStrictly: true
-          }
-        },
-        // {
-        //   prop: 'pcodename',
-        //   label: '上级单位',
-        //   tableOnly: true
-        // },
-        {
+          label: '所属单位',
           prop: 'comname',
-          label: '单位名称',
-          editAble: true,
-          minWidth: 300
-        },
-        {
-          prop: 'comType',
-          label: '单位属性',
-          width: 130,
-          formOnly: true,
-          type: 'select'
-        },
-        {
-          prop: 'comTypeZh',
-          label: '单位属性',
-          width: 130,
-          tableOnly: true
-        },
-        {
-          prop: 'subNum',
-          label: '下级数量',
-          width: 80,
-          tableOnly: true
-        },
-        {
-          prop: 'showIndex',
-          label: '显示排序',
-          width: 80,
-          default: '0',
-          inputFilter: "value=value.replace(/[^\\d]/g,'')",
-          editAble: true
-        },
-        {
-          prop: 'address',
-          label: '单位地址',
-          formOnly: true,
-          editAble: true,
-          online: true,
-          formStyle: {
-            width: '600px'
-          }
-        },
-        {
-          prop: 'comtel',
-          label: '单位电话',
-          formOnly: true,
-          editAble: true
-        },
-        {
-          prop: 'fzr',
-          label: '负责人',
-          formOnly: true,
-          editAble: true
-        },
-        {
-          prop: 'rmb',
-          label: '余额',
-          formOnly: true,
-          addDisable: true
+          holder: '请选择公司'
         },
 
         {
-          prop: 'comtitle',
-          label: '网站名称',
-          formOnly: true,
-          editAble: true
+          label: '批次',
+          prop: 'picizh'
         },
         {
-          prop: 'comlogo',
-          label: '网站logo',
-          formOnly: true,
-          editAble: true,
-          type: 'img'
+          label: '模式',
+          prop: 'modezh'
         },
         {
-          prop: 'addtime',
-          label: '创建时间',
-          width: 160,
-          tableOnly: true
+          label: '类型',
+          prop: 'devicetypezh'
+        },
+        {
+          label: '设备型号',
+          prop: 'xinhaozh'
+        },
+        {
+          label: '设备状态',
+          prop: 'devicevaluezh'
+        },
+        {
+          label: '在线状态',
+          prop: 'onlinevaluezh'
         }
       ],
       formRules: {
@@ -208,21 +236,17 @@ export default {
         comtel: [{ validator: isPhone, trigger: 'blur' }]
       },
       dics: {
-        pcode: [],
-        comType: [
-          // {
-          //   value: 1,
-          //   label: '进销商'
-          // },
-          // {
-          //   value: 2,
-          //   label: '工程商'
-          // },
-          // {
-          //   value: 3,
-          //   label: '业主单位'
-          // }
+        CompanyLimit: [
+          {
+            value: 0,
+            label: '包含下级单位设备'
+          },
+          {
+            value: 1,
+            label: '仅本单位设备'
+          }
         ]
+
       },
       currentPage: 1,
       pageSize: 9000,
@@ -235,13 +259,13 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.onSearch({ com: '' })
+    // this.onSearch({ com: '' })
     this.getDicsList()
   },
   activated() {
     // 保持半缓存
-    this.onSearch({ com: '' })
-    this.getDicsList()
+    // this.onSearch({ com: '' })
+    // this.getDicsList()
   },
   mounted() {
   },
@@ -272,7 +296,7 @@ export default {
           n.label = n.diczh
           switch (n.groupzh) {
             case '公司类型':
-              this.dics.comType.push(n)
+              // this.dics.comType.push(n)
               break
             default:
               break
@@ -287,7 +311,7 @@ export default {
         Keywords: this.query.com
       }
       this.loading = true
-      getCompany(params).then(res => {
+      getEquiList(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
@@ -364,6 +388,7 @@ export default {
   padding: 20px;
   box-sizing: border-box;
   height: calc(100vh - 84px);
+  overflow-y: auto;
 }
 .query{
  width: 100%;

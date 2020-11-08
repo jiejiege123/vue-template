@@ -19,8 +19,8 @@ label {
 
 html {
   height: 100%;
-  -moz-box-sizing: border-box;
-       box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 #app {
@@ -30,8 +30,8 @@ html {
 *,
 *:before,
 *:after {
-  -moz-box-sizing: inherit;
-       box-sizing: inherit;
+  -webkit-box-sizing: inherit;
+          box-sizing: inherit;
 }
 
 .no-padding {
@@ -148,11 +148,10 @@ aside {
   padding-right: 20px;
   -webkit-transition: 600ms ease position;
   -o-transition: 600ms ease position;
-  -moz-transition: 600ms ease position;
   transition: 600ms ease position;
   background: -webkit-linear-gradient(left, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
-  background: -moz-linear-gradient(left, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
   background: -o-linear-gradient(left, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
+  background: -webkit-gradient(linear, left top, right top, from(rgba(32, 182, 249, 1)), color-stop(0%, rgba(32, 182, 249, 1)), color-stop(100%, rgba(33, 120, 241, 1)), to(rgba(33, 120, 241, 1)));
   background: linear-gradient(90deg, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
 
   .subtitle {
@@ -212,4 +211,19 @@ aside {
       color: #606266;
     }
   }
+}
+
+.more-opeareat{
+  width: 250px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+
 }

@@ -113,59 +113,127 @@ const actions = {
   getRouters({ commit }, roles) {
     return new Promise((resolve, reject) => {
       if (roles) {
-        resolve(
-          [
-            {
-              'Id': '975247111765495809',
-              'Name': '系统管理',
-              'Url': 'System',
-              'Type': 4,
-              'Icon': 'sys',
-              'Children': [
-                {
-                  'Id': '1151029042405838848',
-                  'Name': '单位管理',
-                  'ParentId': '975247111765495809',
-                  'Url': 'Companys',
-                  'Type': 1,
-                  'Icon': null,
-                  'Children': [],
-                  'Btns': ['Company01', 'Company02', 'Company03']
-                },
-                {
-                  'Id': '975247111769690115',
-                  'Name': '用户列表',
-                  'ParentId': '975247111765495809',
-                  'Type': 1,
-                  'Url': 'User',
-                  'Icon': null,
-                  'SortCode': 20,
-                  'Children': [],
-                  'Btns': ['User01', 'User02', 'User03']
-                }, {
-                  'Id': '975247111769690114',
-                  'Name': '角色管理',
-                  'ParentId': '975247111765495809',
-                  'Type': 1,
-                  'Url': 'Role',
-                  'Icon': null,
-                  'SortCode': 33,
-                  'Children': [],
-                  'Btns': ['Role01', 'Role02', 'Role03']
-                }, {
-                  'Id': '975247111769690115',
-                  'Name': '其他管理',
-                  'ParentId': '975247111765495809',
-                  'Type': 1,
-                  'Url': 'Other',
-                  'Icon': null,
-                  'SortCode': 20,
-                  'Children': []
-                }
-              ]
-            }
-          ]
-        )
+        const router = [
+          {
+            'Id': '975247111765495809',
+            'Name': '系统管理',
+            'Url': 'System',
+            'Type': 4,
+            'Icon': 'sys',
+            'Children': [
+              {
+                'Id': '1151029042405838848',
+                'Name': '单位管理',
+                'ParentId': '975247111765495809',
+                'Url': 'Companys',
+                'Type': 1,
+                'Icon': null,
+                'Children': [
+                  {
+                    'Id': '1251029042405838848',
+                    'Name': '添加',
+                    'ParentId': '1151029042405838848',
+                    'Url': 'Company01',
+                    'Type': 3,
+                    'Icon': null
+                  },
+                  {
+                    'Id': '1351029042405838848',
+                    'Name': '删除',
+                    'ParentId': '1151029042405838848',
+                    'Url': 'Company02',
+                    'Type': 3,
+                    'Icon': null
+                  },
+                  {
+                    'Id': '1451029042405838848',
+                    'Name': '修改',
+                    'ParentId': '1151029042405838848',
+                    'Url': 'Company03',
+                    'Type': 3,
+                    'Icon': null
+                  }
+                ],
+                'Btns': ['Company01', 'Company02', 'Company03']
+              },
+              {
+                'Id': '975247111769690115',
+                'Name': '用户列表',
+                'ParentId': '975247111765495809',
+                'Type': 1,
+                'Url': 'User',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['User01', 'User02', 'User03']
+              }, {
+                'Id': '975247111769690114',
+                'Name': '角色管理',
+                'ParentId': '975247111765495809',
+                'Type': 1,
+                'Url': 'Role',
+                'Icon': null,
+                'SortCode': 33,
+                'Children': [],
+                'Btns': ['Role01', 'Role02', 'Role03']
+              },
+              // {
+              //   'Id': '975247111769690116',
+              //   'Name': '权限列表',
+              //   'ParentId': '975247111765495809',
+              //   'Type': 1,
+              //   'Url': 'Permission',
+              //   'Icon': null,
+              //   'SortCode': 33,
+              //   'Children': [],
+              //   'Btns': ['Permission01', 'Permission02', 'Permission03']
+              // },
+              {
+                'Id': '97115247111769690115',
+                'Name': '其他管理',
+                'ParentId': '975247111765495809',
+                'Type': 1,
+                'Url': 'Other',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': []
+              }
+            ]
+          },
+          {
+            'Id': '975247111765495811',
+            'Name': '设备管理',
+            'Url': 'Equipment',
+            'Type': 4,
+            'Icon': 'shebei',
+            'Children': [
+              {
+                'Id': '975247111769690112',
+                'Name': '设备列表',
+                'ParentId': '975247111765495811',
+                'Url': 'EquipmentLists',
+                'Type': 1,
+                'Icon': null,
+                'Children': [],
+                'Btns': ['EquipmentLists01', 'EquipmentLists02', 'EquipmentLists03']
+              },
+              {
+                'Id': '975247111769690113',
+                'Name': '设备详情',
+                'ParentId': '975247111765495811',
+                'Type': 1,
+                'Url': 'EquipmentItem',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['EquipmentItem01', 'EquipmentItem02', 'EquipmentItem03']
+              }
+            ]
+
+          }
+        ]
+        resolve(router)
+        localStorage.setItem('routers', JSON.stringify(router))
       } else {
         reject('getRouters error')
       }

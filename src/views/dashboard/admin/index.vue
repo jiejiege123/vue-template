@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-editor-container">
-    123
+    <ImgCropper>
     <!-- <github-corner class="github-corner" />
 
     <panel-group @handleSetLineChartData="handleSetLineChartData" />
@@ -38,10 +38,11 @@
         <box-card />
       </el-col>
     </el-row> -->
-  </div>
+    </imgcropper></div>
 </template>
 
 <script>
+import ImgCropper from '@/components/ImgCropper'
 // import GithubCorner from '@/components/GithubCorner'
 // import PanelGroup from './components/PanelGroup'
 // import LineChart from './components/LineChart'
@@ -74,6 +75,7 @@ const lineChartData = {
 export default {
   name: 'DashboardAdmin',
   components: {
+    ImgCropper
     // GithubCorner,
     // PanelGroup,
     // LineChart,

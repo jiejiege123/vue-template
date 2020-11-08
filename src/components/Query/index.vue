@@ -1,9 +1,9 @@
 <template lang="pug">
   div.layout-row__between.query-laywarp(ref="queryRef")
-    el-row.width100(:gutter="10")
+    el-row.width100(:gutter="10" v-if="spaceBetween")
       el-col.query-item(v-for="(item,index) in queryShow" :key="index" :span="span" )
         div.layout-row.align-center.mb_10(v-if="item.queryType === queryType")
-          span(:style="{width: width, textAlign:'right'}" ) {{item.label}}：
+          span.span-style(:style="{width: width, textAlign:'right'}" ) {{item.label}}：
           el-select(
             v-if="item.type === 'select'"
             v-model="query[item.prop]"
@@ -23,8 +23,9 @@
             :placeholder="item.holder"
             size="small"
             clearable)
+      //- 干掉分开的东西 免得不方便
       el-col(:span="span" :offset="queryHandleOffset")
-        .layout-row.align-center.mb_10(style="text-align: right;justify-content: flex-end;")
+        .layout-row.align-center.mb_10(style="text-align: right;justify-content: flex-start;")
           el-button(
             size="small"
             @click='reset') 重置
@@ -37,6 +38,44 @@
             span.el-dropdown-link
               | {{queryType?'通用查询':'高级查询'}}
               i.el-icon--right(:class="[queryType?'el-icon-arrow-down':'el-icon-arrow-up']")
+    .width100.layout-row.query-laywarp(v-else)
+      .query-item(v-for="(item,index) in queryShow" :key="index")
+        div.layout-row.align-center.mb_10(v-if="item.queryType === queryType")
+          span.span-style(:style="{width: width, textAlign:'right'}" ) {{item.label}}：
+          el-select.mr_15(
+            v-if="item.type === 'select'"
+            v-model="query[item.prop]"
+            :placeholder="item.holder"
+            filterable
+            style="width:200px"
+            size="small"
+            clearable)
+            el-option(
+              v-for="(list,index) in dics[item.prop]"
+              :key="index"
+              :label="list.label"
+              :value="list.value")
+          el-input.mr_15(
+            v-else
+            style="width:200px"
+            v-model="query[item.prop]"
+            :placeholder="item.holder"
+            size="small"
+            clearable)
+      //- 干掉分开的东西 免得不方便
+      .layout-row.align-center.mb_10(style="text-align: right;justify-content: flex-start;")
+        el-button(
+          size="small"
+          @click='reset') 重置
+        el-button(
+          :loading="btnLoading"
+          type="primary"
+          size="small"
+          @click='search') 查询
+        div.ml_10(@click="queryTypeChange" v-if="hasAdvQuery")
+          span.el-dropdown-link
+            | {{queryType?'通用查询':'高级查询'}}
+            i.el-icon--right(:class="[queryType?'el-icon-arrow-down':'el-icon-arrow-up']")
 </template>
 <script>
 import { mapState } from 'vuex'
@@ -49,9 +88,19 @@ export default {
         return []
       }
     },
+    dics: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
     width: {
       type: String,
-      default: '120px'
+      default: '80px'
+    },
+    spaceBetween: {
+      type: Boolean,
+      default: false
     },
     btnLoading: {
       type: Boolean,
@@ -76,7 +125,18 @@ export default {
       return this.queryList.filter(item => item.queryType === this.queryType)
     },
     ...mapState('showSup', ['showComSup'])
-
+  },
+  watch: {
+    queryList: {
+      handler(newVal) {
+        newVal.forEach(n => {
+          if (n.default !== undefined) {
+            this.$set(this.query, n.prop, n.default)
+          }
+        })
+      },
+      immediate: true
+    }
   },
   mounted() {
     if (this.showComSup) {

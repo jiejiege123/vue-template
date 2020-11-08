@@ -7,9 +7,8 @@
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
 -->
 <template lang="pug">
-  .table-warp.flex1.layout-column
+  .table-warp.flex1.layout-column(v-loading="loading")
     .operate(v-if="hasOutOperat")
-      slot(name="outOperate")
       el-button(
         v-has="has01"
         type="primary"
@@ -23,8 +22,9 @@
         size="small"
         :disabled="batchDelDisAble"
         :deleted="deleted") 删除
+      slot(name="outOperate")
+
     el-table.flex1(
-      v-loading="loading"
       :data='tableData'
       style='width: 100%'
       :header-cell-style='headerStyle'
@@ -56,7 +56,8 @@
             v-else-if="item.type==='img'"
             :src="scope.row[item.prop] | filterImg"
             style="width:40px;height:40px;cursor: pointer")
-          span {{scope.row[item.prop]}}
+          span(v-else-if="item.filter") {{dics[item.prop].find(n => n.value === scope.row[item.prop]).label}}
+          span(v-else) {{scope.row[item.prop]}}
       el-table-column(label="操作" align="center" :width="operateWidth" fixed="right" v-if="!disOperated")
         template(slot-scope='scope')
           slot(name="operation" :row="scope.row")
@@ -118,16 +119,16 @@
             div.width100(:style="formStyle")
               el-input(
                 :key='passwordType'
+                autocomplete="new-password"
                 ref='password'
                 v-model='ruleForm[item.prop]'
                 :type='passwordType'
                 :placeholder="item.holder"
                 name='password'
-                tabindex='2'
-                auto-complete='on')
+                tabindex='2')
               span.show-pwd(@click='showPwd')
                 svg-icon(:icon-class="passwordType === 'password' ? 'eye' : 'eye-open'")
-              el-button(type='success', @click="createdPwd" size="small" style='margin-left:15px') 随机生成
+              el-button(v-if="1 === 2" type='success', @click="createdPwd" size="small" style='margin-left:15px') 随机生成
 
           el-form-item(
             v-else
@@ -139,6 +140,9 @@
               :placeholder="item.holder"
               :style="formStyle"
               filterable
+              :multiple="item.multiple"
+              :ref="item.prop"
+              @focus="selectFocus($event, item.prop)"
               )
               el-option(
                 v-for="(list, index) in dics[item.prop]"
@@ -204,6 +208,7 @@
               :limit='1')
               el-button(size="small" type="primary") 点击上传
               span(slot="tip" style='font-size:12px')  只能上传一个文件
+            ImgCropper(v-else-if="item.type === 'imgCut'" @getUrl="getImgCutUrl($event, item.prop)")
             el-input(
               v-else
               v-model='ruleForm[item.prop]'
@@ -211,16 +216,21 @@
               :oninput="item.inputFilter"
               :placeholder="item.holder"
               )
-        el-form-item.dia-footer
+        el-form-item.dia-footer(v-if="dialogType !== 'view'")
           el-button(@click="closeDialog" size="small") 取消
           el-button(type='primary', @click="submitForm('ruleForm')" size="small") 提交
 </template>
 <script>
 import { randomPassword } from '@/utils'
 import { getToken } from '@/utils/auth'
+import ImgCropper from '@/components/ImgCropper'
 
 export default {
   name: 'EditTableForm',
+  components: {
+    ImgCropper
+
+  },
   filters: {
     filterImg: (val) => {
       if (val) {
@@ -262,8 +272,10 @@ export default {
       }
     },
     cellClassName: {
-      type: String || Function,
-      default: ''
+      type: Function,
+      default() {
+        return function() {}
+      }
     },
     columns: {
       type: Array,
@@ -552,6 +564,19 @@ export default {
           this.visible = false
         } else { return }
       })
+    },
+    getImgCutUrl(url, prop) {
+      this.$set(this.ruleForm, prop, url)
+    },
+    selectFocus(e, prop) {
+      const cb = () => {
+        this.$refs.PermissionIds[0].blur()
+      }
+      this.$emit('selectFocus', prop, this.ruleForm, cb)
+    },
+    // 权限专用
+    setPermissionIds(ids) {
+      this.$set(this.ruleForm, 'PermissionIds', ids)
     }
   }
 }
@@ -571,7 +596,8 @@ export default {
 // 表单
 .show-pwd {
   position: absolute;
-  left: 170px;
+  // left: 170px;
+  right: 50px;
   top: 0px;
   font-size: 16px;
   color: #C0C4CC;
@@ -646,6 +672,7 @@ export default {
   ::v-deep .el-dialog__body{
     height: calc(100vh - 200px);
     overflow-y: auto;
+    padding-top: 10px;
   }
 }
 .default-input{

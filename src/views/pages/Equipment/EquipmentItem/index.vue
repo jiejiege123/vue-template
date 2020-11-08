@@ -58,7 +58,7 @@ import { getDicsByName } from '@/api/commom'
 import { checkPhone } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
-  name: 'User',
+  name: 'EquipmentItem',
   components: {
     Query,
     EditTableForm

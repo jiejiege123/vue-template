@@ -8,6 +8,16 @@
  */
 import request from '@/utils/request'
 
+// 图片上传
+export function uploadImage(data) {
+  return request({
+    url: '/api/common/photo/upload/single',
+    method: 'post',
+    data,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
 // 根据值查询字典
 /**
  *

@@ -78,76 +78,89 @@ const actions = {
       // 应该使用递归来写
       function calleArr(array, fatherUrl, pushAraay) {
         array.forEach((n, index) => {
-          if (n.Btns) {
-            btns = btns.concat(n.Btns)
-          }
-          let path, component, hidden, activeMenu, noCache, noTagView, activeTags
-          // 找到上一级的 item
-          if (n.Type === 4) {
-            path = `/${n.Url}`
-            component = Layout
-          } else {
-            path = fatherUrl + `/${n.Url}`
-            let comp
-            try { comp = require(`@/views/pages${path}/index.vue`) } catch (e) {
-              console.log(e)
+          if (n.Type === 4 || n.Type === 1) {
+            if (n.Btns) {
+              btns = btns.concat(n.Btns)
             }
-            if (comp && comp.default) {
-              component = (res) => require([`@/views/pages${path}/index.vue`], res)
+            let path, component, hidden, activeMenu, noCache, noTagView, activeTags
+            // 找到上一级的 item
+            if (n.Type === 4) {
+              path = `/${n.Url}`
+              component = Layout
             } else {
-              component = view404
+              path = fatherUrl + `/${n.Url}`
+              let comp
+              try { comp = require(`@/views/pages${path}/index.vue`) } catch (e) {
+                console.log(e)
+              }
+              if (comp && comp.default) {
+                component = (res) => require([`@/views/pages${path}/index.vue`], res)
+              } else {
+                component = view404
+              }
             }
-          }
-          const breadcrumbItem = []
-          if (n.Url === 'User' || n.Url === 'Role') {
-            hidden = true
-            activeMenu = '/System/Companys'
-            noCache = true
-            noTagView = true
-            findItem(addRoutes, item => {
-              return item.name === 'Companys'
-            }, breadcrumbItem, 'children')
-          } else {
-            hidden = false
-            noCache = false
-            activeMenu = ''
-            noTagView = false
-          }
+            const breadcrumbItem = []
+            if (n.Url === 'User' || n.Url === 'Role') {
+              hidden = true
+              activeMenu = '/System/Companys'
+              noCache = true
+              noTagView = true
+              findItem(addRoutes, item => {
+                return item.name === 'Companys'
+              }, breadcrumbItem, 'children')
+            } else if (n.Url === 'EquipmentItem') {
+              hidden = true
+              activeMenu = '/Equipment/EquipmentLists'
+              noCache = true
+              noTagView = true
+              findItem(addRoutes, item => {
+                return item.name === 'EquipmentLists'
+              }, breadcrumbItem, 'children')
+            } else {
+              hidden = false
+              noCache = false
+              activeMenu = ''
+              noTagView = false
+            }
 
-          if (n.Url === 'Companys') {
-            activeTags = '/System/Role,/System/User'
-          } else {
-            activeTags = ''
-          }
+            if (n.Url === 'Companys') {
+              activeTags = '/System/Role,/System/User'
+            } else if (n.Url === 'EquipmentLists') {
+              activeTags = '/Equipment/EquipmentItem'
+            } else {
+              activeTags = ''
+            }
 
-          pushAraay.push({
-            path: path,
-            hidden: hidden, // 侧边栏隐藏
-            redirect: n.Children[0] ? `${path}/${n.Children[0].Url}` : '',
-            alwaysShow: false, // 总是显示根路由
-            component: component,
-            name: n.Url, // 必填 且不重名
+            pushAraay.push({
+              path: path,
+              hidden: hidden, // 侧边栏隐藏
+              redirect: n.Children[0] && (n.Children[0].Type === '4' || n.Children[0].Type === '1') ? `${path}/${n.Children[0].Url}` : '',
+              alwaysShow: false, // 总是显示根路由
+              component: component,
+              name: n.Url, // 必填 且不重名
 
-            meta: {
-              breadcrumbItem: breadcrumbItem[0],
-              title: n.Name,
-              icon: n.Icon,
-              noCache: noCache, // 不缓存
-              breadcrumb: true, // 面包屑
-              affix: false, // tags-view 固定
-              noTagView: noTagView, // tags-view 默认显示
-              activeTags: activeTags, // tags-view 不显示 的高亮tag
-              activeMenu: activeMenu // 路由条件高亮
-            },
-            children: []
-          })
-          if (n.Children.length > 0) {
-            calleArr(n.Children, path, pushAraay[index].children)
+              meta: {
+                breadcrumbItem: breadcrumbItem[0],
+                title: n.Name,
+                icon: n.Icon,
+                noCache: noCache, // 不缓存
+                breadcrumb: true, // 面包屑
+                affix: false, // tags-view 固定
+                noTagView: noTagView, // tags-view 默认显示
+                activeTags: activeTags, // tags-view 不显示 的高亮tag
+                activeMenu: activeMenu // 路由条件高亮
+              },
+              children: []
+            })
+            if (n.Children.length > 0) {
+              calleArr(n.Children, path, pushAraay[index].children)
+            }
           }
         })
       }
-
       calleArr(routesRes, '', addRoutes)
+
+      console.log(addRoutes)
       localStorage.setItem('roters', addRoutes)
       commit('SET_ROUTES', addRoutes)
       commit('SET_BTNS', btns)

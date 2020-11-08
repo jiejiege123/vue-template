@@ -14,7 +14,6 @@
 <script>
 import { generateTitle } from '@/utils/i18n'
 import pathToRegexp from 'path-to-regexp'
-import { findItem } from '@/utils/index'
 
 export default {
   data() {
@@ -56,9 +55,7 @@ export default {
       if (breadcrumbItem) {
         matched.splice(-1, 0, breadcrumbItem)
       }
-      console.log(matched)
       this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
-      console.log(this.levelList)
     },
     isDashboard(route) {
       const name = route && route.name
