@@ -185,10 +185,8 @@ export default {
 
             // 获取当前城市
             var citysearch = new AMap.CitySearch()
-            console.log(citysearch)
             // 自动获取用户IP，返回当前城市
             citysearch.getCityByIp(function(status, result) {
-              console.log('123')
               if (status === 'complete' && result.info === 'OK') {
                 if (result && result.city && result.bounds) {
                   var cityinfo = result.city
@@ -206,13 +204,13 @@ export default {
             // 如果有经纬度 就生成一个maker
             let marker = ''
 
-            if (this.longitude && this.latitude) {
+            if (that.longitude && that.latitude) {
               marker = new AMap.Marker({
-                position: new AMap.LngLat(parseFloat(this.longitude), parseFloat(this.latitude)),
+                position: new AMap.LngLat(parseFloat(that.longitude), parseFloat(that.latitude)),
                 map: that.map
               })
             }
-            this.marker.push(marker)
+            that.marker.push(marker)
           })
       })
     },
@@ -257,6 +255,9 @@ export default {
 
           that.lnglat = location.lng + ',' + location.lat
           that.addressIn = data.pname + data.cityname + data.adname + data.address
+
+          that.longitudeIn = location.lng
+          that.latitudeIn = location.lat
 
           const searchCity = city.find(n => n.name.includes(data.cityname))
           if (searchCity) {

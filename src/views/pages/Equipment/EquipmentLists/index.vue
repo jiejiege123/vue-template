@@ -36,8 +36,11 @@ div(style="width:100%; height:100%")
       :formRules="formRules"
       :tableData='tableData'
       :columns="tableColumn")
-      template(v-slot:outOperate)
-        el-table-column(label="状态" align="center" type="index")
+      //- template(v-slot:columnHead)
+      //-   el-table-column(label="二维码" align="center" width="80px" type="index")
+      //-     template(slot-scope='scope')
+      //-       svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr")
+            //- svg vue-qr(:text="scope.row.IMEI" :size="25")
       template(v-slot:outOperate)
         el-button(
           type="primary"
@@ -48,32 +51,60 @@ div(style="width:100%; height:100%")
             | 更多菜单
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu.more-opeareat(slot="dropdown")
-            el-dropdown-item(style="width:120px") 修改设备
+            el-dropdown-item(:disabled="moreOne" style="width:120px") 修改设备
             el-dropdown-item(style="width:120px") 删除设备
             el-dropdown-item(style="width:120px") 设备过户
             el-dropdown-item(style="width:120px") 批量导入
             el-dropdown-item(style="width:120px") 导出设备
-            el-dropdown-item(style="width:120px") 事件记录
-            el-dropdown-item(style="width:120px") 故障记录
-            el-dropdown-item(style="width:120px") 设备日志
+            el-dropdown-item(:disabled="moreOne" style="width:120px") 事件记录
+            el-dropdown-item(:disabled="moreOne" style="width:120px") 故障记录
+            el-dropdown-item(:disabled="moreOne" style="width:120px") 设备日志
             el-dropdown-item(style="width:120px") 打印编码
             el-dropdown-item(style="width:120px") 设为个人模式
             el-dropdown-item(style="width:120px") 设为工程模式
             el-dropdown-item(style="width:120px") 状态复位
+      template(v-slot:operation="{row}")
+        svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr(row.IMEI)")
+
+    //- 二维码 弹窗
+    el-dialog.dialog-pad(
+      title="二维码"
+      :append-to-body="true"
+      :visible.sync="qrVisible"
+      @close="qrVisible === false"
+      width="300px")
+      div.center(slot="title") 二维码
+      div.center
+        vue-qr(:text="qrValue" :size="200")
+    //- 其他弹窗
+    el-dialog.dialog-pad(
+      :title="dialogTitle"
+      :append-to-body="true"
+      :visible.sync="dialogVisible"
+      @close="qrVisible === false"
+      width="600px")
+      el-form.default-input(
+        v-loading="formLoadingDia"
+        :model='ruleForm'
+        :class="{'inline': inline}"
+        ref='ruleForm'
+        :rules="formRulesDia"
+        :label-width='120')
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getEquiList, addCom, delCom, updateCom } from '@/api/equipment.js'
 import { getDicsByName } from '@/api/commom'
-
+import VueQr from 'vue-qr'
 import { checkPhone } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'EquipmentLists',
   components: {
     Query,
-    EditTableForm
+    EditTableForm,
+    VueQr
   },
   filters: {
 
@@ -189,13 +220,20 @@ export default {
       loading: false,
       tableData: [
         {
-
+          IMEI: '867884040554676',
+          devicetypezh: '门磁',
+          xinhaozh: 'RT-M11-N',
+          picizh: '333-201031-01',
+          comname: '最高公司',
+          modezh: '工程'
         }
       ],
       tableColumn: [
         {
           label: 'IMEI',
-          prop: 'IMEI'
+          prop: 'IMEI',
+          width: '130px'
+
         },
         {
           label: '所属单位',
@@ -255,7 +293,15 @@ export default {
       pageSize: 9000,
       total: 0,
       formLoading: false,
-      moreDisable: true
+      moreDisable: true,
+      qrVisible: false,
+      qrValue: '',
+      // 弹窗
+      dialogTitle: '',
+      dialogVisible: false,
+      formLoadingDia: false,
+      ruleForm: {},
+      formRulesDia: {}
     }
   },
   computed: {
@@ -263,7 +309,7 @@ export default {
   },
   created() {
     // this.onSearch({ com: '' })
-    this.getDicsList()
+    // this.getDicsList()
   },
   activated() {
     // 保持半缓存
@@ -372,9 +418,19 @@ export default {
       } else {
         this.moreDisable = true
       }
+      if (rows.length === 1) {
+        this.moreOne = false
+      } else {
+        this.moreOne = true
+      }
     },
     addRow() {
-
+      this.dialogTitle = '新增'
+      this.dialogVisible = true
+    },
+    showQr(val) {
+      this.qrVisible = true
+      this.qrValue = val
     }
 
   }
@@ -390,5 +446,10 @@ export default {
 }
 .query{
  width: 100%;
+}
+.dialog-pad{
+  ::v-deep .el-dialog__body{
+    padding: 10px 20px 30px;
+  }
 }
 </style>

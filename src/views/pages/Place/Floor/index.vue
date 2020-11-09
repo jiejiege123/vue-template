@@ -14,18 +14,20 @@ div(style="width:100%; height:100%")
         Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
     edit-table-form(
       :loading='loading'
-      :inline="true"
-      operateWidth='360'
+      :inline="false"
+      operateWidth='200'
       :hasPages="false"
       :currentPage="currentPage"
       :total="total"
       :pageSize="pageSize"
       :dics="dics"
-      dialogWidth='800px'
+      dialogWidth='420px'
       has01="Company01"
       has02="Company02"
       has03="Company03"
       :formStyle={width: '220px'}
+      :showIndex="true"
+      :showView="false"
       :showSelection="false"
       :showBatchDel="false"
       @onHandleCurrentChange="handleCurrentChange"
@@ -37,12 +39,12 @@ div(style="width:100%; height:100%")
       :tableData='tableData'
       :columns="tableColumn")
       template(v-slot:operation="{row}")
-        el-button(
-          @click.stop="goUser(row)"
-          size="small") 用户
-        el-button(
-          @click.stop="goRole(row)"
-          size="small") 角色
+        //- el-button(
+        //-   @click.stop="goUser(row)"
+        //-   size="small") 用户
+        //- el-button(
+        //-   @click.stop="goRole(row)"
+        //-   size="small") 角色
 </template>
 <script >
 import Query from '@/components/Query'
@@ -78,9 +80,16 @@ export default {
       input: '',
       queryList: [
         {
-          label: '单位名称',
-          prop: 'com',
-          holder: '请输入单位名称',
+          label: '建筑物',
+          prop: 'jzwname',
+          holder: '请输入建筑物名称',
+          queryType: false
+        },
+
+        {
+          label: '楼层',
+          prop: 'lcname',
+          holder: '请输入楼层名称',
           queryType: false
         }
       ],
@@ -89,107 +98,51 @@ export default {
        * 表格
        */
       loading: false,
-      tableData: [],
+      tableData: [
+        {
+          lcname: '1楼',
+          jzwname: '最高建筑物',
+          comname: '最高公司',
+          pmt: '1楼'
+        }
+      ],
       tableColumn: [
         {
-          prop: 'comcode',
-          label: '单位ID',
-          width: 120,
+          prop: 'lcname',
+          label: '楼层',
           tableOnly: true
         },
         {
-          prop: 'pcode',
-          label: '上级单位',
-          type: 'cascader',
-          formOnly: true,
-          showAllLevels: false,
-          props: {
-            label: 'comname',
-            value: 'comcode',
-            emitPath: false,
-            checkStrictly: true
-          }
-        },
-        // {
-        //   prop: 'pcodename',
-        //   label: '上级单位',
-        //   tableOnly: true
-        // },
-        {
-          prop: 'comname',
-          label: '单位名称',
-          editAble: true,
-          minWidth: 300
-        },
-        {
-          prop: 'comType',
-          label: '单位属性',
-          width: 130,
-          formOnly: true,
-          type: 'select'
-        },
-        {
-          prop: 'comTypeZh',
-          label: '单位属性',
-          width: 130,
-          tableOnly: true
-        },
-        {
-          prop: 'subNum',
-          label: '下级数量',
-          width: 80,
-          tableOnly: true
-        },
-        {
-          prop: 'showIndex',
-          label: '显示排序',
-          width: 80,
-          default: '0',
-          inputFilter: "value=value.replace(/[^\\d]/g,'')",
-          editAble: true
-        },
-        {
-          prop: 'address',
-          label: '单位地址',
-          formOnly: true,
-          editAble: true,
-          online: true,
-          formStyle: {
-            width: '600px'
-          }
-        },
-        {
-          prop: 'comtel',
-          label: '单位电话',
-          formOnly: true,
-          editAble: true
-        },
-        {
-          prop: 'fzr',
-          label: '负责人',
-          formOnly: true,
-          editAble: true
-        },
-        {
-          prop: 'rmb',
-          label: '余额',
-          formOnly: true,
-          addDisable: true
+          prop: 'lcname',
+          label: '所在楼层',
+          holder: '例: 1楼',
+          formOnly: true
         },
 
         {
-          prop: 'comtitle',
-          label: '网站名称',
+          prop: 'jzwid',
+          label: '建筑物名称',
           formOnly: true,
-          editAble: true
+          type: 'select'
+        },
+
+        {
+          prop: 'jzwname',
+          label: '建筑物名称',
+          tableOnly: true
         },
         {
-          prop: 'comlogo',
-          label: '网站logo',
-          formOnly: true,
-          editAble: true,
-          type: 'img'
+          prop: 'comname',
+          label: '所属单位',
+          tableOnly: true
         },
+        {
+          prop: 'pmt',
+          label: '平面图',
+          type: 'img',
+          width: 100
+        },
+
         {
           prop: 'addtime',
           label: '创建时间',
@@ -198,12 +151,12 @@ export default {
         }
       ],
       formRules: {
-        pcode: [{ required: true, message: '请选择上级单位', trigger: 'change' }],
+        lcname: [{ required: true, message: '请输入所在楼层', trigger: 'blur' }],
         comname: [
           { required: true, message: '请输入活动名称', trigger: 'blur' },
           { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ],
-        comType: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
+        jzwid: [{ required: true, message: '请选择建筑物', trigger: 'change' }],
         showIndex: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
         comtel: [{ validator: isPhone, trigger: 'blur' }]
       },
@@ -235,8 +188,8 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.onSearch({ com: '' })
-    this.getDicsList()
+    // this.onSearch({ com: '' })
+    // this.getDicsList()
   },
   activated() {
     // 保持半缓存

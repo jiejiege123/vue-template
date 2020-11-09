@@ -16,7 +16,7 @@ div(style="width:100%; height:100%")
       :loading='loading'
       :inline="true"
       operateWidth='360'
-      :hasPages="false"
+      :hasPages="true"
       :currentPage="currentPage"
       :total="total"
       :pageSize="pageSize"
@@ -124,7 +124,7 @@ export default {
           minWidth: 200,
           online: true,
           formStyle: {
-
+            width: '600px'
           }
         },
         {
@@ -134,17 +134,41 @@ export default {
           minWidth: 100
         },
         {
+          prop: 'longitude',
+          label: '经度',
+          type: 'map',
+          editAble: true,
+          formOnly: true
+        },
+        {
+          prop: 'latitude',
+          type: 'map',
+          label: '维度',
+          editAble: true,
+          formOnly: true
+        },
+        {
           prop: 'jwzaddress',
           label: '详细地址',
           editAble: true,
-          minWidth: 200
+          online: true,
+          minWidth: 200,
+          formStyle: {
+            width: '600px'
+          }
         },
         {
-          prop: 'pcode',
+          prop: 'lcsnum',
+          label: '楼层数',
+          type: 'number',
+          slot: true,
+          editAble: true
+        },
+        {
+          prop: 'comcode',
           label: '所属单位',
           type: 'cascader',
           formOnly: true,
-          online: true,
           showAllLevels: false,
           props: {
             label: 'comname',
@@ -153,12 +177,7 @@ export default {
             checkStrictly: true
           }
         },
-        {
-          prop: 'lcsnum',
-          label: '楼层数',
-          slot: true,
-          editAble: true
-        },
+
         {
           prop: 'lxr',
           label: '联系人',
@@ -172,14 +191,18 @@ export default {
 
       ],
       formRules: {
-        pcode: [{ required: true, message: '请选择上级单位', trigger: 'change' }],
-        comname: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        ],
-        comType: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
-        showIndex: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
-        comtel: [{ validator: isPhone, trigger: 'blur' }]
+        jwzname: [{ required: true, message: '请输入建筑名称', trigger: 'blur' }],
+        comcode: [{ required: true, message: '请选择所属单位', trigger: 'change' }],
+        longitude: [{ required: true, message: '请点击图标输入查询', trigger: 'blur' }],
+        latitude: [{ required: true, message: '请点击图标输入查询', trigger: 'blur' }],
+        // comname: [
+        //   { required: true, message: '请输入活动名称', trigger: 'blur' },
+        //   { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        // ],
+        jwzaddress: [{ required: true, message: '请输入详细地址', trigger: 'blur' }],
+        lxr: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
+        lcsnum: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
+        lxrtel: [{ validator: isPhone, required: true, trigger: 'blur' }]
       },
       dics: {
         pcode: [],

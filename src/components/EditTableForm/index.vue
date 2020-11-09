@@ -42,6 +42,7 @@
         align="center"
         width="55")
       el-table-column(v-if="showIndex" label="#" align="center" type="index")
+      slot(name="columnHead")
       el-table-column(
         v-for="(item,index) in tableColumns"
         :key="index"
@@ -53,15 +54,16 @@
         template(slot-scope='scope')
           span(v-if="item.prop==='file'") {{}}
             a(:href="scope.row.xxx | filterfile") 下载
-          img(
+          el-image(
             v-else-if="item.type==='img'"
             :src="scope.row[item.prop] | filterImg"
+            :preview-src-list="[scope.row[item.prop] | filterImg]"
             style="width:40px;height:40px;cursor: pointer")
           span(v-else-if="item.filter") {{dics[item.prop].find(n => n.value === scope.row[item.prop]).label}}
           slot(v-else-if="item.slot" :name="item.prop" :row="scope.row")
 
           span(v-else) {{scope.row[item.prop]}}
-      slot(name="column")
+      slot(name="columnFoot")
       el-table-column(label="操作" align="center" :width="operateWidth" fixed="right" v-if="!disOperated")
         template(slot-scope='scope')
           slot(name="operation" :row="scope.row")
@@ -214,12 +216,21 @@
               span(slot="tip" style='font-size:12px')  只能上传一个文件
             ImgCropper(v-else-if="item.type === 'imgCut'" @getUrl="getImgCutUrl($event, item.prop)")
             el-input(
+              :style="[formStyle, item.formStyle]"
               v-else-if="item.type === 'map'"
               v-model='ruleForm[item.prop]'
-              size="small"
               placeholder='请输入'
               :disabled="true")
               el-button(slot="append" icon="el-icon-map-location" type="primary" size="small" @click="inputFocus")
+            el-input-number(
+              v-else-if="item.type === 'number'"
+              v-model='ruleForm[item.prop]'
+              :style="[formStyle, item.formStyle]"
+              :oninput="item.inputFilter"
+              :placeholder="item.holder"
+              controls-position="right"
+              :min="1" :max="300"
+              )
             el-input(
               v-else
               v-model='ruleForm[item.prop]'
@@ -234,7 +245,7 @@
     MapDialog(
       v-if="hasMap"
       dialogTitle="地图"
-      :hasQuery="hasQuery"
+      :hasQuery="dialogType !== 'view'"
       :showLnglat="true"
       :dialogMapVisible="dialogMapVisible"
       :longitude="longitude"
@@ -433,7 +444,6 @@ export default {
       latitude: 0,
       address: '',
       dialogMapVisible: false
-
     }
   },
   computed: {
@@ -621,16 +631,17 @@ export default {
     },
     // 地图专用
     inputFocus() {
-      this.longitude = parseFloat(this.ruleForm.longitude) || 116.20
-      this.latitude = parseFloat(this.ruleForm.latitude) || 39.56
+      this.longitude = parseFloat(this.ruleForm.longitude) || 0
+      this.latitude = parseFloat(this.ruleForm.latitude) || 0
       this.address = this.ruleForm.address
       this.dialogMapVisible = true
     },
     mapSure(address, longitude, latitude) {
       this.dialogMapVisible = false
-      this.$set(this.ruleForm.address, address)
-      this.$set(this.ruleForm.longitude, longitude)
-      this.$set(this.ruleForm.latitude, latitude)
+      console.log(address, longitude, latitude)
+      this.$set(this.ruleForm, 'jwzaddress', address)
+      this.$set(this.ruleForm, 'longitude', longitude)
+      this.$set(this.ruleForm, 'latitude', latitude)
     }
   }
 }
@@ -720,7 +731,7 @@ export default {
   position: relative;
   text-align: right;
   width: 100%;
-  padding-right: 50px;
+  padding-right: 20px;
 }
 .add-dialog{
   ::v-deep .el-dialog__body{
