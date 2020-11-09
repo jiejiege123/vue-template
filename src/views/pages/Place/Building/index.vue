@@ -1,33 +1,35 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-11-02 14:47:25
+ * @LastEditTime: 2020-11-09 17:27:13
+ * @LastEditors: zzz
+ * @Description: In User Settings Edit
+ * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
+-->
 <template lang="pug">
 div(style="width:100%; height:100%")
   .content.layout-column
     .header.layout-row__between
       .query
-        Query(:queryList="queryList"
-        :dics="dics"
-        :hasAdvQuery='true'  :btnLoading="loading" @onSearch="onSearch")
+        Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
     edit-table-form(
       :loading='loading'
       :inline="true"
-      operateWidth='220'
-      :hasPages="true"
+      operateWidth='360'
+      :hasPages="false"
       :currentPage="currentPage"
       :total="total"
       :pageSize="pageSize"
       :dics="dics"
-      :showIndex="true"
       dialogWidth='800px'
       has01="Company01"
       has02="Company02"
       has03="Company03"
+      :hasMap="true"
       :formStyle={width: '220px'}
-      :showAdd="false"
-      :showView="false"
-      :showEdit="false"
-      :showDel="false"
+      :showIndex="true"
       :showSelection="true"
-      :showBatchDel="false"
-      @onSelectChange="onSelectChange"
+      :showBatchDel="true"
       @onHandleCurrentChange="handleCurrentChange"
       @onHandleSizeChange="handleSizeChange"
       @onSubmitForm="onSubmitForm"
@@ -36,41 +38,31 @@ div(style="width:100%; height:100%")
       :formRules="formRules"
       :tableData='tableData'
       :columns="tableColumn")
-      template(v-slot:outOperate)
-        el-table-column(label="状态" align="center" type="index")
-      template(v-slot:outOperate)
+      template(v-slot:lcsnum="{row}")
+        span {{row.lcsnum + '1'}}
+      //- template(v-slot:column)
+        el-table-column(label="楼层数" prop="lcsnum" align="center")
+          template(slot-scope='scope')
+            span {{scope.row.lcsnum}}
+      template(v-slot:operation="{row}")
         el-button(
-          type="primary"
-          size="small"
-          @click='addRow') 新增
-        el-dropdown.ml_10()
-          el-button(type="primary" size="small" :disabled="moreDisable")
-            | 更多菜单
-            i.el-icon-arrow-down.el-icon--right
-          el-dropdown-menu.more-opeareat(slot="dropdown")
-            el-dropdown-item(style="width:120px") 修改设备
-            el-dropdown-item(style="width:120px") 删除设备
-            el-dropdown-item(style="width:120px") 设备过户
-            el-dropdown-item(style="width:120px") 批量导入
-            el-dropdown-item(style="width:120px") 导出设备
-            el-dropdown-item(style="width:120px") 事件记录
-            el-dropdown-item(style="width:120px") 故障记录
-            el-dropdown-item(style="width:120px") 设备日志
-            el-dropdown-item(style="width:120px") 打印编码
-            el-dropdown-item(style="width:120px") 设为个人模式
-            el-dropdown-item(style="width:120px") 设为工程模式
-            el-dropdown-item(style="width:120px") 状态复位
+          @click.stop="goUser(row)"
+          size="small") 布防
+        el-button(
+          type="danger"
+          @click.stop="naggoRole(row)"
+          size="small") 撤防
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getEquiList, addCom, delCom, updateCom } from '@/api/equipment.js'
+import { getCompany, addCom, delCom, updateCom } from '@/api/com'
 import { getDicsByName } from '@/api/commom'
 
 import { checkPhone } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
-  name: 'EquipmentLists',
+  name: 'Building',
   components: {
     Query,
     EditTableForm
@@ -95,91 +87,16 @@ export default {
       input: '',
       queryList: [
         {
-          label: 'IMEI',
-          prop: 'IMEI',
-          holder: '请输入IMEI号码',
+          label: '单位名称',
+          prop: 'comname',
+          holder: '请输入单位名称',
           queryType: false
         },
         {
-          label: '所属单位',
-          prop: 'comcode',
-          holder: '请选择公司',
-          type: 'select',
-          queryType: true
-        },
-        {
-          label: '单位限制',
-          prop: 'CompanyLimit',
-          type: 'select',
-          default: 0,
-          queryType: true
-        },
-        {
-          label: '批次',
-          prop: 'piciid',
-          holder: '请选择批次',
-          type: 'select',
-          queryType: true
-        },
-        {
-          label: '模式',
-          default: '',
-          prop: 'mode',
-          holder: '请选择模式',
-          type: 'select',
-          queryType: true
-        },
-        {
-          label: '类型',
-          prop: 'devicetype',
-          holder: '请选择类型',
-          type: 'select',
-          queryType: true
-        },
-        {
-          label: '设备型号',
-          prop: 'xinhaoid',
-          holder: '请选择公司',
-          type: 'select',
-          queryType: true
-        },
-        {
           label: '建筑物',
-          prop: 'jzwid',
-          holder: '请选择公司',
-          type: 'select',
-          queryType: true
-        },
-        {
-          label: '安装点',
-          prop: 'azdid',
-          holder: '请选择公司',
-          type: 'select',
-          queryType: true
-        },
-        {
-          label: '设备状态',
-          prop: 'devicevalue',
-          default: '',
-          holder: '请选择公司',
-          type: 'select',
-          queryType: true
-        },
-        {
-          label: '绑定状态',
-          prop: 'bangding',
-          holder: '请选择公司',
-          type: 'select',
-          default: '',
-          queryType: true
-        },
-        {
-          label: '库存状态',
-          prop: 'kcvalue',
-          holder: '请选择公司',
-          type: 'select',
-          default: '',
-          queryType: true
+          prop: 'Keywords',
+          holder: '请输入建筑物名称或地址',
+          queryType: false
         }
       ],
       query: {},
@@ -189,44 +106,70 @@ export default {
       loading: false,
       tableData: [
         {
-
+          lcsnum: '12'
         }
       ],
       tableColumn: [
+        // {
+        //   prop: 'comname',
+        //   label: '地图标记',
+        //   editAble: true,
+        //   minWidth: 300,
+        //   formOnly: true
+        // },
         {
-          label: 'IMEI',
-          prop: 'IMEI'
-        },
-        {
-          label: '所属单位',
-          prop: 'comname',
-          holder: '请选择公司'
-        },
+          prop: 'jwzname',
+          label: '建筑物名称',
+          editAble: true,
+          minWidth: 200,
+          online: true,
+          formStyle: {
 
-        {
-          label: '批次',
-          prop: 'picizh'
+          }
         },
         {
-          label: '模式',
-          prop: 'modezh'
+          prop: 'comname',
+          label: '所属单位',
+          tableOnly: true,
+          minWidth: 100
         },
         {
-          label: '类型',
-          prop: 'devicetypezh'
+          prop: 'jwzaddress',
+          label: '详细地址',
+          editAble: true,
+          minWidth: 200
         },
         {
-          label: '设备型号',
-          prop: 'xinhaozh'
+          prop: 'pcode',
+          label: '所属单位',
+          type: 'cascader',
+          formOnly: true,
+          online: true,
+          showAllLevels: false,
+          props: {
+            label: 'comname',
+            value: 'comcode',
+            emitPath: false,
+            checkStrictly: true
+          }
         },
         {
-          label: '设备状态',
-          prop: 'devicevaluezh'
+          prop: 'lcsnum',
+          label: '楼层数',
+          slot: true,
+          editAble: true
         },
         {
-          label: '在线状态',
-          prop: 'onlinevaluezh'
+          prop: 'lxr',
+          label: '联系人',
+          editAble: true
+        },
+        {
+          prop: 'lxrtel',
+          label: '联系人电话',
+          editAble: true
         }
+
       ],
       formRules: {
         pcode: [{ required: true, message: '请选择上级单位', trigger: 'change' }],
@@ -239,23 +182,27 @@ export default {
         comtel: [{ validator: isPhone, trigger: 'blur' }]
       },
       dics: {
-        CompanyLimit: [
-          {
-            value: 0,
-            label: '包含下级单位设备'
-          },
-          {
-            value: 1,
-            label: '仅本单位设备'
-          }
+        pcode: [],
+        comType: [
+          // {
+          //   value: 1,
+          //   label: '进销商'
+          // },
+          // {
+          //   value: 2,
+          //   label: '工程商'
+          // },
+          // {
+          //   value: 3,
+          //   label: '业主单位'
+          // }
         ]
-
       },
       currentPage: 1,
       pageSize: 9000,
       total: 0,
       formLoading: false,
-      moreDisable: true
+      showss: true
     }
   },
   computed: {
@@ -263,7 +210,7 @@ export default {
   },
   created() {
     // this.onSearch({ com: '' })
-    this.getDicsList()
+    // this.getDicsList()
   },
   activated() {
     // 保持半缓存
@@ -299,7 +246,7 @@ export default {
           n.label = n.diczh
           switch (n.groupzh) {
             case '公司类型':
-              // this.dics.comType.push(n)
+              this.dics.comType.push(n)
               break
             default:
               break
@@ -314,7 +261,7 @@ export default {
         Keywords: this.query.com
       }
       this.loading = true
-      getEquiList(params).then(res => {
+      getCompany(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
@@ -365,18 +312,23 @@ export default {
         console.error(err)
       })
     },
-    onSelectChange(rows) {
-      console.log(rows)
-      if (rows.length > 0) {
-        this.moreDisable = false
-      } else {
-        this.moreDisable = true
-      }
+    goUser(row) {
+      console.log(row)
+      // this.showComSup = false
+      this.$router.push(
+        { path: '/System/User', query: {
+          comcode: row.comcode,
+          comname: row.comname
+        }}
+      )
     },
-    addRow() {
-
+    goRole(row) {
+      this.$router.push(
+        { path: '/System/Role', query: {
+          comcode: row.comcode,
+          comname: row.comname
+        }})
     }
-
   }
 }
 </script>
@@ -386,7 +338,6 @@ export default {
   padding: 20px;
   box-sizing: border-box;
   height: calc(100vh - 84px);
-  overflow-y: auto;
 }
 .query{
  width: 100%;

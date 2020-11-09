@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-06 19:40:23
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-09 10:59:13
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\store\modules\permission.js
  */
@@ -118,7 +118,8 @@ const actions = {
               }, breadcrumbItem, 'children')
             } else {
               hidden = false
-              noCache = false
+              noCache = true
+              // noCache = false
               activeMenu = ''
               noTagView = false
             }
@@ -160,8 +161,7 @@ const actions = {
       }
       calleArr(routesRes, '', addRoutes)
 
-      console.log(addRoutes)
-      localStorage.setItem('roters', addRoutes)
+      localStorage.setItem('addRoutes', JSON.stringify(addRoutes))
       commit('SET_ROUTES', addRoutes)
       commit('SET_BTNS', btns)
       resolve(state.routes)

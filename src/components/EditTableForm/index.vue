@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-06 16:33:30
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-09 17:00:17
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
 -->
@@ -10,6 +10,7 @@
   .table-warp.flex1.layout-column(v-loading="loading")
     .operate(v-if="hasOutOperat")
       el-button(
+        v-if="showAdd"
         v-has="has01"
         type="primary"
         size="small"
@@ -57,7 +58,10 @@
             :src="scope.row[item.prop] | filterImg"
             style="width:40px;height:40px;cursor: pointer")
           span(v-else-if="item.filter") {{dics[item.prop].find(n => n.value === scope.row[item.prop]).label}}
+          slot(v-else-if="item.slot" :name="item.prop" :row="scope.row")
+
           span(v-else) {{scope.row[item.prop]}}
+      slot(name="column")
       el-table-column(label="操作" align="center" :width="operateWidth" fixed="right" v-if="!disOperated")
         template(slot-scope='scope')
           slot(name="operation" :row="scope.row")
@@ -210,6 +214,13 @@
               span(slot="tip" style='font-size:12px')  只能上传一个文件
             ImgCropper(v-else-if="item.type === 'imgCut'" @getUrl="getImgCutUrl($event, item.prop)")
             el-input(
+              v-else-if="item.type === 'map'"
+              v-model='ruleForm[item.prop]'
+              size="small"
+              placeholder='请输入'
+              :disabled="true")
+              el-button(slot="append" icon="el-icon-map-location" type="primary" size="small" @click="inputFocus")
+            el-input(
               v-else
               v-model='ruleForm[item.prop]'
               :style="[formStyle, item.formStyle]"
@@ -218,18 +229,32 @@
               )
         el-form-item.dia-footer(v-if="dialogType !== 'view'")
           el-button(@click="closeDialog" size="small") 取消
-          el-button(type='primary', @click="submitForm('ruleForm')" size="small") 提交
+          el-button(type='primary', @click="submitForm" size="small") 提交
+    //- 地图弹窗
+    MapDialog(
+      v-if="hasMap"
+      dialogTitle="地图"
+      :hasQuery="hasQuery"
+      :showLnglat="true"
+      :dialogMapVisible="dialogMapVisible"
+      :longitude="longitude"
+      :latitude="latitude"
+      :address="address"
+      @onSure="mapSure"
+      @closeDialog="dialogMapVisible = false"
+    )
 </template>
 <script>
 import { randomPassword } from '@/utils'
 import { getToken } from '@/utils/auth'
 import ImgCropper from '@/components/ImgCropper'
+import MapDialog from '@/components/MapDialog'
 
 export default {
   name: 'EditTableForm',
   components: {
-    ImgCropper
-
+    ImgCropper,
+    MapDialog
   },
   filters: {
     filterImg: (val) => {
@@ -290,6 +315,10 @@ export default {
     disOperated: {
       type: Boolean,
       default: false
+    },
+    showAdd: {
+      type: Boolean,
+      default: true
     },
     showBatchDel: {
       type: Boolean,
@@ -380,6 +409,14 @@ export default {
     formLoading: {
       type: Boolean,
       default: false
+    },
+    hasMap: {
+      type: Boolean,
+      default: false
+    },
+    hasQuery: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -391,7 +428,11 @@ export default {
       ruleForm: {},
       dialogType: 'add',
       passwordType: 'password',
-      test: 'value=value.replace(/[^\\d.]/g,"")'
+      test: 'value=value.replace(/[^\\d.]/g,"")',
+      longitude: 0,
+      latitude: 0,
+      address: '',
+      dialogMapVisible: false
 
     }
   },
@@ -439,7 +480,7 @@ export default {
       } else {
         this.batchDelDisAble = true
       }
-      // this.$emit('onSelectChange', rows)
+      this.$emit('onSelectChange', rows)
     },
     rowClick(row) {
       this.$refs.reftable.toggleRowSelection(row)
@@ -577,6 +618,19 @@ export default {
     // 权限专用
     setPermissionIds(ids) {
       this.$set(this.ruleForm, 'PermissionIds', ids)
+    },
+    // 地图专用
+    inputFocus() {
+      this.longitude = parseFloat(this.ruleForm.longitude) || 116.20
+      this.latitude = parseFloat(this.ruleForm.latitude) || 39.56
+      this.address = this.ruleForm.address
+      this.dialogMapVisible = true
+    },
+    mapSure(address, longitude, latitude) {
+      this.dialogMapVisible = false
+      this.$set(this.ruleForm.address, address)
+      this.$set(this.ruleForm.longitude, longitude)
+      this.$set(this.ruleForm.latitude, latitude)
     }
   }
 }

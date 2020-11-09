@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-05 09:56:59
+ * @LastEditTime: 2020-11-09 09:10:37
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\permission.js
@@ -19,7 +19,7 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
-  if (to.path !== '/404') {
+  if (to.path !== '/404' && !to.path.includes('404')) {
     localStorage.setItem('router', to.fullPath)
   }
   // start progress bar
