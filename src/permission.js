@@ -19,7 +19,7 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
-  if (to.path !== '/404' && !to.path.includes('404')) {
+  if (to.path !== '/404' && !to.fullPath.includes('404')) {
     localStorage.setItem('router', to.fullPath)
   }
   // start progress bar
@@ -33,14 +33,14 @@ router.beforeEach(async(to, from, next) => {
 
   if (hasToken) {
     if (to.path === '/login') {
-      // if is logged in, redirect to the home page
       next({ path: '/' })
-      NProgress.done() // hack: https://github.com/PanJiaChen/vue-element-admin/pull/2939
+      NProgress.done()
     } else {
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
         next()
+        NProgress.done()
       } else {
         try {
           // get user info
@@ -50,9 +50,12 @@ router.beforeEach(async(to, from, next) => {
           const accessRoutes = await store.dispatch('permission/generateRoutes', routesRes) // 根据角色 去获取菜单和按钮权限
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
-          const toPath = localStorage.getItem('router')
-          next({ path: toPath || '/' })
+          router.options.routes = accessRoutes
 
+          const toPath = localStorage.getItem('router')
+
+          next({ path: toPath || '/' })
+          NProgress.done()
           // next({ ...to, replace: true })
         } catch (error) {
           // remove token and go to login page to re-login

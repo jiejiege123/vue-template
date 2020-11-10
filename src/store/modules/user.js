@@ -146,8 +146,50 @@ const actions = {
 
           },
           {
+            'Id': '985247111765495811',
+            'Name': '安装管理',
+            'Url': 'Place',
+            'Type': 4,
+            'Icon': 'anzhuang',
+            'Children': [
+              {
+                'Id': '985247111769690122',
+                'Name': '建筑物管理',
+                'ParentId': '985247111765495811',
+                'Url': 'Building',
+                'Type': 1,
+                'Icon': null,
+                'Children': [],
+                'Btns': ['Building01', 'Building02', 'Building03']
+              },
+              {
+                'Id': '985247111769690132',
+                'Name': '楼层管理',
+                'ParentId': '985247111765495811',
+                'Type': 1,
+                'Url': 'Floor',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['Floor01', 'Floor02', 'Floor03']
+              },
+              {
+                'Id': '985247111769690142',
+                'Name': '安装点管理',
+                'ParentId': '985247111765495811',
+                'Type': 1,
+                'Url': 'Installpoint',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['Installpoint01', 'Installpoint02', 'Installpoint03']
+              }
+            ]
+
+          },
+          {
             'Id': '975247111765495809',
-            'Name': '系统管理',
+            'Name': '权限管理',
             'Url': 'System',
             'Type': 4,
             'Icon': 'sys',
@@ -230,48 +272,6 @@ const actions = {
                 'Children': []
               }
             ]
-          },
-          {
-            'Id': '985247111765495811',
-            'Name': '安装管理',
-            'Url': 'Place',
-            'Type': 4,
-            'Icon': 'anzhuang',
-            'Children': [
-              {
-                'Id': '985247111769690122',
-                'Name': '建筑物管理',
-                'ParentId': '985247111765495811',
-                'Url': 'Building',
-                'Type': 1,
-                'Icon': null,
-                'Children': [],
-                'Btns': ['Building01', 'Building02', 'Building03']
-              },
-              {
-                'Id': '985247111769690132',
-                'Name': '楼层管理',
-                'ParentId': '985247111765495811',
-                'Type': 1,
-                'Url': 'Floor',
-                'Icon': null,
-                'SortCode': 20,
-                'Children': [],
-                'Btns': ['Floor01', 'Floor02', 'Floor03']
-              },
-              {
-                'Id': '985247111769690142',
-                'Name': '安装点管理',
-                'ParentId': '985247111765495811',
-                'Type': 1,
-                'Url': 'Installpoint',
-                'Icon': null,
-                'SortCode': 20,
-                'Children': [],
-                'Btns': ['Installpoint01', 'Installpoint02', 'Installpoint03']
-              }
-            ]
-
           }
 
         ]

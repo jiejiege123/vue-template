@@ -32,6 +32,7 @@
       height="250"
       border
       ref="reftable"
+      :tree-props="{children: 'children'}"
       :cell-class-name="cellClassName"
       @row-click="rowClick"
       @selection-change="selectionChange"

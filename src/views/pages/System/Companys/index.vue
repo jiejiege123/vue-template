@@ -10,8 +10,27 @@
 div(style="width:100%; height:100%")
   .content.layout-column
     .header.layout-row__between
-      .query
-        Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
+      .query.layout-row.mb_15
+        //- Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
+        el-dropdown(
+          size="small"
+          @command="searchTypeChange" trigger="click")
+          el-button(style="margin-right: 5px") {{searchTitle}}
+            i.el-icon-arrow-down.el-icon--right
+          el-dropdown-menu(slot='dropdown')
+            el-dropdown-item(command="comname") 单位名称
+            el-dropdown-item(command="comcode") 单位ID
+
+        el-input.mr_15(
+          style="width: 200px"
+          v-model="search"
+          :placeholder="queryHolder"
+          clearable)
+        el-button(
+          :loading="loading"
+          type="primary"
+          @click='search') 查询
+
     edit-table-form(
       :loading='loading'
       :inline="true"
@@ -75,7 +94,10 @@ export default {
       /**
        * 查询
        */
+      searchTitle: '单位名称',
+      searchProp: 'comname',
       input: '',
+      queryHolder: '请输入单位名称',
       queryList: [
         {
           label: '单位名称',
@@ -85,6 +107,7 @@ export default {
         }
       ],
       query: {},
+      search: '',
       /**
        * 表格
        */
@@ -122,14 +145,14 @@ export default {
           minWidth: 300
         },
         {
-          prop: 'comType',
+          prop: 'comtype',
           label: '单位属性',
           width: 130,
           formOnly: true,
           type: 'select'
         },
         {
-          prop: 'comTypeZh',
+          prop: 'comtypeZh',
           label: '单位属性',
           width: 130,
           tableOnly: true
@@ -203,13 +226,13 @@ export default {
           { required: true, message: '请输入活动名称', trigger: 'blur' },
           { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ],
-        comType: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
+        comtype: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
         showIndex: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
         comtel: [{ validator: isPhone, trigger: 'blur' }]
       },
       dics: {
         pcode: [],
-        comType: [
+        comtype: [
           // {
           //   value: 1,
           //   label: '进销商'
@@ -235,8 +258,8 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    // this.onSearch({ com: '' })
-    // this.getDicsList()
+    this.onSearch({ com: '' })
+    this.getDicsList()
   },
   activated() {
     // 保持半缓存
@@ -246,6 +269,22 @@ export default {
   mounted() {
   },
   methods: {
+    searchTypeChange(e) {
+      this.searchProp = e
+      switch (e) {
+        case 'comname':
+          this.searchTitle = '单位名称'
+          this.queryHolder = '请输入单位名称'
+          break
+        case 'comcode':
+          this.searchTitle = '单位ID'
+          this.queryHolder = '请输入单位ID'
+
+          break
+        default:
+          break
+      }
+    },
     handleCurrentChange(e) {
       this.currentPage = e
       this.getDataList()
@@ -272,7 +311,7 @@ export default {
           n.label = n.diczh
           switch (n.groupzh) {
             case '公司类型':
-              this.dics.comType.push(n)
+              this.dics.comtype.push(n)
               break
             default:
               break
@@ -307,7 +346,7 @@ export default {
     },
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
-      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType) ? this.dics.comType.find(n => n.value === params.comType).label : ''
+      params.comtypeZh = this.dics.comtype.find(n => n.value === params.comtype) ? this.dics.comtype.find(n => n.value === params.comtype).label : ''
       params.pcodename = this.tableData.find(n => n.comcode === params.pcode) ? this.tableData.find(n => n.comcode === params.pcode).comname : ''
       this.formLoading = true
       let methods
