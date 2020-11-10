@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-06 19:53:52
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-10 17:51:40
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
 -->
@@ -10,49 +10,54 @@
   .content.layout-column
     //- 返回单位管理查单
     .hearer-breadcrumb
-      el-button(type="text" style="padding: 0" @click="goCompany") 单位管理
+      el-button(type="text" style="padding: 0" @click="goBack") 设备管理
       i.el-icon-arrow-right
       span 用户列表
       span.ml_20(style="color: #000") {{comname}}
-    .header.layout-row__between
-      .query
-        Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
-    edit-table-form(
-      :loading='loading'
-      :inline="true"
-      operateWidth='360'
-      :hasPages="false"
-      :currentPage="currentPage"
-      :total="total"
-      :pageSize="pageSize"
-      :dics="dics"
-      dialogWidth='800px'
-      has01="Company01"
-      has02="Company02"
-      has03="Company03"
-      :formStyle={width: '220px'}
-      :showSelection="false"
-      :showBatchDel="false"
-      @onHandleCurrentChange="handleCurrentChange"
-      @onHandleSizeChange="handleSizeChange"
-      @onSubmitForm="onSubmitForm"
-      @onDeleted="onDeleted"
-      :formLoading="formLoading"
-      :formRules="formRules"
-      :tableData='tableData'
-      :columns="tableColumn")
-      template(v-slot:operation="{row}")
-        el-button(
-          @click.stop="goUser(row)"
-          size="small") 用户
-        el-button(
-          @click.stop="goRole(row)"
-          size="small") 角色
+    el-card.box-card.mb_20
+      div.clr_b2(slot="header") 设备信息
+      //- 数据开始了
+      el-form.default-input.inline(
+        v-loading="listLoading"
+        :model='ruleForm'
+        ref='ruleForm'
+        label-width='120px')
+        .layout-row.flex-wrap
+          div.card-form(v-for="item in formList" :key="item.id" style="width: 360px")
+            el-form-item(
+              :prop='item.prop'
+              :label="item.label")
+              span {{ruleForm[item.prop]}}
+    el-card.box-card
+      div.clr_b2(slot="header") 设备属性
+      //- 数据开始了
+      el-form.default-input.inline(
+        v-loading="listLoading"
+        :model='ruleForm'
+        ref='ruleForm'
+        label-width='120px')
+        .layout-row.flex-wrap
+          div.card-form(style="width: 360px")
+            el-form-item(
+              prop='menci'
+              label="门磁状态")
+              span {{ruleForm.menci}}
+          div.card-form(style="width: 360px")
+            el-form-item(
+              prop='menci'
+              label="信号强度")
+              span {{ruleForm.menci}}
+          div.card-form(style="width: 360px")
+            el-form-item(
+              prop='menci'
+              label="电池电压")
+              span {{ruleForm.menci}}
+
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getUserList, addCom, delCom, updateCom } from '@/api/com'
+import { getUserList } from '@/api/com'
 import { getDicsByName } from '@/api/commom'
 
 import { checkPhone } from '@/utils/index'
@@ -80,7 +85,6 @@ export default {
       /**
        * 查询
        */
-      input: '',
       queryList: [
         {
           label: '用户姓名',
@@ -212,17 +216,114 @@ export default {
       pageSize: 9000,
       total: 0,
       formLoading: false,
-      showss: true,
-      comname: ''
+      // 设备信息
+      ruleForm: {},
+      IMEI: '',
+      listLoading: false,
+      formList: [
+        {
+          prop: 'IMEI',
+          label: 'IMEI'
+        },
+        {
+          prop: 'comname',
+          label: '所属单位'
+        },
+        {
+          prop: 'IMEI',
+          label: 'IMEI'
+        },
+        {
+          prop: 'jzwname',
+          label: '建筑物'
+        },
+        {
+          prop: 'ICCID',
+          label: 'ICCID'
+        },
+        {
+          prop: 'picizh',
+          label: '批次'
+        },
+        {
+          prop: 'IMSI',
+          label: 'IMSI'
+        },
+        {
+          prop: 'devicevaluezh',
+          label: '状态'
+        },
+        {
+          prop: 'louce',
+          label: '楼层'
+        },
+        {
+          prop: 'devicetypezh',
+          label: '类型'
+        },
+        {
+          prop: 'bangdingzh',
+          label: '绑定状态'
+        },
+        {
+          prop: 'azdid',
+          label: '安装位置'
+        },
+        {
+          prop: 'xinhaoid',
+          label: '设备型号'
+        },
+        {
+          prop: 'zhucetiem',
+          label: '注册日期'
+        },
+        {
+          prop: 'sxtid',
+          label: '摄像头'
+        },
+        {
+          prop: 'kucunid',
+          label: '库存状态'
+        },
+        {
+          prop: 'sxtid',
+          label: '摄像头'
+        },
+        {
+          prop: 'sxtid',
+          label: '最近事件时间'
+        },
+        {
+          prop: 'sxtid',
+          label: '责任人'
+        },
+        {
+          prop: 'sxtid',
+          label: '出货时间'
+        },
+        {
+          prop: 'sxtid',
+          label: '首次安装时间'
+        },
+        {
+          prop: 'sxtid',
+          label: '其他责任人'
+        },
+        {
+          prop: 'sxtid',
+          label: '经纬度'
+        }
+
+      ]
     }
   },
   computed: {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.comname = this.$route.query.comname
-    this.comcode = this.$route.query.comcode
-    this.onSearch({ com: '' })
+    this.IMEI = this.$route.query.IMEI
+    // this.comcode = this.$route.query.comcode
+    // this.onSearch({ com: '' })
     // this.getDicsList()
   },
   mounted() {
@@ -287,42 +388,9 @@ export default {
         this.loading = false
       })
     },
-    onSubmitForm(ruleForm, dialogType, cb) {
-      const params = Object.assign({}, ruleForm)
-      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType) ? this.dics.comType.find(n => n.value === params.comType).label : ''
-      params.pcodename = this.tableData.find(n => n.comcode === params.pcode) ? this.tableData.find(n => n.comcode === params.pcode).comname : ''
-      this.formLoading = true
-      let methods
-      if (dialogType === 'add') {
-        methods = addCom
-      } else {
-        methods = updateCom
-      }
-      methods(params).then(res => {
-        console.log(res)
-        this.formLoading = true
-        cb(true)
-      }).catch((err) => {
-        this.$message.error(err)
-        this.formLoading = false
-      })
-    },
-    onDeleted(row) {
-      const params = {
-        cid: row.id
-      }
-      delCom(params).then(res => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
-        this.getDataList()
-      }).catch(err => {
-        console.error(err)
-      })
-    },
-    goCompany() {
-      this.$router.push('/System/Companys')
+
+    goBack() {
+      this.$router.push('/Equipment/EquipmentLists')
     }
   }
 }
@@ -332,7 +400,7 @@ export default {
 .content{
   padding: 20px;
   box-sizing: border-box;
-  height: calc(100vh - 84px);
+  // height: calc(100vh - 84px);
 }
 .query{
  width: 100%;
@@ -342,5 +410,13 @@ export default {
   color: #666;
   font-size: 14px;
 
+}
+.card-form{
+  ::v-deep .el-form-item {
+    margin-bottom: 0px;
+    .el-form-item__label{
+      font-weight: 400;
+    }
+  }
 }
 </style>

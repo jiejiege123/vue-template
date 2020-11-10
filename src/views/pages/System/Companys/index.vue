@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-06 19:53:52
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-10 12:22:02
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
 -->
@@ -235,13 +235,13 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.onSearch({ com: '' })
-    this.getDicsList()
+    // this.onSearch({ com: '' })
+    // this.getDicsList()
   },
   activated() {
     // 保持半缓存
-    this.onSearch({ com: '' })
-    this.getDicsList()
+    // this.onSearch({ com: '' })
+    // this.getDicsList()
   },
   mounted() {
   },

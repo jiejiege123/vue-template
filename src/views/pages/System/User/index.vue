@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-06 19:53:52
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-10 12:22:23
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
 -->
@@ -222,7 +222,7 @@ export default {
   created() {
     this.comname = this.$route.query.comname
     this.comcode = this.$route.query.comcode
-    this.onSearch({ com: '' })
+    // this.onSearch({ com: '' })
     // this.getDicsList()
   },
   mounted() {

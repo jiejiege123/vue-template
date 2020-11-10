@@ -27,6 +27,7 @@ div(style="width:100%; height:100%")
       :showDel="false"
       :showSelection="true"
       :showBatchDel="false"
+      :cellClassName="cellClassName"
       @onSelectChange="onSelectChange"
       @onHandleCurrentChange="handleCurrentChange"
       @onHandleSizeChange="handleSizeChange"
@@ -36,10 +37,17 @@ div(style="width:100%; height:100%")
       :formRules="formRules"
       :tableData='tableData'
       :columns="tableColumn")
-      //- template(v-slot:columnHead)
-      //-   el-table-column(label="二维码" align="center" width="80px" type="index")
-      //-     template(slot-scope='scope')
-      //-       svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr")
+      template(v-slot:columnHead)
+        el-table-column(label="IMEI" align="center" width="180px" type="index" prop="IMEI")
+          template(slot-scope='scope')
+            .layout-row.align-center
+              span#imei(onselectstart="return false" style="-moz-user-select:none;") {{scope.row.IMEI}}
+              svg-icon.clr_b2.hand(icon-class="copy"
+              onselectstart="return false" style="font-size: 20px;margin-left:5px;-moz-user-select:none" @click.stop="copyImei(scope.row.IMEI)")
+      template(v-slot:columnFoot)
+        el-table-column(label="设备状态" align="center" width="80px" type="index" prop="devicevaluezh")
+          template(slot-scope='scope')
+            span.hand(@click="showTableDialog('devicevalue')") {{scope.row.devicevaluezh}}
             //- svg vue-qr(:text="scope.row.IMEI" :size="25")
       template(v-slot:outOperate)
         el-button(
@@ -65,9 +73,9 @@ div(style="width:100%; height:100%")
             el-dropdown-item(style="width:120px") 状态复位
       template(v-slot:operation="{row}")
         svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr(row.IMEI)")
-
+        el-button.ml_10(type="primary" size="small" @click.stop="goDetail(row)") 详情
     //- 二维码 弹窗
-    el-dialog.dialog-pad(
+    el-dialog.dialog-pr(
       title="二维码"
       :append-to-body="true"
       :visible.sync="qrVisible"
@@ -86,10 +94,56 @@ div(style="width:100%; height:100%")
       el-form.default-input(
         v-loading="formLoadingDia"
         :model='ruleForm'
-        :class="{'inline': inline}"
         ref='ruleForm'
         :rules="formRulesDia"
-        :label-width='120')
+        label-width='80px')
+        //- 开始各种判断
+        el-form-item(
+          prop='IMEI'
+          label="IMEI")
+          el-input(
+            style="width: 400px"
+            v-model='ruleForm.IMEI'
+            placeholder="请输入要添加到IMEI号")
+        el-form-item.dia-footer()
+          el-button(@click="dialogVisible = false" size="small") 取消
+          el-button(type='primary', @click="submitForm" size="small") 提交
+    //- 列表弹窗
+    el-dialog.dialog-table(
+      :title="tableDialogTitle"
+      :append-to-body="true"
+      :visible.sync="tableDialogVisible"
+      @close="tableDialogVisible === false"
+      :top="tableDialogTop"
+      :width="tableDialogWidth")
+      .layout-column(style="height: 100%")
+        .header.layout-row__between
+          .query
+            Query(
+              :queryList="tableQueryList"
+              :hasAdvQuery='false'
+              :dics="tableQueryDics"
+              :btnLoading="tableLoading"
+              @onSearch="onSearchTable")
+        edit-table-form(
+          :loading='tableLoading'
+          :hasOutOperat="false"
+          :tableData="tableDialogData"
+          :columns="tableDialogColums"
+          :disOperated="tableDisOperated"
+          operateWidth="220"
+          :showSelection="false"
+          :showIndex="false"
+          :showView="false"
+          :showEdit="false"
+          :showDel="false"
+          :hasPages="true"
+          :currentPage="tableCurrentPage"
+          :total="tableTotal"
+          :pageSize="tablePageSize"
+          :dics="tableDics"
+          @onHandleCurrentChange="handleCurrentChangeTable"
+          @onHandleSizeChange="handleSizeChangeTable")
 </template>
 <script >
 import Query from '@/components/Query'
@@ -225,16 +279,16 @@ export default {
           xinhaozh: 'RT-M11-N',
           picizh: '333-201031-01',
           comname: '最高公司',
-          modezh: '工程'
+          modezh: '工程',
+          devicevaluezh: '正常'
         }
       ],
       tableColumn: [
-        {
-          label: 'IMEI',
-          prop: 'IMEI',
-          width: '130px'
-
-        },
+        // {
+        //   label: 'IMEI',
+        //   prop: 'IMEI',
+        //   width: '140px'
+        // },
         {
           label: '所属单位',
           prop: 'comname',
@@ -257,10 +311,10 @@ export default {
           label: '设备型号',
           prop: 'xinhaozh'
         },
-        {
-          label: '设备状态',
-          prop: 'devicevaluezh'
-        },
+        // {
+        //   label: '设备状态',
+        //   prop: 'devicevaluezh'
+        // },
         {
           label: '在线状态',
           prop: 'onlinevaluezh'
@@ -301,7 +355,30 @@ export default {
       dialogVisible: false,
       formLoadingDia: false,
       ruleForm: {},
-      formRulesDia: {}
+      formRulesDia: {
+        IMEI: [
+          { required: true, message: '请输入IMEI号码', trigger: 'blur' },
+          { min: 1, max: 25, message: '长度在 3 到 25 个字符', trigger: 'blur' }
+        ]
+      },
+      moreOne: false,
+      // 表格弹窗
+      tableType: 'devicevalue',
+      tableDialogTitle: '',
+      tableDialogVisible: false,
+      tableDialogWidth: '1000px',
+      tableDialogTop: '10vh',
+      tableQueryList: [],
+      tableQuery: {},
+      tableQueryDics: {},
+      tableDialogData: [],
+      tableDialogColums: [],
+      tableDisOperated: true,
+      tableCurrentPage: 1,
+      tableTotal: 1,
+      tablePageSize: 20,
+      tableDics: {}
+
     }
   },
   computed: {
@@ -319,6 +396,20 @@ export default {
   mounted() {
   },
   methods: {
+    cellClassName({ row, column, rowIndex, columnIndex }) {
+      if (column.property === 'devicevaluezh') {
+        switch (row.devicevaluezh) {
+          case '正常':
+            // 通过
+            return 'approve-pass'
+          // 拒绝
+          case '不正常':
+            return 'approve-refused'
+          default:
+            return 'approve-ing'
+        }
+      }
+    },
     handleCurrentChange(e) {
       this.currentPage = e
       this.getDataList()
@@ -327,6 +418,7 @@ export default {
       this.pageSize = e
       this.getDataList()
     },
+
     onSearch(query) {
       this.currentPage = 1
       this.pageSize = 20
@@ -431,6 +523,58 @@ export default {
     showQr(val) {
       this.qrVisible = true
       this.qrValue = val
+    },
+    goDetail(row) {
+      this.$router.push(
+        { path: '/Equipment/EquipmentItem', query: {
+          IMEI: row.IMEI
+        }})
+    },
+    copyImei(imei) {
+      var val = document.getElementById('imei')// 此处为需要复制文本的包裹元素
+      window.getSelection().selectAllChildren(val)
+      document.execCommand('Copy')
+      this.$notify({
+        title: '复制成功',
+        message: imei,
+        type: 'success',
+        duration: 2000
+      })
+    },
+    showTableDialog(type) {
+      this.tableType = type
+      this.tableDialogVisible = true
+      this.tableQueryList = [
+        {
+          label: '事件名称',
+          prop: 'IMEI',
+          holder: '请选择事件名称',
+          queryType: false
+        }
+      ]
+      this.tableDialogColums = [
+        {
+          prop: '',
+          label: ''
+        }
+      ]
+      this.getWhatDataList()
+    },
+    handleCurrentChangeTable(e) {
+      this.tableCurrentPage = e
+      this.getWhatDataList()
+    },
+    handleSizeChangeTable(e) {
+      this.tablePageSize = e
+      this.getWhatDataList()
+    },
+    onSearchTable(query) {
+      this.tableCurrentPage = 1
+      this.tablePageSize = 20
+      this.tableQuery = query
+    },
+    getWhatDataList() {
+
     }
 
   }
@@ -449,6 +593,28 @@ export default {
 }
 .dialog-pad{
   ::v-deep .el-dialog__body{
+    height: calc(100vh - 300px);
+    padding: 10px 20px 30px;
+  }
+}
+.dialog-pr{
+  ::v-deep .el-dialog__body{
+    padding: 10px 20px 30px;
+  }
+}
+.dia-footer{
+  position: relative;
+  text-align: right;
+  width: 100%;
+  padding-right: 20px;
+}
+.inline{
+  display: flex;
+  flex-wrap: wrap;
+}
+.dialog-table{
+  ::v-deep .el-dialog__body{
+    height: calc(100vh - 150px);
     padding: 10px 20px 30px;
   }
 }
