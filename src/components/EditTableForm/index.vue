@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-09 17:00:17
+ * @LastEditTime: 2020-11-11 14:28:23
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -32,7 +32,9 @@
       height="250"
       border
       ref="reftable"
-      :tree-props="{children: 'children'}"
+      default-expand-all
+      row-key="comid"
+      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       :cell-class-name="cellClassName"
       @row-click="rowClick"
       @selection-change="selectionChange"
@@ -60,7 +62,7 @@
             :src="scope.row[item.prop] | filterImg"
             :preview-src-list="[scope.row[item.prop] | filterImg]"
             style="width:40px;height:40px;cursor: pointer")
-          span(v-else-if="item.filter") {{dics[item.prop].find(n => n.value === scope.row[item.prop]).label}}
+          span(v-else-if="item.filter") {{dics[item.prop].find(n => n.value === scope.row[item.prop]) ? dics[item.prop].find(n => n.value === scope.row[item.prop]).label : scope.row[item.prop]}}
           slot(v-else-if="item.slot" :name="item.prop" :row="scope.row")
 
           span(v-else) {{scope.row[item.prop]}}
@@ -241,7 +243,7 @@
               )
         el-form-item.dia-footer(v-if="dialogType !== 'view'")
           el-button(@click="closeDialog" size="small") 取消
-          el-button(type='primary', @click="submitForm" size="small") 提交
+          el-button(type='primary', @click="submitForm('ruleForm')" size="small") 提交
     //- 地图弹窗
     MapDialog(
       v-if="hasMap"
@@ -610,11 +612,19 @@ export default {
         })
       })
     },
-    submitForm() {
-      this.$emit('onSubmitForm', this.ruleForm, this.dialogType, (ok) => {
-        if (ok) {
-          this.visible = false
-        } else { return }
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$emit('onSubmitForm', this.ruleForm, this.dialogType, (ok) => {
+            if (ok) {
+              this.visible = false
+            } else { return }
+          })
+        } else {
+          this.$message.error('请将加*内容填写完整')
+          console.error('error submit!!')
+          return false
+        }
       })
     },
     getImgCutUrl(url, prop) {

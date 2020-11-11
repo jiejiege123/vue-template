@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-09 10:59:13
+ * @LastEditTime: 2020-11-11 09:32:54
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\store\modules\permission.js
@@ -101,13 +101,15 @@ const actions = {
             }
             const breadcrumbItem = []
             if (n.Url === 'User' || n.Url === 'Role') {
-              hidden = true
-              activeMenu = '/System/Companys'
+              hidden = false
+              activeMenu = ''
+              // activeMenu = '/System/Companys'
               noCache = true
-              noTagView = true
-              findItem(addRoutes, item => {
-                return item.name === 'Companys'
-              }, breadcrumbItem, 'children')
+              noTagView = false
+              // noTagView = true
+              // findItem(addRoutes, item => {
+              //   return item.name === 'Companys'
+              // }, breadcrumbItem, 'children')
             } else if (n.Url === 'EquipmentItem') {
               hidden = true
               activeMenu = '/Equipment/EquipmentLists'
@@ -125,7 +127,8 @@ const actions = {
             }
 
             if (n.Url === 'Companys') {
-              activeTags = '/System/Role,/System/User'
+              activeTags = ''
+              // activeTags = '/System/Role,/System/User'
             } else if (n.Url === 'EquipmentLists') {
               activeTags = '/Equipment/EquipmentItem'
             } else {

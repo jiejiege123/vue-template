@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-10 12:22:02
+ * @LastEditTime: 2020-11-11 12:25:37
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -69,7 +69,7 @@ import EditTableForm from '@/components/EditTableForm'
 import { getCompany, addCom, delCom, updateCom } from '@/api/com'
 import { getDicsByName } from '@/api/commom'
 
-import { checkPhone } from '@/utils/index'
+import { checkPhone, toTree } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Companys',
@@ -117,7 +117,7 @@ export default {
         {
           prop: 'comcode',
           label: '单位ID',
-          width: 120,
+          width: 200,
           tableOnly: true
         },
         {
@@ -142,7 +142,7 @@ export default {
           prop: 'comname',
           label: '单位名称',
           editAble: true,
-          minWidth: 300
+          minWidth: 250
         },
         {
           prop: 'comtype',
@@ -158,13 +158,13 @@ export default {
           tableOnly: true
         },
         {
-          prop: 'subNum',
+          prop: 'lowercomnum',
           label: '下级数量',
           width: 80,
           tableOnly: true
         },
         {
-          prop: 'showIndex',
+          prop: 'sortno',
           label: '显示排序',
           width: 80,
           default: '0',
@@ -174,8 +174,9 @@ export default {
         {
           prop: 'address',
           label: '单位地址',
+          addDisable: true,
           formOnly: true,
-          editAble: true,
+          editAble: false,
           online: true,
           formStyle: {
             width: '600px'
@@ -184,14 +185,16 @@ export default {
         {
           prop: 'comtel',
           label: '单位电话',
+          addDisable: true,
           formOnly: true,
-          editAble: true
+          editAble: false
         },
         {
           prop: 'fzr',
+          addDisable: true,
           label: '负责人',
           formOnly: true,
-          editAble: true
+          editAble: false
         },
         {
           prop: 'rmb',
@@ -203,14 +206,16 @@ export default {
         {
           prop: 'comtitle',
           label: '网站名称',
+          addDisable: true,
           formOnly: true,
-          editAble: true
+          editAble: false
         },
         {
           prop: 'comlogo',
+          addDisable: true,
           label: '网站logo',
           formOnly: true,
-          editAble: true,
+          editAble: false,
           type: 'img'
         },
         {
@@ -227,7 +232,7 @@ export default {
           { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ],
         comtype: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
-        showIndex: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
+        sortno: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
         comtel: [{ validator: isPhone, trigger: 'blur' }]
       },
       dics: {
@@ -263,8 +268,8 @@ export default {
   },
   activated() {
     // 保持半缓存
-    // this.onSearch({ com: '' })
-    // this.getDicsList()
+    this.onSearch({ com: '' })
+    this.getDicsList()
   },
   mounted() {
   },
@@ -331,13 +336,17 @@ export default {
           this.loading = false
         })
         const data = res.Data.Models
+        // 遍历树形菜单
         data.forEach(n => {
           if (n.comcode === this.userInfo.comcode) {
             n.delDisabled = true
           }
         })
-        this.tableData = res.Data.Models
-        this.$set(this.dics, 'pcode', res.Data.Models)
+
+        const setData = toTree(data)
+        console.log(setData)
+        this.tableData = setData
+        this.$set(this.dics, 'pcode', setData)
         this.total = res.Data.TotalCount
       }).catch((err) => {
         this.$message.error(err)
@@ -357,6 +366,7 @@ export default {
       }
       methods(params).then(res => {
         this.formLoading = true
+        this.getDataList()
         cb(true)
       }).catch((err) => {
         this.$message.error(err)
@@ -365,7 +375,7 @@ export default {
     },
     onDeleted(row) {
       const params = {
-        cid: row.id
+        comid: row.comid
       }
       delCom(params).then(res => {
         this.$message({

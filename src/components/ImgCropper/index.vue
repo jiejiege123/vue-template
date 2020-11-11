@@ -82,6 +82,13 @@ export default {
       }
     }
   },
+  props: {
+    srcOpen: {
+      type: String,
+      default: ''
+    }
+  },
+
   data() {
     return {
       btnLoading: false,
@@ -106,6 +113,19 @@ export default {
       },
       fileName: '', // 本机文件地址
       previewStyle1: {}
+    }
+  },
+  watch: {
+    srcOpen: {
+      handler(newVal) {
+        console.log(newVal)
+        if (newVal) {
+          console.log(newVal)
+          this.imgFile = newVal
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   methods: {

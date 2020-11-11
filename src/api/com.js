@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2020-11-03 12:15:16
- * @LastEditTime: 2020-11-05 17:07:45
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-11 11:03:56
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\api\com.js
  */
@@ -32,10 +32,11 @@ export function updateCom(data) {
     data
   })
 }
+
 // 删除公司
 export function delCom(params) {
   return request({
-    url: '/api/company/deltet',
+    url: '/api/company/delete',
     method: 'get',
     params
   })
@@ -53,6 +54,13 @@ export function getUserList(data) {
 export function addUser(data) {
   return request({
     url: '/api/user/add',
+    method: 'post',
+    data
+  })
+}
+export function changepwd(data) {
+  return request({
+    url: '/api/user/changepwd',
     method: 'post',
     data
   })

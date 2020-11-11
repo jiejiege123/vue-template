@@ -272,6 +272,46 @@ const actions = {
                 'Children': []
               }
             ]
+          },
+          {
+            'Id': '976247111765495809',
+            'Name': '系统设置',
+            'Url': 'Sys',
+            'Type': 4,
+            'Icon': 'sys',
+            'Children': [
+              {
+                'Id': '976229042405838848',
+                'Name': '平台设置',
+                'ParentId': '976247111765495809',
+                'Url': 'CompanyInfo',
+                'Type': 1,
+                'Icon': null,
+                'Children': []
+              },
+              {
+                'Id': '976229042405838849',
+                'Name': '其他设置',
+                'ParentId': '976247111765495809',
+                'Type': 1,
+                'Url': 'User',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['User01', 'User02', 'User03']
+              }
+              // {
+              //   'Id': '975247111769690116',
+              //   'Name': '权限列表',
+              //   'ParentId': '975247111765495809',
+              //   'Type': 1,
+              //   'Url': 'Permission',
+              //   'Icon': null,
+              //   'SortCode': 33,
+              //   'Children': [],
+              //   'Btns': ['Permission01', 'Permission02', 'Permission03']
+              // },
+            ]
           }
 
         ]

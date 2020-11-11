@@ -26,30 +26,105 @@
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
-          <router-link to="/profile/index">
+          <!-- <router-link to="/profile/index">
             <el-dropdown-item>
               {{ $t('navbar.profile') }}
             </el-dropdown-item>
-          </router-link>
-          <router-link to="/">
+          </router-link> -->
+          <!-- <router-link to="/">
             <el-dropdown-item>
               {{ $t('navbar.dashboard') }}
             </el-dropdown-item>
-          </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-element-admin/">
+          </router-link> -->
+          <!-- <a target="_blank" href="https://github.com/PanJiaChen/vue-element-admin/">
             <el-dropdown-item>
               {{ $t('navbar.github') }}
             </el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
+          </a> -->
+          <!-- <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
             <el-dropdown-item>Docs</el-dropdown-item>
-          </a>
+          </a> -->
+          <el-dropdown-item divided>
+            <span style="display:block;" @click="showModify">修改密码</span>
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">{{ $t('navbar.logOut') }}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <el-dialog
+      title="修改密码"
+      :visible.sync="dialogFormVisible"
+      append-to-body
+      width="30%"
+      class="dialog-class"
+      @open="open('pwdform')"
+    >
+      <el-form ref="pwdform" :model="form" :rules="rules">
+        <el-form-item prop="oldPassword" label="原密码" label-width="80px">
+          <el-input
+            :key="oldPasswordType"
+            ref="oldPasswordType"
+            v-model="form.oldPassword"
+            :type="oldPasswordType"
+            placeholder="请输入旧密码"
+            name="password"
+            tabindex="2"
+            size="small"
+            auto-complete="on"
+          />
+          <span slot="suffix" class="show-pwd" @click="showPwd('oldPasswordType')">
+            <svg-icon :icon-class="oldPasswordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+
+        </el-form-item>
+
+        <el-form-item prop="newPassword" label="新密码" label-width="80px">
+
+          <el-input
+            :key="newPasswordType"
+            ref="newPasswordType"
+            v-model="form.newPassword"
+            :type="newPasswordType"
+            placeholder="请输入新密码"
+            name="password"
+            tabindex="2"
+            size="small"
+            auto-complete="on"
+          />
+          <span slot="suffix" class="show-pwd" @click="showPwd('newPasswordType')">
+            <svg-icon :icon-class="newPasswordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+
+        </el-form-item>
+
+        <el-form-item prop="checkPassword" label="确认密码" label-width="80px">
+
+          <el-input
+            :key="checkPasswordType"
+            ref="checkPasswordType"
+            v-model="form.checkPassword"
+            :type="checkPasswordType"
+            placeholder="请再次输入新密码"
+            name="password"
+            size="small"
+            tabindex="2"
+            auto-complete="on"
+            @keyup.enter.native="handlePost('pwdform')"
+          />
+          <span slot="suffix" class="show-pwd" @click="showPwd('checkPasswordType')">
+            <svg-icon :icon-class="checkPasswordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" size="small" @click="handlePost('pwdform')">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -62,6 +137,7 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import Search from '@/components/HeaderSearch'
+import { changepwd } from '@/api/com'
 
 export default {
   components: {
@@ -73,13 +149,51 @@ export default {
     LangSelect,
     Search
   },
+  data() {
+    var validatePass = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入密码'))
+      } else {
+        if (this.form.checkPassword !== '') {
+          this.$refs.pwdform.validateField('checkPassword')
+        }
+        callback()
+      }
+    }
+    var validatePass2 = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.form.newPassword) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      dialogFormVisible: false,
+      form: {},
+      oldPasswordType: 'password',
+      newPasswordType: 'password',
+      checkPasswordType: 'password',
+      // "UserId": "",
+      // 	"OldPassowrd": "",
+      // 	"NewPassowrd": ""
+      rules: {
+        oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
+        newPassword: [{ validator: validatePass, required: true, trigger: 'blur' }],
+        checkPassword: [{ validator: validatePass2, required: true, trigger: 'blur' }]
+      }
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
       'avatar',
-      'device'
+      'device',
+      'userInfo'
     ])
   },
+
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
@@ -87,6 +201,49 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    showModify() {
+      this.dialogFormVisible = true
+    },
+    /**
+     * @description: '提交修改密码'
+     * @param {type} ''
+     * @return: ''
+     */
+    handlePost(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const params = {
+            'UserId': this.userInfo.userid,
+            'OldPassowrd': this.form.oldPassword,
+            'NewPassowrd': this.form.newPassword
+          }
+          changepwd(params).then(res => {
+            this.$message.success('密码修改成功')
+            this.logout()
+          })
+        } else {
+          this.$message.error('请将加*内容填写完整')
+          console.error('error submit!!')
+          return false
+        }
+      })
+    },
+    showPwd(type) {
+      if (this[type] === 'password') {
+        this[type] = ''
+      } else {
+        this[type] = 'password'
+      }
+      this.$nextTick(() => {
+        this.$refs[type].focus()
+      })
+    },
+    open(formName) {
+      this.$nextTick(() => {
+        this.$refs[formName].clearValidate()
+        this.form = {}
+      })
     }
   }
 }

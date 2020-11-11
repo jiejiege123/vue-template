@@ -1,15 +1,15 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-06 19:53:52
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-11 14:34:05
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
 -->
 <template lang="pug">
 .content.layout-column
   //- 返回单位管理查单
-  .hearer-breadcrumb
+  .hearer-breadcrumb(v-if="comcode")
     el-button(type="text" style="padding: 0" @click="goCompany") 单位管理
     i.el-icon-arrow-right
     span 角色列表
@@ -49,7 +49,7 @@
         inactive-color="#ff4949"
         :active-value="1"
         :inactive-value="0"
-        @change="statusChange")
+        @change="statusChange($event, row)")
   //- 权限列表弹出
   el-dialog.add-dialog(
     :title='preTitle',
@@ -95,8 +95,8 @@
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getRoleList, addCom, updateRole, enableRole } from '@/api/com'
-import { getDicsByName } from '@/api/commom'
+import { getRoleList, addRole, updateRole, enableRole } from '@/api/com'
+// import { getDicsByName } from '@/api/commom'
 
 import { mapGetters } from 'vuex'
 export default {
@@ -128,18 +128,19 @@ export default {
        */
       loading: false,
       tableData: [
-        {
-          id: '1234',
-          Name: '最高权限',
-          Description: '这是最高权限',
-          IsSystem: true,
-          Status: 1
-        }
+        // {
+        //   id: '1234',
+        //   Name: '最高权限',
+        //   Description: '这是最高权限',
+        //   IsSystem: true,
+        //   Status: 1
+        // }
       ],
       tableColumn: [
         {
           prop: 'id',
           label: 'ID',
+          width: 100,
           tableOnly: true
         },
         {
@@ -273,8 +274,8 @@ export default {
     this.comcode = this.$route.query.comcode
     this.preTableData = JSON.parse(localStorage.getItem('routers'))
     console.log(this.preTableData)
-    // this.onSearch({ com: '' })
-    // this.getDicsList()
+    this.onSearch({ Name: '' })
+    this.getDicsList()
   },
   activated() {
     // 保持半缓存
@@ -317,30 +318,30 @@ export default {
       this.getDataList()
     },
     getDicsList() {
-      const params = {
-        names: '公司类型'
-      }
-      getDicsByName(params).then(res => {
-        // console.log(res)
-        const dics = res.Data
-        dics.forEach(n => {
-          n.value = n.dicvalue
-          n.label = n.diczh
-          switch (n.groupzh) {
-            case '公司类型':
-              this.dics.comType.push(n)
-              break
-            default:
-              break
-          }
-        })
-      })
+      // const params = {
+      //   names: '公司类型'
+      // }
+      // getDicsByName(params).then(res => {
+      //   // console.log(res)
+      //   const dics = res.Data
+      //   dics.forEach(n => {
+      //     n.value = n.dicvalue
+      //     n.label = n.diczh
+      //     switch (n.groupzh) {
+      //       case '公司类型':
+      //         this.dics.comType.push(n)
+      //         break
+      //       default:
+      //         break
+      //     }
+      //   })
+      // })
     },
     getDataList() {
       const params = {
         PageIndex: this.currentPage,
         PageSize: this.pageSize,
-        Keywords: this.query.com
+        Keywords: this.query.Name
       }
       this.loading = true
       getRoleList(params).then(res => {
@@ -348,13 +349,9 @@ export default {
           this.loading = false
         })
         const data = res.Data.Models
-        data.forEach(n => {
-          if (n.comcode === this.userInfo.comcode) {
-            n.delDisabled = true
-          }
-        })
-        this.tableData = res.Data.Models
-        this.$set(this.dics, 'pcode', res.Data.Models)
+
+        this.tableData = data
+        this.$set(this.dics, 'pcode', data)
         this.total = res.Data.TotalCount
       }).catch((err) => {
         this.$message.error(err)
@@ -363,12 +360,10 @@ export default {
     },
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
-      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType) ? this.dics.comType.find(n => n.value === params.comType).label : ''
-      params.pcodename = this.tableData.find(n => n.comcode === params.pcode) ? this.tableData.find(n => n.comcode === params.pcode).comname : ''
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
-        methods = addCom
+        methods = addRole
       } else {
         methods = updateRole
       }
@@ -385,8 +380,17 @@ export default {
     goCompany() {
       this.$router.push('/System/Companys')
     },
-    statusChange(e) {
-      enableRole().then(res => {})
+    statusChange(e, row) { // 启用或者停用
+      console.log(row)
+      const params = Object.assign({}, row)
+      params.Status = e
+      enableRole(params).then(res => {
+        console.log(res)
+        this.$message.success(res.Data)
+        this.getDataList()
+      }).catch(err => {
+        console.error(err)
+      })
     },
     selectFocus(prop, ruleForm, cb) {
       if (prop === 'PermissionIds') {

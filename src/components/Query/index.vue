@@ -22,6 +22,7 @@
             v-model="query[item.prop]"
             :placeholder="item.holder"
             size="small"
+            style="padding-right:15px; width:160px"
             clearable)
       //- 干掉分开的东西 免得不方便
       el-col(:span="span" :offset="queryHandleOffset")
@@ -47,17 +48,28 @@
             v-model="query[item.prop]"
             :placeholder="item.holder"
             filterable
-            style="width:200px"
+            :style="{width: inputWidth}"
+            :clearable="item.clearable"
             size="small"
-            clearable)
+            )
             el-option(
               v-for="(list,index) in dics[item.prop]"
               :key="index"
               :label="list.label"
               :value="list.value")
+          el-cascader.mr_15(
+              v-else-if="item.type === 'cascader'"
+              :options='dics[item.prop]',
+              :show-all-levels='item.showAllLevels'
+              :props="item.props"
+              v-model="query[item.prop]"
+              :placeholder="item.holder"
+              :style="{width: inputWidth}"
+              :clearable="item.clearable"
+              filterable)
           el-input.mr_15(
             v-else
-            style="width:200px"
+            :style="{width:inputWidth}"
             v-model="query[item.prop]"
             :placeholder="item.holder"
             size="small"
@@ -109,6 +121,10 @@ export default {
     hasAdvQuery: {
       type: Boolean,
       default: false
+    },
+    inputWidth: {
+      type: String,
+      default: '200px'
     }
   },
   data() {
@@ -179,7 +195,7 @@ export default {
       const query = {}
       this.queryShow.forEach(n => {
         if (n.queryType === this.queryType) {
-          query[n.prop] = this.query[n.prop] || null
+          query[n.prop] = this.query[n.prop]
         }
       })
       this.$emit('onSearch', query)
@@ -188,8 +204,11 @@ export default {
       for (const key in this.query) {
         // eslint-disable-next-line no-prototype-builtins
         if (this.query.hasOwnProperty(key)) {
-          if (this.queryShow.find(n => n.prop === key)) {
-            this.$set(this.query, [key], '')
+          const rse = this.queryShow.find(n => n.prop === key)
+          console.log(rse)
+
+          if (rse) {
+            this.$set(this.query, [key], rse.default || '')
           }
         }
       }
