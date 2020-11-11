@@ -1,3 +1,7 @@
+/*
+ * @Author: zzz
+ * @LastEditors: zzz
+ */
 import request from '@/utils/request'
 
 // 获取设备列表
@@ -30,6 +34,39 @@ export function updateEqui(data) {
 export function delEqui(params) {
   return request({
     url: '/api/device/delete',
+    method: 'get',
+    params
+  })
+}
+
+// 批次管理
+export function getPiciList(data) {
+  return request({
+    url: '/api/pici/search',
+    method: 'post',
+    data
+  })
+}
+
+export function addPici(data) {
+  return request({
+    url: '/api/pici/add',
+    method: 'post',
+    data
+  })
+}
+
+export function updatePici(data) {
+  return request({
+    url: '/api/pici/update',
+    method: 'post',
+    data
+  })
+}
+
+export function delPici(params) {
+  return request({
+    url: '/api/pici/delete',
     method: 'get',
     params
   })

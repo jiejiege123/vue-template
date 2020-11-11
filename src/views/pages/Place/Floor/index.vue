@@ -1,8 +1,8 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-06 19:53:52
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-11 17:50:04
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
 -->
@@ -11,12 +11,12 @@ div(style="width:100%; height:100%")
   .content.layout-column
     .header.layout-row__between
       .query
-        Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
+        Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch" :dics="dics")
     edit-table-form(
       :loading='loading'
       :inline="false"
       operateWidth='200'
-      :hasPages="false"
+      :hasPages="true"
       :currentPage="currentPage"
       :total="total"
       :pageSize="pageSize"
@@ -49,7 +49,7 @@ div(style="width:100%; height:100%")
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getCompany, addCom, delCom, updateCom } from '@/api/com'
+import { getBuildingList, getFloorList, addFloor, deleteFloor, updateFloor } from '@/api/place'
 import { getDicsByName } from '@/api/commom'
 
 import { checkPhone } from '@/utils/index'
@@ -81,8 +81,9 @@ export default {
       queryList: [
         {
           label: '建筑物',
-          prop: 'jzwname',
+          prop: 'jzwid',
           holder: '请输入建筑物名称',
+          type: 'select',
           queryType: false
         },
 
@@ -98,14 +99,7 @@ export default {
        * 表格
        */
       loading: false,
-      tableData: [
-        {
-          lcname: '1楼',
-          jzwname: '最高建筑物',
-          comname: '最高公司',
-          pmt: '1楼'
-        }
-      ],
+      tableData: [],
       tableColumn: [
         {
           prop: 'lcname',
@@ -122,8 +116,8 @@ export default {
         {
           prop: 'jzwid',
           label: '建筑物名称',
-          formOnly: true,
-          type: 'select'
+          type: 'select',
+          formOnly: true
         },
 
         {
@@ -161,6 +155,7 @@ export default {
         comtel: [{ validator: isPhone, trigger: 'blur' }]
       },
       dics: {
+        jzwid: [],
         pcode: [],
         comType: [
           // {
@@ -188,12 +183,13 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    // this.onSearch({ com: '' })
+    this.getBuildingData()
+    this.onSearch({})
     // this.getDicsList()
   },
   activated() {
     // 保持半缓存
-    this.onSearch({ com: '' })
+    this.onSearch()
     this.getDicsList()
   },
   mounted() {
@@ -234,24 +230,23 @@ export default {
       })
     },
     getDataList() {
+      if (this.query.jzwid) {
+        this.query.jzwname = this.dics.jzwid.find(n => n.value === this.query.jzwid).jwzname
+      }
+      this.query.jzwid
       const params = {
         PageIndex: this.currentPage,
         PageSize: this.pageSize,
-        Keywords: this.query.com
+        ...this.query
       }
       this.loading = true
-      getCompany(params).then(res => {
+      getFloorList(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
-        const data = res.Data.Models
-        data.forEach(n => {
-          if (n.comcode === this.userInfo.comcode) {
-            n.delDisabled = true
-          }
-        })
+
         this.tableData = res.Data.Models
-        this.$set(this.dics, 'pcode', res.Data.Models)
+        // this.$set(this.dics, 'pcode', res.Data.Models)
         this.total = res.Data.TotalCount
       }).catch((err) => {
         this.$message.error(err)
@@ -260,17 +255,18 @@ export default {
     },
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
-      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType) ? this.dics.comType.find(n => n.value === params.comType).label : ''
-      params.pcodename = this.tableData.find(n => n.comcode === params.pcode) ? this.tableData.find(n => n.comcode === params.pcode).comname : ''
+
+      params.jzwname = this.dics.jzwid.find(n => n.value === params.jzwid).jwzname
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
-        methods = addCom
+        methods = addFloor
       } else {
-        methods = updateCom
+        methods = updateFloor
       }
       methods(params).then(res => {
         this.formLoading = true
+        this.getDataList()
         cb(true)
       }).catch((err) => {
         this.$message.error(err)
@@ -279,9 +275,9 @@ export default {
     },
     onDeleted(row) {
       const params = {
-        cid: row.id
+        lcid: row.lcid
       }
-      delCom(params).then(res => {
+      deleteFloor(params).then(res => {
         this.$message({
           type: 'success',
           message: '删除成功!'
@@ -291,22 +287,24 @@ export default {
         console.error(err)
       })
     },
-    goUser(row) {
-      console.log(row)
-      // this.showComSup = false
-      this.$router.push(
-        { path: '/System/User', query: {
-          comcode: row.comcode,
-          comname: row.comname
-        }}
-      )
-    },
-    goRole(row) {
-      this.$router.push(
-        { path: '/System/Role', query: {
-          comcode: row.comcode,
-          comname: row.comname
-        }})
+    getBuildingData() {
+      const params = {
+        PageIndex: 1,
+        PageSize: 9999
+      }
+      getBuildingList(params).then(res => {
+        this.$nextTick(() => {
+        })
+        const data = res.Data.Models
+        data.forEach(n => {
+          n.value = n.jzwid
+          n.label = n.jwzname
+        })
+        this.$set(this.dics, 'jzwid', data)
+      }).catch((err) => {
+        this.$message.error(err)
+        this.loading = false
+      })
     }
   }
 }

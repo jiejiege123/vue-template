@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-11 14:46:28
+ * @LastEditTime: 2020-11-11 17:52:31
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -11,25 +11,7 @@ div(style="width:100%; height:100%")
   .content.layout-column
     .header.layout-row__between
       .query.layout-row.mb_15
-        //- Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
-        el-dropdown(
-          size="small"
-          @command="searchTypeChange" trigger="click")
-          el-button(style="margin-right: 5px") {{searchTitle}}
-            i.el-icon-arrow-down.el-icon--right
-          el-dropdown-menu(slot='dropdown')
-            el-dropdown-item(command="comname") 单位名称
-            el-dropdown-item(command="comcode") 单位ID
-
-        el-input.mr_15(
-          style="width: 200px"
-          v-model="search"
-          :placeholder="queryHolder"
-          clearable)
-        el-button(
-          :loading="loading"
-          type="primary"
-          @click='search') 查询
+        Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
 
     edit-table-form(
       :loading='loading'
@@ -55,24 +37,18 @@ div(style="width:100%; height:100%")
       :formRules="formRules"
       :tableData='tableData'
       :columns="tableColumn")
-      template(v-slot:operation="{row}")
-        el-button(
-          @click.stop="goUser(row)"
-          size="small") 用户
-        el-button(
-          @click.stop="goRole(row)"
-          size="small") 角色
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getCompany, addCom, delCom, updateCom } from '@/api/com'
+import { getPiciList, addPici, delPici, updatePici } from '@/api/com'
 import { getDicsByName } from '@/api/commom'
 
-import { checkPhone, toTree } from '@/utils/index'
+import { toTree } from '@/utils/index'
+// import { checkPhone, toTree } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
-  name: 'Companys',
+  name: 'DeviceBatch',
   components: {
     Query,
     EditTableForm
@@ -81,33 +57,30 @@ export default {
 
   },
   data() {
-    var isPhone = (rule, value, callback) => {
-      if (value) {
-        if (!checkPhone(value)) {
-          callback(new Error('请输入正确的电话号码'))
-        } else {
-          callback()
-        }
-      }
-    }
+    // var isPhone = (rule, value, callback) => {
+    //   if (value) {
+    //     if (!checkPhone(value)) {
+    //       callback(new Error('请输入正确的电话号码'))
+    //     } else {
+    //       callback()
+    //     }
+    //   }
+    // }
     return {
       /**
        * 查询
        */
-      searchTitle: '单位名称',
-      searchProp: 'comname',
       input: '',
-      queryHolder: '请输入单位名称',
+
+      query: {},
+      search: '',
       queryList: [
         {
-          label: '单位名称',
-          prop: 'com',
-          holder: '请输入单位名称',
+          prop: 'pici',
+          label: '批次',
           queryType: false
         }
       ],
-      query: {},
-      search: '',
       /**
        * 表格
        */
@@ -226,31 +199,10 @@ export default {
         }
       ],
       formRules: {
-        pcode: [{ required: true, message: '请选择上级单位', trigger: 'change' }],
-        comname: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        ],
-        comtype: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
-        sortno: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
-        comtel: [{ validator: isPhone, trigger: 'blur' }]
+
       },
       dics: {
-        pcode: [],
-        comtype: [
-          // {
-          //   value: 1,
-          //   label: '进销商'
-          // },
-          // {
-          //   value: 2,
-          //   label: '工程商'
-          // },
-          // {
-          //   value: 3,
-          //   label: '业主单位'
-          // }
-        ]
+
       },
       currentPage: 1,
       pageSize: 9000,
@@ -263,33 +215,18 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.onSearch({ com: '' })
-    this.getDicsList()
+    // this.onSearch({ com: '' })
+    // this.getDicsList()
   },
   activated() {
     // 保持半缓存
-    this.onSearch({ com: '' })
-    this.getDicsList()
+    // this.onSearch({ com: '' })
+    // this.getDicsList()
   },
   mounted() {
   },
   methods: {
-    searchTypeChange(e) {
-      this.searchProp = e
-      switch (e) {
-        case 'comname':
-          this.searchTitle = '单位名称'
-          this.queryHolder = '请输入单位名称'
-          break
-        case 'comcode':
-          this.searchTitle = '单位ID'
-          this.queryHolder = '请输入单位ID'
 
-          break
-        default:
-          break
-      }
-    },
     handleCurrentChange(e) {
       this.currentPage = e
       this.getDataList()
@@ -306,7 +243,7 @@ export default {
     },
     getDicsList() {
       const params = {
-        names: '公司类型'
+        names: ''
       }
       getDicsByName(params).then(res => {
         // console.log(res)
@@ -315,8 +252,7 @@ export default {
           n.value = n.dicvalue
           n.label = n.diczh
           switch (n.groupzh) {
-            case '公司类型':
-              this.dics.comtype.push(n)
+            case '':
               break
             default:
               break
@@ -331,7 +267,7 @@ export default {
         Keywords: this.query.com
       }
       this.loading = true
-      getCompany(params).then(res => {
+      getPiciList(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
@@ -360,9 +296,9 @@ export default {
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
-        methods = addCom
+        methods = addPici
       } else {
-        methods = updateCom
+        methods = updatePici
       }
       methods(params).then(res => {
         this.formLoading = true
@@ -377,7 +313,7 @@ export default {
       const params = {
         comid: row.comid
       }
-      delCom(params).then(res => {
+      delPici(params).then(res => {
         this.$message({
           type: 'success',
           message: '删除成功!'

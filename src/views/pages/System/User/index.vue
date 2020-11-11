@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-11 14:29:05
+ * @LastEditTime: 2020-11-11 15:07:08
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -484,7 +484,6 @@ export default {
 
         this.$set(this.queryDics, 'comname', setData)
         this.$set(this.dics, 'comcode', setData)
-        this.total = res.Data.TotalCount
       }).catch((err) => {
         this.$message.error(err)
         this.loading = false

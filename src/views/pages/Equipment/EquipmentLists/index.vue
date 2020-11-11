@@ -149,9 +149,10 @@ div(style="width:100%; height:100%")
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getEquiList, addCom, delCom, updateCom } from '@/api/equipment.js'
+import { getCompany } from '@/api/com'
 import { getDicsByName } from '@/api/commom'
 import VueQr from 'vue-qr'
-import { checkPhone } from '@/utils/index'
+import { checkPhone, toTree } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'EquipmentLists',
@@ -188,15 +189,22 @@ export default {
         {
           label: '所属单位',
           prop: 'comcode',
-          holder: '请选择公司',
-          type: 'select',
-          queryType: true
+          holder: '请选择所属单位',
+          type: 'cascader',
+          queryType: true,
+          showAllLevels: false,
+          props: {
+            label: 'comname',
+            value: 'comcode',
+            emitPath: false,
+            checkStrictly: true
+          }
         },
         {
           label: '单位限制',
           prop: 'CompanyLimit',
           type: 'select',
-          default: 0,
+          default: 1,
           queryType: true
         },
         {
@@ -333,15 +341,15 @@ export default {
       dics: {
         CompanyLimit: [
           {
-            value: 0,
-            label: '包含下级单位设备'
+            value: 1,
+            label: '包含下级单位用户'
           },
           {
-            value: 1,
-            label: '仅本单位设备'
+            value: 0,
+            label: '仅本单位用户'
           }
-        ]
-
+        ],
+        comcode: []
       },
       currentPage: 1,
       pageSize: 9000,
@@ -385,8 +393,10 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
+    // 获取单位
+    this.getCompanyData()
+    this.getDicsList()
     // this.onSearch({ com: '' })
-    // this.getDicsList()
   },
   activated() {
     // 保持半缓存
@@ -427,7 +437,7 @@ export default {
     },
     getDicsList() {
       const params = {
-        names: '公司类型'
+        names: '公司类型, 设备模式, 设备类型'
       }
       getDicsByName(params).then(res => {
         // console.log(res)
@@ -575,6 +585,34 @@ export default {
     },
     getWhatDataList() {
 
+    },
+    getCompanyData() {
+      const params = {
+        PageIndex: 1,
+        PageSize: 9999
+      }
+      this.loading = true
+      getCompany(params).then(res => {
+        this.$nextTick(() => {
+          this.loading = false
+        })
+        const data = res.Data.Models
+        // 遍历树形菜单
+        data.forEach(n => {
+          if (n.comcode === this.userInfo.comcode) {
+            n.delDisabled = true
+          }
+        })
+
+        const setData = toTree(data)
+        console.log(setData)
+        // this.tableData = setData
+        this.$set(this.dics, 'comcode', setData)
+        this.total = res.Data.TotalCount
+      }).catch((err) => {
+        this.$message.error(err)
+        this.loading = false
+      })
     }
 
   }

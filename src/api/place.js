@@ -36,6 +36,23 @@ export function deleteBuilding(params) {
   })
 }
 
+// 布防
+export function armedBuilding(data) {
+  return request({
+    url: '/api/building/armed',
+    method: 'post',
+    data
+  })
+}
+
+// 撤防
+export function disarmBuilding(data) {
+  return request({
+    url: '/api/building/disarm',
+    method: 'post',
+    data
+  })
+}
 // 楼层管理
 export function getFloorList(data) {
   return request({

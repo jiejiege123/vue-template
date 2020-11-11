@@ -141,6 +141,17 @@ const actions = {
                 'SortCode': 20,
                 'Children': [],
                 'Btns': ['EquipmentItem01', 'EquipmentItem02', 'EquipmentItem03']
+              },
+              {
+                'Id': '975247111769690114',
+                'Name': '批次管理',
+                'ParentId': '975247111765495811',
+                'Type': 1,
+                'Url': 'DeviceBatch',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['EquipmentItem01', 'EquipmentItem02', 'EquipmentItem03']
               }
             ]
 
