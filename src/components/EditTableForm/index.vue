@@ -437,7 +437,9 @@ export default {
       batchDelDisAble: true,
       title: '',
       visible: false,
-      ruleForm: {},
+      ruleForm: {
+
+      },
       dialogType: 'add',
       passwordType: 'password',
       test: 'value=value.replace(/[^\\d.]/g,"")',

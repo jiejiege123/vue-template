@@ -256,7 +256,7 @@ export default {
         },
         {
           value: 2,
-          label: '不知火舞'
+          label: '公共菜单'
         },
         {
           value: 1,

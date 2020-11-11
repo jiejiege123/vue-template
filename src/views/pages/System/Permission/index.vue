@@ -8,12 +8,6 @@
 -->
 <template lang="pug">
   .content.layout-column
-    //- 返回单位管理查单
-    .hearer-breadcrumb
-      el-button(type="text" style="padding: 0" @click="goCompany") 角色管理
-      i.el-icon-arrow-right
-      span 角色列表
-      span.ml_20(style="color: #000") {{comname}}
     .header.layout-row__between
       .query
         Query(:queryList="queryList" :btnLoading="loading" @onSearch="onSearch")
@@ -33,6 +27,7 @@
       :formStyle={width: '220px'}
       :showSelection="false"
       :showBatchDel="false"
+      :showIndex='true'
       :cellClassName="cellClassName"
       @onHandleCurrentChange="handleCurrentChange"
       @onHandleSizeChange="handleSizeChange"
@@ -53,7 +48,7 @@
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getRoleList, addCom, updateRole, enableRole } from '@/api/com'
-import { getDicsByName } from '@/api/commom'
+// import { getDicsByName } from '@/api/commom'
 
 import { mapGetters } from 'vuex'
 export default {
@@ -73,9 +68,9 @@ export default {
       input: '',
       queryList: [
         {
-          label: '角色名称',
-          prop: 'Name',
-          holder: '请输入角色名称',
+          label: '权限名称',
+          prop: 'Keywords',
+          holder: '请输入权限名称',
           queryType: false
         }
       ],
@@ -95,88 +90,92 @@ export default {
       ],
       tableColumn: [
         {
-          prop: 'id',
-          label: 'ID',
-          tableOnly: true
-        },
-        {
-          prop: 'Name',
-          label: '角色名称',
-          editAble: true
-        },
-        {
-          prop: 'PermissionIds',
-          label: '权限',
-          type: 'select',
-          filter: true,
+          prop: 'Pcode',
+          label: '上级',
           formOnly: true,
-          editAble: true
-        },
-        {
-          prop: 'Description',
-          label: '角色描述',
-          formOnly: true,
-          online: true,
-          formStyle: {
-            width: '600px'
+          type: 'cascader',
+          showAllLevels: false,
+          props: {
+            emitPath: false,
+            children: 'children',
+            value: 'value',
+            label: 'label'
           },
           editAble: true
         },
         {
-          prop: 'IsSystem',
-          label: '是否系统角色',
-          type: 'select',
-          filter: true,
-          addDisable: true
+          prop: 'Name',
+          label: '权限名称',
+          editAble: true
         },
         {
-          prop: 'Status',
-          label: '状态',
+          prop: 'Code',
+          label: '权限码',
+          editAble: true
+        },
+        {
+          prop: 'Type',
+          label: '权限类型',
           type: 'select',
-          filter: true
+          filter: true,
+          editAble: true
+        },
+        {
+          prop: 'Url',
+          label: '连接',
+          editAble: true
+
+        },
+        {
+          prop: 'Icon',
+          label: '图标',
+          editAble: true
+        },
+        {
+          prop: 'Order',
+          label: '排序',
+          editAble: true
         }
 
       ],
       formRules: {
-        Name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }]
+        Pcode: [{ required: true, message: '请选择上级', trigger: 'change' }],
+        Name: [{ required: true, message: '请输入权限名称', trigger: 'blur' }],
+        Code: [{ required: true, message: '请输入权限码', trigger: 'blur' }],
+        Type: [{ required: true, message: '请选择权限类型', trigger: 'change' }],
+        Url: [{ required: true, message: '请输入权限码', trigger: 'blur' }]
       },
       dics: {
-        IsSystem: [
+        Type: [
           {
-            value: true,
-            label: '是'
+            label: '节点组',
+            value: 4
           },
           {
-            value: false,
-            label: '否'
-          }
-        ],
-        Status: [
-          {
-            value: 0,
-            label: '不可用'
+            label: '权限菜单',
+            value: 1
           },
           {
-            value: 1,
-            label: '可用'
+            label: '权限项',
+            value: 3
+          },
+          {
+            label: '公共菜单',
+            value: 2
           }
         ]
       },
       currentPage: 1,
       pageSize: 9000,
       total: 0,
-      formLoading: false,
-      showss: true,
-      comname: ''
+      formLoading: false
     }
   },
   computed: {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.comname = this.$route.query.comname
-    this.comcode = this.$route.query.comcode
-    // this.onSearch({ com: '' })
+    // this.onSearch({})
     // this.getDicsList()
   },
   activated() {
@@ -216,30 +215,30 @@ export default {
       this.getDataList()
     },
     getDicsList() {
-      const params = {
-        names: '公司类型'
-      }
-      getDicsByName(params).then(res => {
-        // console.log(res)
-        const dics = res.Data
-        dics.forEach(n => {
-          n.value = n.dicvalue
-          n.label = n.diczh
-          switch (n.groupzh) {
-            case '公司类型':
-              this.dics.comType.push(n)
-              break
-            default:
-              break
-          }
-        })
-      })
+      // const params = {
+      //   names: '公司类型'
+      // }
+      // getDicsByName(params).then(res => {
+      //   // console.log(res)
+      //   const dics = res.Data
+      //   dics.forEach(n => {
+      //     n.value = n.dicvalue
+      //     n.label = n.diczh
+      //     switch (n.groupzh) {
+      //       case '公司类型':
+      //         this.dics.comType.push(n)
+      //         break
+      //       default:
+      //         break
+      //     }
+      //   })
+      // })
     },
     getDataList() {
       const params = {
         PageIndex: this.currentPage,
         PageSize: this.pageSize,
-        Keywords: this.query.com
+        ...this.query
       }
       this.loading = true
       getRoleList(params).then(res => {
