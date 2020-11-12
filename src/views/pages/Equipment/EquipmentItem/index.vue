@@ -10,11 +10,11 @@
   .content.layout-column
     //- 返回单位管理查单
     .hearer-breadcrumb
-      el-button(type="text" style="padding: 0" @click="goBack") 设备管理
+      el-button(type="text" style="padding: 0" @click="goBack") 设备列表
       i.el-icon-arrow-right
-      span 用户列表
-      span.ml_20(style="color: #000") {{comname}}
-    el-card.box-card.mb_20
+      span 设备详情
+      //- span.ml_20(style="color: #000") {{comname}}
+    el-card.box-card.mb_10
       div.clr_b2(slot="header") 设备信息
       //- 数据开始了
       el-form.default-input.inline(
@@ -28,7 +28,7 @@
               :prop='item.prop'
               :label="item.label")
               span {{ruleForm[item.prop]}}
-    el-card.box-card
+    el-card.box-card.mb_10
       div.clr_b2(slot="header") 设备属性
       //- 数据开始了
       el-form.default-input.inline(
@@ -52,6 +52,62 @@
               prop='menci'
               label="电池电压")
               span {{ruleForm.menci}}
+    //- 型号强度
+    el-radio-group.mb_10(v-model="radio1")
+      el-radio-button(label="信号强度")
+      el-radio-button(label="电池电压")
+    div
+      el-row(:gutter="20")
+        el-col(:span="8")
+          el-card.box-card.mb_10
+            div.clr_b2(slot="header") {{radio1}}
+            //- 数据开始了
+            el-form.default-input.inline(
+              v-loading="listLoading"
+              :model='ruleForm'
+              ref='ruleForm'
+              label-width='120px')
+              .layout-row.flex-wrap
+                div.card-form(style="width: 360px")
+                  el-form-item(
+                    prop='menci'
+                    label="门磁状态")
+                    span {{ruleForm.menci}}
+                div.card-form(style="width: 360px")
+                  el-form-item(
+                    prop='menci'
+                    label="信号强度")
+                    span {{ruleForm.menci}}
+                div.card-form(style="width: 360px")
+                  el-form-item(
+                    prop='menci'
+                    label="电池电压")
+                    span {{ruleForm.menci}}
+        el-col(:span="16")
+          el-card.box-card.mb_10
+            div.clr_b2(slot="header") {{radio1}}
+            //- 数据开始了
+            el-form.default-input.inline(
+              v-loading="listLoading"
+              :model='ruleForm'
+              ref='ruleForm'
+              label-width='120px')
+              .layout-row.flex-wrap
+                div.card-form(style="width: 360px")
+                  el-form-item(
+                    prop='menci'
+                    label="门磁状态")
+                    span {{ruleForm.menci}}
+                div.card-form(style="width: 360px")
+                  el-form-item(
+                    prop='menci'
+                    label="信号强度")
+                    span {{ruleForm.menci}}
+                div.card-form(style="width: 360px")
+                  el-form-item(
+                    prop='menci'
+                    label="电池电压")
+                    span {{ruleForm.menci}}
 
 </template>
 <script >
@@ -94,128 +150,7 @@ export default {
         }
       ],
       query: {},
-      /**
-       * 表格
-       */
-      loading: false,
-      tableData: [],
-      tableColumn: [
-        {
-          prop: 'realname',
-          label: '用户姓名',
-          width: 120
-        },
-        {
-          prop: 'comname',
-          label: '所属单位',
-          tableOnly: true
-        },
-        {
-          prop: 'username',
-          label: '手机号码'
-        },
-        {
-          prop: 'userpass',
-          label: '用户密码',
-          type: 'password',
-          formOnly: true
 
-        },
-        {
-          prop: 'userroleid',
-          label: '角色',
-          type: 'select',
-          formOnly: true
-        },
-        {
-          prop: 'userrole',
-          label: '角色',
-          tableOnly: true
-        },
-        {
-          prop: 'status',
-          label: '用户状态',
-          type: 'select',
-          formOnly: true,
-          addDisable: true
-
-        },
-        {
-          prop: 'statuszh',
-          label: '用户状态',
-          tableOnly: true
-        },
-        {
-          prop: 'address',
-          label: '地址',
-          formOnly: true,
-          online: true,
-          formStyle: {
-            width: '600px'
-          }
-        },
-
-        {
-          prop: 'sfzzm',
-          label: '身份证正面',
-          formOnly: true,
-          type: 'img'
-        },
-        {
-          prop: 'sfzfm',
-          label: '身份证反面',
-          formOnly: true,
-          type: 'img'
-        },
-        {
-          prop: 'sfzno',
-          label: '身份证号码',
-          formOnly: true
-        },
-        {
-          prop: 'logo',
-          label: '用户头像',
-          formOnly: true,
-          type: 'imgCut'
-        },
-        {
-          prop: 'rmb',
-          label: '余额',
-          formOnly: true,
-          addDisable: true
-        }
-
-      ],
-      formRules: {
-        realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }],
-        username: [
-          { required: true, message: '请输入手机号码', trigger: 'blur' },
-          { validator: isPhone, trigger: 'blur' }
-        ],
-        userpass: [{ required: true, message: '请输入用户密码', trigger: 'blur' }],
-        userroleid: [{ required: true, message: '请选择角色', trigger: 'change' }]
-      },
-      dics: {
-        pcode: [],
-        status: [
-          {
-            value: 1,
-            label: '正常'
-          },
-          {
-            value: 2,
-            label: '被禁用'
-          },
-          {
-            value: 3,
-            label: '已注销'
-          }
-        ]
-      },
-      currentPage: 1,
-      pageSize: 9000,
-      total: 0,
-      formLoading: false,
       // 设备信息
       ruleForm: {},
       IMEI: '',
@@ -314,7 +249,8 @@ export default {
           label: '经纬度'
         }
 
-      ]
+      ],
+      radio1: '信号强度'
     }
   },
   computed: {
@@ -417,6 +353,11 @@ export default {
     .el-form-item__label{
       font-weight: 400;
     }
+  }
+}
+.box-card{
+  ::v-deep .el-card__header{
+    padding: 14px 20px;
   }
 }
 </style>

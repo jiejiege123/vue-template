@@ -10,6 +10,7 @@ div(style="width:100%; height:100%")
         @selectChange="querySelectChange"
         @onSearch="onSearch")
     edit-table-form(
+      ref="tableForm"
       :loading='loading'
       :inline="true"
       operateWidth='220'
@@ -62,23 +63,23 @@ div(style="width:100%; height:100%")
           size="small"
           @click='addRow') 新增
 
-        el-dropdown.ml_10()
+        el-dropdown.ml_10(@command="dropCommand")
           el-button(type="primary" size="small" :disabled="moreDisable")
             | 更多菜单
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu.more-opeareat(slot="dropdown")
-            el-dropdown-item(:disabled="moreOne" style="width:120px") 修改设备
-            el-dropdown-item(style="width:120px") 删除设备
-            el-dropdown-item(style="width:120px") 设备过户
-            el-dropdown-item(style="width:120px") 批量导入
-            el-dropdown-item(style="width:120px") 导出设备
-            el-dropdown-item(:disabled="moreOne" style="width:120px") 事件记录
-            el-dropdown-item(:disabled="moreOne" style="width:120px") 故障记录
-            el-dropdown-item(:disabled="moreOne" style="width:120px") 设备日志
-            el-dropdown-item(style="width:120px") 打印编码
-            el-dropdown-item(style="width:120px") 设为个人模式
-            el-dropdown-item(style="width:120px") 设为工程模式
-            el-dropdown-item(style="width:120px") 状态复位
+            el-dropdown-item(command="editRow" :disabled="moreOne" style="width:120px") 修改设备
+            el-dropdown-item(command="delRow" style="width:120px") 删除设备
+            el-dropdown-item(command="guohu" style="width:120px") 设备过户
+            el-dropdown-item(command="import" style="width:120px") 批量导入
+            el-dropdown-item(command="export" style="width:120px") 导出设备
+            el-dropdown-item(command="eventRecord" :disabled="moreOne" style="width:120px") 事件记录
+            el-dropdown-item(command="faultRecord" :disabled="moreOne" style="width:120px") 故障记录
+            el-dropdown-item(command="deviceLog" :disabled="moreOne" style="width:120px") 设备日志
+            el-dropdown-item(command="print" style="width:120px") 打印编码
+            el-dropdown-item(command="personalModel" style="width:120px") 设为个人模式
+            el-dropdown-item(command="EngineerModel" style="width:120px") 设为工程模式
+            el-dropdown-item(command="resetStatus" style="width:120px") 状态复位
       template(v-slot:operation="{row}")
         svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr(row.IMEI)")
         el-button.ml_10(type="primary" size="small" @click.stop="goDetail(row)") 详情
@@ -98,6 +99,7 @@ div(style="width:100%; height:100%")
       :append-to-body="true"
       :visible.sync="dialogVisible"
       @close="dialogVisible === false"
+      @open="open('ruleForm')"
       width="600px")
       el-form.default-input(
         v-loading="formLoadingDia"
@@ -107,15 +109,68 @@ div(style="width:100%; height:100%")
         label-width='80px')
         //- 开始各种判断
         el-form-item(
+          v-if="rowStatus === 'add'"
           prop='IMEI'
           label="IMEI")
           el-input(
             style="width: 400px"
             v-model='ruleForm.IMEI'
             placeholder="请输入要添加到IMEI号")
+        el-form-item(
+          v-if="rowStatus === 'guohu'"
+          prop='comcode'
+          label="单位名称")
+          el-cascader(
+            :options='dics.comcode',
+            :show-all-levels='true'
+            :props="{label: 'comname',value: 'comcode',emitPath: false,checkStrictly: true}"
+            v-model="ruleForm.comcode"
+            placeholder="请选择公司"
+            filterable)
+        el-form-item(
+          v-if="rowStatus === 'import'"
+          prop='pici'
+          label="批次")
+          el-select(
+            v-model="ruleForm.pici"
+            placeholder="请选择批次"
+            filterable)
+            el-option(
+              v-for="(list, index) in dics.pici"
+              :key="index"
+              :label="list.label"
+              :value="list.value")
+        el-form-item(
+          v-if="rowStatus === 'import'"
+          prop='xinhaoid'
+          label="设备型号")
+          el-select(
+            v-model="ruleForm.xinhaoid"
+            placeholder="请选择设备型号"
+            filterable)
+            el-option(
+              v-for="(list, index) in dics.xinhaoid"
+              :key="index"
+              :label="list.label"
+              :value="list.value")
+        el-form-item(
+          v-if="rowStatus === 'import'"
+          prop='file'
+          label="文件")
+          .layout-row
+            el-upload.upload-demo(
+              :action="action"
+              :headers="headers"
+              accept=".xls, .xlsx"
+              :on-success='handleFileSuccess'
+              :before-upload='beforeFileUpload'
+              :limit='1')
+              el-button(size="small" type="primary") 点击上传
+              span(slot="tip" style='font-size:12px')  只能上传Excel格式文件
+            el-button.ml_10(type="text" @click="downLoad") 下载模板
         el-form-item.dia-footer()
           el-button(@click="dialogVisible = false" size="small") 取消
-          el-button(type='primary', @click="submitForm" size="small") 提交
+          el-button(type='primary', @click="submitForm('ruleForm')" size="small") 提交
 
     //- 列表弹窗
     el-dialog.dialog-table(
@@ -168,7 +223,8 @@ div(style="width:100%; height:100%")
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import BangdDialog from '@/components/BangdDialog'
-import { getEquiList, addCom, delCom, updateCom } from '@/api/equipment.js'
+import { getToken } from '@/utils/auth'
+import { getEquiList, addEqui, delEqui, updateEqui } from '@/api/equipment.js'
 import { getCompany } from '@/api/com'
 import { getBuildingList, getInstallpointList } from '@/api/place'
 import { getDicsByName } from '@/api/commom'
@@ -319,6 +375,7 @@ export default {
           label: 'IMEI',
           prop: 'IMEI',
           width: '140px',
+          editAble: true,
           formOnly: true
         },
         {
@@ -335,6 +392,7 @@ export default {
         {
           label: '批次',
           prop: 'pici',
+          editAble: true,
           type: 'select',
           formOnly: true
         },
@@ -350,6 +408,7 @@ export default {
         },
         {
           label: '设备型号',
+          editAble: true,
           formOnley: true,
           type: 'select',
           prop: 'xinhaoid'
@@ -425,6 +484,18 @@ export default {
       formLoadingDia: false,
       ruleForm: {},
       formRulesDia: {
+        comcode: [
+          { required: true, message: '请选择单位', trigger: 'change' }
+        ],
+        pici: [
+          { required: true, message: '请选择批次', trigger: 'change' }
+        ],
+        xinhaoid: [
+          { required: true, message: '请选择设备型号', trigger: 'change' }
+        ],
+        file: [
+          { required: true, message: '请上传文件' }
+        ],
         IMEI: [
           { required: true, message: '请输入IMEI号码', trigger: 'blur' },
           { min: 1, max: 25, message: '长度在 3 到 25 个字符', trigger: 'blur' }
@@ -454,12 +525,23 @@ export default {
       bangdType: 'shebei',
 
       comData: [],
-      imei: ''
+      imei: '',
+      // 勾选行数据
+      row: {},
+      rowStatus: ''
 
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    action() { // 上传文件
+      return `${process.env.VUE_APP_BASE_API}/api/common/photo/upload/single`
+    },
+    headers() {
+      return {
+        Authorization: 'Bearer ' + getToken()
+      }
+    }
   },
   created() {
     // 获取单位
@@ -576,9 +658,9 @@ export default {
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
-        methods = addCom
+        methods = addEqui
       } else {
-        methods = updateCom
+        methods = updateEqui
       }
       methods(params).then(res => {
         this.formLoading = true
@@ -589,21 +671,22 @@ export default {
       })
     },
     onDeleted(row) {
-      const params = {
-        cid: row.id
-      }
-      delCom(params).then(res => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
-        this.getDataList()
-      }).catch(err => {
-        console.error(err)
-      })
+      // const params = {
+      //   cid: row.id
+      // }
+      // delCom(params).then(res => {
+      //   this.$message({
+      //     type: 'success',
+      //     message: '删除成功!'
+      //   })
+      //   this.getDataList()
+      // }).catch(err => {
+      //   console.error(err)
+      // })
     },
     onSelectChange(rows) {
       console.log(rows)
+      this.row = rows
       if (rows.length > 0) {
         this.moreDisable = false
       } else {
@@ -617,14 +700,18 @@ export default {
     },
     addRow() {
       this.dialogTitle = '新增'
-      this.dialogType = 'add'
+      this.rowStatus = 'add'
+
       this.dialogVisible = true
     },
-    addIMEI() {
-      this.dialogTitle = '新增设备'
-      this.dialogType = 'addIMEI'
-      this.dialogVisible = true
+    open(ruleForm) {
+      this.$nextTick(() => {
+        if (this.$refs[ruleForm]) {
+          this.$refs[ruleForm].clearValidate()
+        }
+      })
     },
+
     showQr(val) {
       this.qrVisible = true
       this.qrValue = val
@@ -758,8 +845,20 @@ export default {
         this.loading = false
       })
     },
-    submitForm() {
-
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.rowStatus === 'add') {
+            console.log(this.ruleForm)
+          } else if (this.rowStatus === 'gouhu') {
+            console.log(this.ruleForm)
+          }
+        } else {
+          this.$message.error('请将加*内容填写完整')
+          console.error('error submit!!')
+          return false
+        }
+      })
     },
     querySelectChange(e, prop, form) {
       // 判断是谁改变
@@ -773,6 +872,104 @@ export default {
     showBangding(row) {
       this.bangdVisible = true
       this.imei = row.IMEI
+    },
+    dropCommand(e) {
+      this.rowStatus = e
+      if (e === 'editRow') {
+        this.$refs.tableForm.editRow(this.row[0])
+      } else if (e === 'delRow') { // 删除
+        this.$confirm('删除设备后会导致设备无法与平台连接，无法收到相关报警与提示，及产生的后果自行承担，确认将该设备删除？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'error'
+        }).then(() => {
+          // 调用接口
+          const params = {
+            deviceid: this.row[0].deviceid
+          }
+          delEqui(params).then(res => {
+            // console.log();
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.getDataList()
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      } else if (e === 'guohu') { // 过户
+        this.dialogVisible = true
+        this.dialogTitle = '设备过户'
+      } else if (e === 'import') { // 导入
+        this.dialogVisible = true
+        this.dialogTitle = '设备类型'
+      } else if (e === 'export') { // 导出
+        this.$confirm('确定要导出设备吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // this.$emit('onDeleted', row)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      } else if (e === 'eventRecord') {
+        this.tableDialogTitle = '事件日志'
+        this.tableQueryList = [
+          {
+            label: '事件名称',
+            prop: 'IMEI',
+            type: 'select',
+            holder: '请选择事件',
+            queryType: false
+          }
+        ]
+        this.tableDialogColums = [
+          {
+            label: '事件事件',
+            prop: 'IMEI'
+          },
+          {
+            label: '事件名称',
+            prop: 'IMEI'
+          },
+          {
+            label: '设备上报内容',
+            prop: 'IMEI'
+          }
+        ]
+        this.tableDialogVisible = true
+      }
+    },
+    handleFileSuccess(res) {
+      if (res.Status === 200) {
+        const url = res.Data
+        this.$set(this.ruleForm, 'file', url)
+      } else {
+        this.$message.error(res.Msg)
+      }
+    },
+    beforeFileUpload(file) {
+      const fileExt = file.name.substr(file.name.lastIndexOf('.')).toLowerCase()
+      // const isZip = file.type === 'application/x-zip-compressed'
+      // const iszip = file.type === 'application/zip'
+      const xls = fileExt === '.xls'
+      const xlsx = fileExt === '.xlsx'
+      if (!xlsx && !xls) {
+        this.$message.error('上传文件是Excel格式文件!')
+      }
+      return (xls || xlsx)
+    },
+    downLoad() {
+      const url = process.env.VUE_APP_BASE_API + 'file'
+      window.open(url)
     }
 
   }
@@ -793,6 +990,9 @@ export default {
   ::v-deep .el-dialog__body{
     height: calc(100vh - 300px);
     padding: 10px 20px 30px;
+    .el-form-item__label{
+      font-weight: 400;
+    }
   }
 }
 .dialog-pr{

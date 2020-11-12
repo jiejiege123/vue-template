@@ -196,7 +196,7 @@
             div(v-else-if="item.type === 'img'")
               img.avatar(
                 v-if='ruleForm[item.prop] && (dialogType==="view")'
-                :src='ruleForm[item.prop] | filterImg'
+                :src='ruploaduleForm[item.prop] | filterImg'
                 style="margin:10px; cursor: pointer")
               el-upload.avatar-uploader(
                 v-else-if='!ruleForm[item.prop] && (dialogType==="view")')
