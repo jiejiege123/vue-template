@@ -47,6 +47,7 @@
             v-if="item.type === 'select'"
             v-model="query[item.prop]"
             :placeholder="item.holder"
+            @change="selectChange($event, item)"
             filterable
             :style="{width: inputWidth}"
             :clearable="item.clearable"
@@ -58,15 +59,16 @@
               :label="list.label"
               :value="list.value")
           el-cascader.mr_15(
-              v-else-if="item.type === 'cascader'"
-              :options='dics[item.prop]',
-              :show-all-levels='item.showAllLevels'
-              :props="item.props"
-              v-model="query[item.prop]"
-              :placeholder="item.holder"
-              :style="{width: inputWidth}"
-              :clearable="item.clearable"
-              filterable)
+            v-else-if="item.type === 'cascader'"
+            :options='dics[item.prop]',
+            :show-all-levels='item.showAllLevels'
+            :props="item.props"
+            v-model="query[item.prop]"
+            @change="selectChange($event, item)"
+            :placeholder="item.holder"
+            :style="{width: inputWidth}"
+            :clearable="item.clearable"
+            filterable)
           el-input.mr_15(
             v-else
             :style="{width:inputWidth}"
@@ -151,7 +153,8 @@ export default {
           }
         })
       },
-      immediate: true
+      immediate: true,
+      deep: true
     }
   },
   mounted() {
@@ -212,6 +215,13 @@ export default {
           }
         }
       }
+    },
+    selectChange(e, item) {
+      // 清空一些改清空的值
+      item.selectClear.forEach(n => {
+        this.$set(this.query, n, '')
+      })
+      this.$emit('selectChange', e, item.prop, this.query)
     }
   }
 }

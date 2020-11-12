@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-12 09:23:13
+ * @LastEditTime: 2020-11-12 14:19:10
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -11,7 +11,7 @@
     title='一键布防',
     width="700px"
     :visible.sync='dialogVisible'
-    :dialogLoading="dialogLoading"
+    v-loading="dialogLoading"
     @open="open('ruleForm')"
     :close-on-click-modal="false"
     :append-to-body="true")

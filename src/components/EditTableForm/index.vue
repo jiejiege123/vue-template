@@ -1,13 +1,13 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-11 14:28:23
+ * @LastEditTime: 2020-11-12 17:36:38
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
 -->
 <template lang="pug">
-  .table-warp.flex1.layout-column(v-loading="loading")
+  .table-warp.flex1.layout-column(v-show="!hiddenTable" v-loading="loading")
     .operate(v-if="hasOutOperat")
       el-button(
         v-if="showAdd"
@@ -26,6 +26,7 @@
       slot(name="outOperate")
 
     el-table.flex1(
+      v-if="!hiddenTable"
       :data='tableData'
       style='width: 100%'
       :header-cell-style='headerStyle'
@@ -151,6 +152,7 @@
               filterable
               :multiple="item.multiple"
               :ref="item.prop"
+              @change="selectChange($event, item.prop)"
               @focus="selectFocus($event, item.prop)"
               )
               el-option(
@@ -180,7 +182,7 @@
               :show-all-levels='item.showAllLevels'
               :props="item.props"
               v-model="ruleForm[item.prop]"
-
+              @change="selectChange($event, item.prop)"
               :placeholder="item.holder"
               :style="formStyle"
               filterable)
@@ -295,6 +297,10 @@ export default {
     }
   },
   props: {
+    hiddenTable: {
+      type: Boolean,
+      default: false
+    },
     hasOutOperat: {
       type: Boolean,
       default: true
@@ -453,15 +459,15 @@ export default {
   },
   computed: {
     tableColumns() {
-      return this.columnsSub.filter(n => !n.formOnly)
+      return this.columns.filter(n => !n.formOnly)
     },
     formColumns() {
       if (this.dialogType === 'update') {
-        return this.columnsSub.filter(n => n.editAble === true)
+        return this.columns.filter(n => n.editAble === true)
       } else if (this.dialogType === 'add') {
-        return this.columnsSub.filter(n => !n.tableOnly && !n.addDisable)
+        return this.columns.filter(n => !n.tableOnly && !n.addDisable)
       } else {
-        return this.columnsSub.filter(n => !n.tableOnly)
+        return this.columns.filter(n => !n.tableOnly)
       }
     },
     action() {
@@ -574,6 +580,7 @@ export default {
     addRow() {
       this.visible = true
       const ruleForm = {}
+      console.log(this.formColumns)
       this.formColumns.map(n => {
         ruleForm[n.prop] = n.default || ''
       })
@@ -637,6 +644,9 @@ export default {
         this.$refs.PermissionIds[0].blur()
       }
       this.$emit('selectFocus', prop, this.ruleForm, cb)
+    },
+    selectChange(e, prop) {
+      this.$emit('selectFocus', prop, this.ruleForm)
     },
     // 权限专用
     setPermissionIds(ids) {

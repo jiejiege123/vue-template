@@ -5,7 +5,10 @@ div(style="width:100%; height:100%")
       .query
         Query(:queryList="queryList"
         :dics="dics"
-        :hasAdvQuery='true'  :btnLoading="loading" @onSearch="onSearch")
+        :hasAdvQuery='true'
+        :btnLoading="loading"
+        @selectChange="querySelectChange"
+        @onSearch="onSearch")
     edit-table-form(
       :loading='loading'
       :inline="true"
@@ -14,14 +17,14 @@ div(style="width:100%; height:100%")
       :currentPage="currentPage"
       :total="total"
       :pageSize="pageSize"
-      :dics="dics"
+      :dics="dicsForm"
       :showIndex="true"
       dialogWidth='800px'
       has01="Company01"
       has02="Company02"
       has03="Company03"
       :formStyle={width: '220px'}
-      :showAdd="false"
+      :showAdd="true"
       :showView="false"
       :showEdit="false"
       :showDel="false"
@@ -48,12 +51,17 @@ div(style="width:100%; height:100%")
         el-table-column(label="设备状态" align="center" width="80px" type="index" prop="devicevaluezh")
           template(slot-scope='scope')
             span.hand(@click="showTableDialog('devicevalue')") {{scope.row.devicevaluezh}}
+        el-table-column(label="安装点位" align="center" width="80px" type="index" prop="anzhungdid")
+          template(slot-scope='scope')
+            span.hand.clr_b2(v-if="scope.row.anzhungdid") {{scope.row.anzhungdid}}
+            el-button(v-else type="primary" size="small" @click.stop='showBangding(scope.row)') 绑定
             //- svg vue-qr(:text="scope.row.IMEI" :size="25")
       template(v-slot:outOperate)
         el-button(
           type="primary"
           size="small"
           @click='addRow') 新增
+
         el-dropdown.ml_10()
           el-button(type="primary" size="small" :disabled="moreDisable")
             | 更多菜单
@@ -89,7 +97,7 @@ div(style="width:100%; height:100%")
       :title="dialogTitle"
       :append-to-body="true"
       :visible.sync="dialogVisible"
-      @close="qrVisible === false"
+      @close="dialogVisible === false"
       width="600px")
       el-form.default-input(
         v-loading="formLoadingDia"
@@ -108,6 +116,7 @@ div(style="width:100%; height:100%")
         el-form-item.dia-footer()
           el-button(@click="dialogVisible = false" size="small") 取消
           el-button(type='primary', @click="submitForm" size="small") 提交
+
     //- 列表弹窗
     el-dialog.dialog-table(
       :title="tableDialogTitle"
@@ -144,22 +153,35 @@ div(style="width:100%; height:100%")
           :dics="tableDics"
           @onHandleCurrentChange="handleCurrentChangeTable"
           @onHandleSizeChange="handleSizeChangeTable")
+    //- 绑定弹窗
+    BangdDialog(
+      :dialogTitle="bangdTitle"
+      :dialogVisible="bangdVisible"
+      :dialogType="bangdType"
+      :comcode="userInfo.comcode"
+      :comname="userInfo.comname"
+      :comData='comData'
+      :imei="imei"
+    )
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
+import BangdDialog from '@/components/BangdDialog'
 import { getEquiList, addCom, delCom, updateCom } from '@/api/equipment.js'
 import { getCompany } from '@/api/com'
+import { getBuildingList, getInstallpointList } from '@/api/place'
 import { getDicsByName } from '@/api/commom'
 import VueQr from 'vue-qr'
-import { checkPhone, toTree } from '@/utils/index'
+import { checkPhone, toTree, deepClone } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'EquipmentLists',
   components: {
     Query,
     EditTableForm,
-    VueQr
+    VueQr,
+    BangdDialog
   },
   filters: {
 
@@ -198,7 +220,8 @@ export default {
             value: 'comcode',
             emitPath: false,
             checkStrictly: true
-          }
+          },
+          selectClear: ['jzwid', 'azdid', 'pici', 'xinhaoid']
         },
         {
           label: '单位限制',
@@ -216,7 +239,6 @@ export default {
         },
         {
           label: '模式',
-          default: '',
           prop: 'mode',
           holder: '请选择模式',
           type: 'select',
@@ -240,6 +262,7 @@ export default {
           label: '建筑物',
           prop: 'jzwid',
           holder: '请选择公司',
+          selectClear: ['azdid'],
           type: 'select',
           queryType: true
         },
@@ -292,32 +315,49 @@ export default {
         }
       ],
       tableColumn: [
-        // {
-        //   label: 'IMEI',
-        //   prop: 'IMEI',
-        //   width: '140px'
-        // },
+        {
+          label: 'IMEI',
+          prop: 'IMEI',
+          width: '140px',
+          formOnly: true
+        },
         {
           label: '所属单位',
           prop: 'comname',
-          holder: '请选择公司'
+          holder: '请选择公司',
+          addDisable: true
         },
-
         {
           label: '批次',
-          prop: 'picizh'
+          prop: 'picizh',
+          tableOnly: true
+        },
+        {
+          label: '批次',
+          prop: 'pici',
+          type: 'select',
+          formOnly: true
         },
         {
           label: '模式',
+          addDisable: true,
           prop: 'modezh'
         },
         {
           label: '类型',
+          addDisable: true,
           prop: 'devicetypezh'
         },
         {
           label: '设备型号',
-          prop: 'xinhaozh'
+          formOnley: true,
+          type: 'select',
+          prop: 'xinhaoid'
+        },
+        {
+          label: '设备型号',
+          prop: 'xinhaozh',
+          tableOnly: true
         },
         // {
         //   label: '设备状态',
@@ -325,17 +365,20 @@ export default {
         // },
         {
           label: '在线状态',
+          addDisable: true,
           prop: 'onlinevaluezh'
         }
       ],
       formRules: {
-        pcode: [{ required: true, message: '请选择上级单位', trigger: 'change' }],
-        comname: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        ],
-        comType: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
-        showIndex: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
+        IMEI: [{ required: true, message: '请输入设备IMEI', trigger: 'blur' }],
+        pici: [{ required: true, message: '请选择批次', trigger: 'change' }],
+        xinhaoid: [{ required: true, message: '请选择设备型号', trigger: 'change' }],
+        // comname: [
+        //   { required: true, message: '请输入活动名称', trigger: 'blur' },
+        //   { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        // ],
+        // comType: [{ required: true, message: '请选择单位属性', trigger: 'change' }],
+        // showIndex: [{ required: true, message: '请输入排序显示', trigger: 'blur' }],
         comtel: [{ validator: isPhone, trigger: 'blur' }]
       },
       dics: {
@@ -349,7 +392,24 @@ export default {
             label: '仅本单位用户'
           }
         ],
-        comcode: []
+        comcode: [],
+        comtype: [],
+        mode: []
+      },
+      dicsForm: {
+        CompanyLimit: [
+          {
+            value: 1,
+            label: '包含下级单位用户'
+          },
+          {
+            value: 0,
+            label: '仅本单位用户'
+          }
+        ],
+        comcode: [],
+        comtype: [],
+        mode: []
       },
       currentPage: 1,
       pageSize: 9000,
@@ -360,6 +420,7 @@ export default {
       qrValue: '',
       // 弹窗
       dialogTitle: '',
+      dialogType: '',
       dialogVisible: false,
       formLoadingDia: false,
       ruleForm: {},
@@ -385,7 +446,15 @@ export default {
       tableCurrentPage: 1,
       tableTotal: 1,
       tablePageSize: 20,
-      tableDics: {}
+      tableDics: {},
+      tableLoading: false,
+      // 绑定弹窗
+      bangdTitle: '绑定安装点',
+      bangdVisible: false,
+      bangdType: 'shebei',
+
+      comData: [],
+      imei: ''
 
     }
   },
@@ -395,6 +464,11 @@ export default {
   created() {
     // 获取单位
     this.getCompanyData()
+    // 批次
+    // this.getCompanyData()
+    // // 设备型号
+    // this.getCompanyData()
+
     this.getDicsList()
     // this.onSearch({ com: '' })
   },
@@ -437,21 +511,36 @@ export default {
     },
     getDicsList() {
       const params = {
-        names: '公司类型, 设备模式, 设备类型'
+        names: '公司类型;设备模式;设备类型'
       }
       getDicsByName(params).then(res => {
         // console.log(res)
         const dics = res.Data
+        const dicsData = {
+          comtype: [],
+          mode: [],
+          devicetype: []
+        }
         dics.forEach(n => {
           n.value = n.dicvalue
           n.label = n.diczh
           switch (n.groupzh) {
             case '公司类型':
-              // this.dics.comType.push(n)
+              dicsData.comtype.push(n)
+              break
+            case '设备模式':
+              dicsData.mode.push(n)
+              break
+            case '设备类型':
+              dicsData.devicetype.push(n)
               break
             default:
               break
           }
+
+          this.$set(this.dics, 'comtype', dicsData.comtype)
+          this.$set(this.dics, 'mode', dicsData.mode)
+          this.$set(this.dics, 'devicetype', dicsData.devicetype)
         })
       })
     },
@@ -528,6 +617,12 @@ export default {
     },
     addRow() {
       this.dialogTitle = '新增'
+      this.dialogType = 'add'
+      this.dialogVisible = true
+    },
+    addIMEI() {
+      this.dialogTitle = '新增设备'
+      this.dialogType = 'addIMEI'
       this.dialogVisible = true
     },
     showQr(val) {
@@ -596,6 +691,7 @@ export default {
         this.$nextTick(() => {
           this.loading = false
         })
+        this.comData = deepClone(res.Data.Models)
         const data = res.Data.Models
         // 遍历树形菜单
         data.forEach(n => {
@@ -605,14 +701,78 @@ export default {
         })
 
         const setData = toTree(data)
-        console.log(setData)
-        // this.tableData = setData
         this.$set(this.dics, 'comcode', setData)
-        this.total = res.Data.TotalCount
+        this.$set(this.dicsForm, 'comcode', setData)
       }).catch((err) => {
         this.$message.error(err)
         this.loading = false
       })
+    },
+    getBuildingListData(comname) {
+      const params = {
+        PageIndex: 1,
+        PageSize: 9999,
+        comname: comname
+      }
+      this.loading = true
+
+      this.$set(this.dics, 'jzwid', [])
+      this.$set(this.dics, 'azdid', [])
+
+      getBuildingList(params).then(res => {
+        this.$nextTick(() => {
+          this.loading = false
+        })
+        const data = res.Data.Models
+        data.forEach(n => {
+          n.label = n.jwzname
+          n.value = n.jzwid
+        })
+        this.$set(this.dics, 'jzwid', data)
+      }).catch((err) => {
+        this.$message.error(err)
+        this.loading = false
+      })
+    },
+    getInstallpointListData(jzwid) {
+      const params = {
+        PageIndex: 1,
+        PageSize: 9999,
+        jzwid: jzwid
+      }
+      this.loading = true
+
+      this.$set(this.dics, 'azdid', [])
+      getInstallpointList(params).then(res => {
+        this.$nextTick(() => {
+          this.loading = false
+        })
+        const data = res.Data.Models
+        data.forEach(n => {
+          n.label = n.azdid
+          n.value = n.azdid
+        })
+        this.$set(this.dics, 'azdid', data)
+      }).catch((err) => {
+        this.$message.error(err)
+        this.loading = false
+      })
+    },
+    submitForm() {
+
+    },
+    querySelectChange(e, prop, form) {
+      // 判断是谁改变
+      if (prop === 'comcode') {
+        const comname = this.comData.find(n => n.comcode === e).comname
+        this.getBuildingListData(comname)
+      } else if (prop === 'jzwid') {
+        this.getBuildingListData(e)
+      }
+    },
+    showBangding(row) {
+      this.bangdVisible = true
+      this.imei = row.IMEI
     }
 
   }
