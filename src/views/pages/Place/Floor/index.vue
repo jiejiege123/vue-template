@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-11 17:50:04
+ * @LastEditTime: 2020-11-12 09:24:20
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -15,7 +15,7 @@ div(style="width:100%; height:100%")
     edit-table-form(
       :loading='loading'
       :inline="false"
-      operateWidth='200'
+      operateWidth='320'
       :hasPages="true"
       :currentPage="currentPage"
       :total="total"
@@ -39,26 +39,30 @@ div(style="width:100%; height:100%")
       :tableData='tableData'
       :columns="tableColumn")
       template(v-slot:operation="{row}")
-        //- el-button(
-        //-   @click.stop="goUser(row)"
-        //-   size="small") 用户
-        //- el-button(
-        //-   @click.stop="goRole(row)"
-        //-   size="small") 角色
+        el-button(
+          @click.stop="showBufang(row)"
+          size="small") 布防
+        el-button(
+          type="danger"
+          @click.stop="showChefang(row)"
+          size="small") 撤防
+    armed-dialog(:dialogVisible="dialogVisible" :dialogLoading="dialogLoading" @onArmed="submitForm")
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getBuildingList, getFloorList, addFloor, deleteFloor, updateFloor } from '@/api/place'
+import { getBuildingList, getFloorList, addFloor, deleteFloor, updateFloor, armedFloor, disarmFloor } from '@/api/place'
 import { getDicsByName } from '@/api/commom'
 
+import ArmedDialog from '@/components/ArmedDialog'
 import { checkPhone } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Floor',
   components: {
     Query,
-    EditTableForm
+    EditTableForm,
+    ArmedDialog
   },
   filters: {
 
@@ -104,7 +108,8 @@ export default {
         {
           prop: 'lcname',
           label: '楼层',
-          tableOnly: true
+          tableOnly: true,
+          width: 120
         },
         {
           prop: 'lcname',
@@ -176,7 +181,9 @@ export default {
       pageSize: 9000,
       total: 0,
       formLoading: false,
-      showss: true
+      // 布防弹窗
+      dialogVisible: false,
+      nowRow: {}
     }
   },
   computed: {
@@ -304,6 +311,44 @@ export default {
       }).catch((err) => {
         this.$message.error(err)
         this.loading = false
+      })
+    },
+    showBufang(row) {
+      this.dialogVisible = true
+      this.nowRow = row
+    },
+    submitForm(TimeRanges) {
+      const params = {
+        lcid: this.nowRow.lcid,
+        TimeRanges: TimeRanges
+      }
+      this.dialogLoading = true
+      armedFloor(params).then(res => {
+        this.dialogLoading = false
+        this.dialogVisible = false
+        this.$message.success('操作成功')
+        this.getDataList()
+      }).catch(err => {
+        this.dialogLoading = false
+        console.error(err)
+      })
+    },
+    showChefang(row) {
+      this.$confirm('一键撤防将对该建筑物下所有安装点进行撤防，确认后将重置建筑物下所有安装点撤防状态。', {
+        title: '操作提示',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        disarmFloor({ lcid: row.lcid }).then(res => {
+          this.$message.success('操作成功')
+          this.getDataList()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     }
   }

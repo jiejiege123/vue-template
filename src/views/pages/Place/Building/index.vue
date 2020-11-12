@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-11 17:50:42
+ * @LastEditTime: 2020-11-12 09:18:34
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -59,6 +59,7 @@ div(style="width:100%; height:100%")
     el-dialog.add-dialog(
       title='一键布防',
       width="700px"
+      v-loading="dialogLoading"
       :visible.sync='dialogVisible'
       @open="open('ruleForm')"
       :close-on-click-modal="false"

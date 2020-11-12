@@ -138,9 +138,31 @@ export function enableRole(data) {
 }
 
 // 获取权限列表
-export function getRouter(data) {
+export function getPermission(data) {
   return request({
     url: '/api/permission/search',
+    method: 'post',
+    data
+  })
+}
+
+export function addPermission(data) {
+  return request({
+    url: '/api/permission/add',
+    method: 'post',
+    data
+  })
+}
+export function updatePermission(data) {
+  return request({
+    url: '/api/permission/update',
+    method: 'post',
+    data
+  })
+}
+export function delPermission(data) {
+  return request({
+    url: '/api/permission/delete',
     method: 'post',
     data
   })

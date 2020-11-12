@@ -85,6 +85,26 @@ export function deleteFloor(params) {
   })
 }
 
+// 楼层布防 /api/floor/armed
+
+// 布防
+export function armedFloor(data) {
+  return request({
+    url: '/api/floor/armed',
+    method: 'post',
+    data
+  })
+}
+
+// 撤防
+export function disarmFloor(data) {
+  return request({
+    url: '/api/floor/disarm',
+    method: 'post',
+    data
+  })
+}
+
 // 安装点管理
 export function getInstallpointList(data) {
   return request({

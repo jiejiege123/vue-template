@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-11 15:07:08
+ * @LastEditTime: 2020-11-12 08:57:17
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -500,7 +500,7 @@ export default {
         })
         const setData = res.Data.Models
         setData.forEach(n => {
-          n.value = n.id
+          n.value = n.Id
           n.label = n.Name
         })
         this.$set(this.queryDics, 'userrole', setData)

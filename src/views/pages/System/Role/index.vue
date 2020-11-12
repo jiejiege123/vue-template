@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-11 14:34:05
+ * @LastEditTime: 2020-11-12 08:53:01
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -34,6 +34,7 @@
     :formStyle={width: '220px'}
     :showSelection="false"
     :showBatchDel="false"
+    :showIndex="true"
     :cellClassName="cellClassName"
     @selectFocus="selectFocus"
     @onHandleCurrentChange="handleCurrentChange"
@@ -138,7 +139,7 @@ export default {
       ],
       tableColumn: [
         {
-          prop: 'id',
+          prop: 'Id',
           label: 'ID',
           width: 100,
           tableOnly: true
@@ -257,7 +258,7 @@ export default {
         },
         {
           value: 2,
-          label: '不知火舞'
+          label: '公共菜单'
         },
         {
           value: 1,

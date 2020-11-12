@@ -261,27 +261,27 @@ const actions = {
                 'Children': [],
                 'Btns': ['Role01', 'Role02', 'Role03']
               },
-              // {
-              //   'Id': '975247111769690116',
-              //   'Name': '权限列表',
-              //   'ParentId': '975247111765495809',
-              //   'Type': 1,
-              //   'Url': 'Permission',
-              //   'Icon': null,
-              //   'SortCode': 33,
-              //   'Children': [],
-              //   'Btns': ['Permission01', 'Permission02', 'Permission03']
-              // },
               {
-                'Id': '97115247111769690115',
-                'Name': '其他管理',
+                'Id': '975247111769690116',
+                'Name': '权限列表',
                 'ParentId': '975247111765495809',
                 'Type': 1,
-                'Url': 'Other',
+                'Url': 'Permission',
                 'Icon': null,
-                'SortCode': 20,
-                'Children': []
+                'SortCode': 33,
+                'Children': [],
+                'Btns': ['Permission01', 'Permission02', 'Permission03']
               }
+              // {
+              //   'Id': '97115247111769690115',
+              //   'Name': '其他管理',
+              //   'ParentId': '975247111765495809',
+              //   'Type': 1,
+              //   'Url': 'Other',
+              //   'Icon': null,
+              //   'SortCode': 20,
+              //   'Children': []
+              // }
             ]
           },
           {
