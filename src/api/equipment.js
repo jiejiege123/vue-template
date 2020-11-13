@@ -42,7 +42,7 @@ export function delEqui(params) {
 // 批次管理
 export function getPiciList(data) {
   return request({
-    url: '/api/pici/search',
+    url: '/api/batchno/search',
     method: 'post',
     data
   })
@@ -50,7 +50,7 @@ export function getPiciList(data) {
 
 export function addPici(data) {
   return request({
-    url: '/api/pici/add',
+    url: '/api/batchno/add',
     method: 'post',
     data
   })
@@ -58,7 +58,7 @@ export function addPici(data) {
 
 export function updatePici(data) {
   return request({
-    url: '/api/pici/update',
+    url: '/api/batchno/update',
     method: 'post',
     data
   })
@@ -66,7 +66,38 @@ export function updatePici(data) {
 
 export function delPici(params) {
   return request({
-    url: '/api/pici/delete',
+    url: '/api/batchno/delete',
+    method: 'get',
+    params
+  })
+}
+
+// 型号管理
+export function getModelList(data) {
+  return request({
+    url: '/api/model/search',
+    method: 'post',
+    data
+  })
+}
+
+export function addModel(data) {
+  return request({
+    url: '/api/model/add',
+    method: 'post',
+    data
+  })
+}
+export function updateModel(data) {
+  return request({
+    url: '/api/model/update',
+    method: 'post',
+    data
+  })
+}
+export function delModel(params) {
+  return request({
+    url: '/api/model/delete',
     method: 'get',
     params
   })

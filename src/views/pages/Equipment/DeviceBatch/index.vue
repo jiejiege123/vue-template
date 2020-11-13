@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-12 08:33:11
+ * @LastEditTime: 2020-11-13 12:46:01
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\User\index.vue
@@ -45,6 +45,7 @@
     @onHandleCurrentChange="handleCurrentChange"
     @onHandleSizeChange="handleSizeChange"
     @onSubmitForm="onSubmitForm"
+    @onDeleted='onDeleted'
     :formLoading="formLoading"
     :formRules="formRules"
     :tableData='tableData'
@@ -110,8 +111,8 @@
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getRoleList, updateComle, addCom, delCom } from '@/api/com'
-
+import { getPiciList, updatePici, addPici, delPici } from '@/api/equipment'
+import { parseTime } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'DeviceBatch',
@@ -162,17 +163,17 @@ export default {
        */
       loading: false,
       tableData: [
-        {
-          pici: '333-201031-01',
-          desc: '成都',
-          creatTime: '2020-10-22'
-        }
+
       ],
       tableColumn: [
         {
-          prop: 'pici',
+          prop: 'piciname',
           label: '批次',
           editAble: true
+        },
+        {
+          prop: 'comname',
+          label: '单位名称'
         },
         {
           prop: 'desc',
@@ -182,36 +183,16 @@ export default {
           editAble: true
         },
         {
-          prop: 'creatTime',
+          prop: 'addtime',
           label: '创建时间',
           tableOnly: true
         }
 
       ],
       formRules: {
-        Name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }]
       },
       dics: {
-        IsSystem: [
-          {
-            value: true,
-            label: '是'
-          },
-          {
-            value: false,
-            label: '否'
-          }
-        ],
-        Status: [
-          {
-            value: 0,
-            label: '不可用'
-          },
-          {
-            value: 1,
-            label: '可用'
-          }
-        ]
+
       },
       currentPage: 1,
       pageSize: 9000,
@@ -223,7 +204,7 @@ export default {
       preTitle: '',
       visible: false,
       ruleForm: {
-        date: '201111',
+        date: parseTime(new Date(), '{y}{m}{d}').slice(2),
         index: '01'
       },
       ruleFormRules: {
@@ -237,7 +218,7 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    // this.onSearch({ com: '' })
+    this.onSearch({})
     // this.getDicsList()
   },
   activated() {
@@ -283,23 +264,18 @@ export default {
 
     getDataList() {
       const params = {
-        PageIndex: this.currentPage,
-        PageSize: this.pageSize,
-        Keywords: this.query.com
+        PageIndex: 1,
+        PageSize: 9999,
+        ...this.query
       }
       this.loading = true
-      getRoleList(params).then(res => {
+      getPiciList(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
         const data = res.Data.Models
-        data.forEach(n => {
-          if (n.comcode === this.userInfo.comcode) {
-            n.delDisabled = true
-          }
-        })
-        this.tableData = res.Data.Models
-        this.$set(this.dics, 'pcode', res.Data.Models)
+
+        this.tableData = data
         this.total = res.Data.TotalCount
       }).catch((err) => {
         this.$message.error(err)
@@ -308,29 +284,30 @@ export default {
     },
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
-      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType) ? this.dics.comType.find(n => n.value === params.comType).label : ''
-      params.pcodename = this.tableData.find(n => n.comcode === params.pcode) ? this.tableData.find(n => n.comcode === params.pcode).comname : ''
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
-        methods = addCom
+        methods = addPici
       } else {
-        methods = updateComle
+        methods = updatePici
       }
       methods(params).then(res => {
         console.log(res)
         this.formLoading = true
-        cb(true)
+        this.visible = false
+        // cb(true)
+        this.getDataList()
       }).catch((err) => {
         this.$message.error(err)
+        this.visible = false
         this.formLoading = false
       })
     },
     onDeleted(row) {
       const params = {
-        cid: row.id
+        piciid: row.piciid
       }
-      delCom(params).then(res => {
+      delPici(params).then(res => {
         this.$message({
           type: 'success',
           message: '删除成功!'
@@ -361,7 +338,10 @@ export default {
       })
     },
     submitPre() {
-
+      const ruleForm = Object.assign({}, this.ruleForm)
+      ruleForm.piciname = `${this.userInfo.comcode}-${ruleForm.date}-${ruleForm.index}`
+      const dialogType = this.preTitle === '添加批次' ? 'add' : 'edit'
+      this.onSubmitForm(ruleForm, dialogType)
     }
 
   }

@@ -7,6 +7,7 @@ import echarts from 'echarts'
 import resize from './mixins/resize'
 
 export default {
+  name: 'MixChart',
   mixins: [resize],
   props: {
     className: {
@@ -44,13 +45,6 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(document.getElementById(this.id))
-      const xData = (function() {
-        const data = []
-        for (let i = 1; i < 13; i++) {
-          data.push(i + 'month')
-        }
-        return data
-      }())
       this.chart.setOption({
         color: ['#3398DB'],
         // tooltip: {
@@ -60,16 +54,17 @@ export default {
         //   }
         // },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
+          left: '10%',
+          right: '10%',
+          bottom: '8%',
+          top: '2%',
+          containLabel: false
         },
         xAxis: [
           {
             show: false,
             type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'aaa'],
             axisTick: {
               alignWithLabel: true
             }
@@ -83,10 +78,27 @@ export default {
         ],
         series: [
           {
-            name: '直接访问',
+            data: [150, 200, 250, 300, 350, 400, 450, 500],
             type: 'bar',
-            barWidth: '60%',
-            data: [10, 52, 200, 334, 390, 330, 220]
+            itemStyle: {
+              color: '#ddd',
+              barBorderRadius: [5, 5, 0, 0]
+            },
+            silent: true,
+            barWidth: 30,
+            barGap: '-100%'
+
+          },
+          {
+            data: [150, 200, 250, 300, 0, 0, 0, 0],
+            type: 'bar',
+            itemStyle: {
+              barBorderRadius: [5, 5, 0, 0]
+            },
+            silent: true,
+            barWidth: 30,
+            barGap: '-100%'
+
           }
         ]
       })

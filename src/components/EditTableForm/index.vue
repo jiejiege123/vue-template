@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-12 17:36:38
+ * @LastEditTime: 2020-11-13 12:06:08
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -580,7 +580,6 @@ export default {
     addRow() {
       this.visible = true
       const ruleForm = {}
-      console.log(this.formColumns)
       this.formColumns.map(n => {
         ruleForm[n.prop] = n.default || ''
       })

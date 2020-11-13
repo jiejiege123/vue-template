@@ -10,7 +10,7 @@
             :placeholder="item.holder"
             filterable
             style="padding-right:15px; width:160px"
-            size="small"
+
             clearable)
             el-option(
               v-for="(list,index) in item.dics"
@@ -21,19 +21,19 @@
             v-else
             v-model="query[item.prop]"
             :placeholder="item.holder"
-            size="small"
+
             style="padding-right:15px; width:160px"
             clearable)
       //- 干掉分开的东西 免得不方便
       el-col(:span="span" :offset="queryHandleOffset")
         .layout-row.align-center.mb_10(style="text-align: right;justify-content: flex-start;")
           el-button(
-            size="small"
+
             @click='reset') 重置
           el-button(
             :loading="btnLoading"
             type="primary"
-            size="small"
+
             @click='search') 查询
           div.ml_10(@click="queryTypeChange" v-if="hasAdvQuery")
             span.el-dropdown-link
@@ -42,7 +42,7 @@
     .width100.layout-row.query-laywarp(v-else)
       .query-item(v-for="(item,index) in queryShow" :key="index")
         div.layout-row.align-center.mb_10(v-if="item.queryType === queryType")
-          span.span-style(:style="{width: width, textAlign:'right'}" ) {{item.label}}：
+          span.span-style(v-if="!item.hiddenLabel" :style="{width: width, textAlign:'right'}" ) {{item.label}}：
           el-select.mr_15(
             v-if="item.type === 'select'"
             v-model="query[item.prop]"
@@ -51,7 +51,7 @@
             filterable
             :style="{width: inputWidth}"
             :clearable="item.clearable"
-            size="small"
+
             )
             el-option(
               v-for="(list,index) in dics[item.prop]"
@@ -62,6 +62,7 @@
             v-else-if="item.type === 'cascader'"
             :options='dics[item.prop]',
             :show-all-levels='item.showAllLevels'
+
             :props="item.props"
             v-model="query[item.prop]"
             @change="selectChange($event, item)"
@@ -69,22 +70,30 @@
             :style="{width: inputWidth}"
             :clearable="item.clearable"
             filterable)
+          el-date-picker.mr_15(
+            v-else-if="item.type === 'date'"
+            v-model="query[item.prop]"
+            type="date"
+
+            value-format="yyyy-MM-dd"
+            :style="{width:inputWidth}"
+            placeholder="请选择日期")
           el-input.mr_15(
             v-else
             :style="{width:inputWidth}"
             v-model="query[item.prop]"
             :placeholder="item.holder"
-            size="small"
+
             clearable)
       //- 干掉分开的东西 免得不方便
       .layout-row.align-center.mb_10(style="text-align: right;justify-content: flex-start;")
         el-button(
-          size="small"
+
           @click='reset') 重置
         el-button(
           :loading="btnLoading"
           type="primary"
-          size="small"
+
           @click='search') 查询
         div.ml_10(@click="queryTypeChange" v-if="hasAdvQuery")
           span.el-dropdown-link

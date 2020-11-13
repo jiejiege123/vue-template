@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-11 09:32:54
+ * @LastEditTime: 2020-11-13 17:25:38
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\store\modules\permission.js
@@ -118,6 +118,22 @@ const actions = {
               findItem(addRoutes, item => {
                 return item.name === 'EquipmentLists'
               }, breadcrumbItem, 'children')
+            } else if (n.Url === 'AlarmHistroy') {
+              hidden = true
+              activeMenu = '/Alarm/AlarmRecord'
+              noCache = true
+              noTagView = true
+              findItem(addRoutes, item => {
+                return item.name === 'AlarmRecord'
+              }, breadcrumbItem, 'children')
+            } else if (n.Url === 'OrderItem') {
+              hidden = true
+              activeMenu = '/Alarm/WorkOrder'
+              noCache = true
+              noTagView = true
+              findItem(addRoutes, item => {
+                return item.name === 'WorkOrder'
+              }, breadcrumbItem, 'children')
             } else {
               hidden = false
               noCache = true
@@ -131,6 +147,10 @@ const actions = {
               // activeTags = '/System/Role,/System/User'
             } else if (n.Url === 'EquipmentLists') {
               activeTags = '/Equipment/EquipmentItem'
+            } else if (n.Url === 'AlarmRecord') {
+              activeTags = '/Alarm/AlarmHistroy'
+            } else if (n.Url === 'WorkOrder') {
+              activeTags = '/Alarm/OrderItem'
             } else {
               activeTags = ''
             }

@@ -115,6 +115,57 @@ const actions = {
       if (roles) {
         const router = [
           {
+            'Id': '1326708790602633230',
+            'Name': '报警管理',
+            'Url': 'Alarm',
+            'Type': 4,
+            'Icon': 'alarm',
+            'Children': [
+              {
+                'Id': '1326708790602633210',
+                'Name': '报警记录',
+                'ParentId': '1326708790602633230',
+                'Url': 'AlarmRecord',
+                'Type': 1,
+                'Icon': null,
+                'Children': [],
+                'Btns': ['EquipmentLists01', 'EquipmentLists02', 'EquipmentLists03']
+              },
+              {
+                'Id': '1326708790602633212',
+                'Name': '报警历史记录',
+                'ParentId': '1326708790602633230',
+                'Url': 'AlarmHistroy',
+                'Type': 1,
+                'Icon': null,
+                'Children': [],
+                'Btns': ['EquipmentLists01', 'EquipmentLists02', 'EquipmentLists03']
+              },
+              {
+                'Id': '1326708790602633211',
+                'Name': '工单处理',
+                'ParentId': '1326708790602633230',
+                'Type': 1,
+                'Url': 'WorkOrder',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['EquipmentItem01', 'EquipmentItem02', 'EquipmentItem03']
+              },
+              {
+                'Id': '1326708790602633213',
+                'Name': '工单处理',
+                'ParentId': '1326708790602633230',
+                'Type': 1,
+                'Url': 'OrderItem',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['EquipmentItem01', 'EquipmentItem02', 'EquipmentItem03']
+              }
+            ]
+          },
+          {
             'Id': '975247111765495811',
             'Name': '设备管理',
             'Url': 'Equipment',
@@ -152,9 +203,19 @@ const actions = {
                 'SortCode': 20,
                 'Children': [],
                 'Btns': ['EquipmentItem01', 'EquipmentItem02', 'EquipmentItem03']
+              },
+              {
+                'Id': '975247111769690115',
+                'Name': '型号管理',
+                'ParentId': '975247111765495811',
+                'Type': 1,
+                'Url': 'Model',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['EquipmentItem01', 'EquipmentItem02', 'EquipmentItem03']
               }
             ]
-
           },
           {
             'Id': '985247111765495811',
@@ -203,7 +264,7 @@ const actions = {
             'Name': '权限管理',
             'Url': 'System',
             'Type': 4,
-            'Icon': 'sys',
+            'Icon': 'quanxian',
             'Children': [
               {
                 'Id': '1151029042405838848',

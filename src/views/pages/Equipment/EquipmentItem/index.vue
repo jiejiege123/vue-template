@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-10 17:51:40
+ * @LastEditTime: 2020-11-13 10:37:05
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -59,84 +59,74 @@
     div
       el-row(:gutter="20")
         el-col(:span="8")
-          el-card.box-card.mb_10
+          el-card.box-card.mb_10.chart-warp(style="height: 320px")
             div.clr_b2(slot="header") {{radio1}}
             //- 数据开始了
-            el-form.default-input.inline(
-              v-loading="listLoading"
-              :model='ruleForm'
-              ref='ruleForm'
-              label-width='120px')
-              .layout-row.flex-wrap
-                div.card-form(style="width: 360px")
-                  el-form-item(
-                    prop='menci'
-                    label="门磁状态")
-                    span {{ruleForm.menci}}
-                div.card-form(style="width: 360px")
-                  el-form-item(
-                    prop='menci'
-                    label="信号强度")
-                    span {{ruleForm.menci}}
-                div.card-form(style="width: 360px")
-                  el-form-item(
-                    prop='menci'
-                    label="电池电压")
-                    span {{ruleForm.menci}}
+            msg-chart(id="msg-chart" width="100%" height="100%")
         el-col(:span="16")
-          el-card.box-card.mb_10
+          el-card.box-card.mb_10.chart-warp
             div.clr_b2(slot="header") {{radio1}}
             //- 数据开始了
-            el-form.default-input.inline(
-              v-loading="listLoading"
-              :model='ruleForm'
-              ref='ruleForm'
-              label-width='120px')
-              .layout-row.flex-wrap
-                div.card-form(style="width: 360px")
-                  el-form-item(
-                    prop='menci'
-                    label="门磁状态")
-                    span {{ruleForm.menci}}
-                div.card-form(style="width: 360px")
-                  el-form-item(
-                    prop='menci'
-                    label="信号强度")
-                    span {{ruleForm.menci}}
-                div.card-form(style="width: 360px")
-                  el-form-item(
-                    prop='menci'
-                    label="电池电压")
-                    span {{ruleForm.menci}}
-
+            msg-Line-chart(id="msg-line-chart" width="100%" height="100%")
+    .layout-column(style="height: 100%")
+      .header.layout-row__between
+        .query
+          Query(
+            :queryList="tableQueryList"
+            :hasAdvQuery='false'
+            :dics="tableQueryDics"
+            :btnLoading="tableLoading"
+            @onSearch="onSearchTable")
+      edit-table-form(
+        :loading='tableLoading'
+        :hasOutOperat="false"
+        :tableData="tableDialogData"
+        :columns="tableDialogColums"
+        :disOperated="tableDisOperated"
+        operateWidth="220"
+        :showSelection="false"
+        :showIndex="false"
+        :showView="false"
+        :showEdit="false"
+        :showDel="false"
+        :hasPages="true"
+        :currentPage="tableCurrentPage"
+        :total="tableTotal"
+        :pageSize="tablePageSize"
+        :dics="tableDics"
+        @onHandleCurrentChange="handleCurrentChangeTable"
+        @onHandleSizeChange="handleSizeChangeTable")
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getUserList } from '@/api/com'
 import { getDicsByName } from '@/api/commom'
-
-import { checkPhone } from '@/utils/index'
+import MsgChart from '@/components/Charts/MsgChart'
+import MsgLineChart from '@/components/Charts/MsgLineChart'
+// import { checkPhone } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'EquipmentItem',
   components: {
     Query,
-    EditTableForm
+    EditTableForm,
+    MsgChart,
+    MsgLineChart
   },
   filters: {
 
   },
   data() {
-    var isPhone = (rule, value, callback) => {
-      if (value) {
-        if (!checkPhone(value)) {
-          callback(new Error('请输入正确的电话号码'))
-        } else {
-          callback()
-        }
-      }
-    }
+    // var isPhone = (rule, value, callback) => {
+    //   if (value) {
+    //     if (!checkPhone(value)) {
+    //       callback(new Error('请输入正确的电话号码'))
+    //     } else {
+    //       callback()
+    //     }
+    //   }
+    // }
     return {
       /**
        * 查询
@@ -250,7 +240,40 @@ export default {
         }
 
       ],
-      radio1: '信号强度'
+      radio1: '信号强度',
+      // 事件表格
+      tableQueryList: [
+        {
+          label: '事件名称',
+          prop: 'IMEI',
+          type: 'select',
+          holder: '请选择事件',
+          queryType: false
+        }
+      ],
+      tableQuery: {},
+      tableQueryDics: {},
+      tableDialogData: [],
+      tableDialogColums: [
+        {
+          label: '事件事件',
+          prop: 'IMEI'
+        },
+        {
+          label: '事件名称',
+          prop: 'IMEI'
+        },
+        {
+          label: '设备上报内容',
+          prop: 'IMEI'
+        }
+      ],
+      tableDisOperated: true,
+      tableCurrentPage: 1,
+      tableTotal: 1,
+      tablePageSize: 20,
+      tableDics: {},
+      tableLoading: false
     }
   },
   computed: {
@@ -358,6 +381,12 @@ export default {
 .box-card{
   ::v-deep .el-card__header{
     padding: 14px 20px;
+  }
+}
+.chart-warp{
+  height: 320px;
+  ::v-deep .el-card__body{
+    height: calc(100% - 50px);
   }
 }
 </style>

@@ -282,6 +282,7 @@ export default {
         {
           label: '单位限制',
           prop: 'CompanyLimit',
+          clearable: false,
           type: 'select',
           default: 1,
           queryType: true
@@ -317,7 +318,7 @@ export default {
         {
           label: '建筑物',
           prop: 'jzwid',
-          holder: '请选择公司',
+          holder: '请选择建筑物',
           selectClear: ['azdid'],
           type: 'select',
           queryType: true
@@ -325,7 +326,7 @@ export default {
         {
           label: '安装点',
           prop: 'azdid',
-          holder: '请选择公司',
+          holder: '请选择安装点',
           type: 'select',
           queryType: true
         },
@@ -333,7 +334,7 @@ export default {
           label: '设备状态',
           prop: 'devicevalue',
           default: '',
-          holder: '请选择公司',
+          holder: '请选择设备型号',
           type: 'select',
           queryType: true
         },
