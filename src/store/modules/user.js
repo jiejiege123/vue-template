@@ -154,10 +154,21 @@ const actions = {
               },
               {
                 'Id': '1326708790602633213',
-                'Name': '工单处理',
+                'Name': '工单详情',
                 'ParentId': '1326708790602633230',
                 'Type': 1,
                 'Url': 'OrderItem',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['EquipmentItem01', 'EquipmentItem02', 'EquipmentItem03']
+              },
+              {
+                'Id': '1326708790602633214',
+                'Name': '历史工单记录',
+                'ParentId': '1326708790602633230',
+                'Type': 1,
+                'Url': 'OrderHistory',
                 'Icon': null,
                 'SortCode': 20,
                 'Children': [],
@@ -249,6 +260,59 @@ const actions = {
                 'Id': '985247111769690142',
                 'Name': '安装点管理',
                 'ParentId': '985247111765495811',
+                'Type': 1,
+                'Url': 'Installpoint',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['Installpoint01', 'Installpoint02', 'Installpoint03']
+              },
+              {
+                'Id': '985247111769690143',
+                'Name': '接警联系人',
+                'ParentId': '985247111765495811',
+                'Type': 1,
+                'Url': 'Linkman',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['Installpoint01', 'Installpoint02', 'Installpoint03']
+              }
+            ]
+
+          },
+          {
+            'Id': '985247111765495820',
+            'Name': '统计分析',
+            'Url': 'Analyze',
+            'Type': 4,
+            'Icon': 'tongji',
+            'Children': [
+              {
+                'Id': '985247111765495821',
+                'Name': '故障设备分析',
+                'ParentId': '985247111765495820',
+                'Url': 'Building',
+                'Type': 1,
+                'Icon': null,
+                'Children': [],
+                'Btns': ['Building01', 'Building02', 'Building03']
+              },
+              {
+                'Id': '985247111765495822',
+                'Name': '设备报警分析',
+                'ParentId': '985247111765495820',
+                'Type': 1,
+                'Url': 'Floor',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['Floor01', 'Floor02', 'Floor03']
+              },
+              {
+                'Id': '985247111765495823',
+                'Name': '设备状态分析',
+                'ParentId': '985247111765495820',
                 'Type': 1,
                 'Url': 'Installpoint',
                 'Icon': null,
@@ -363,10 +427,21 @@ const actions = {
               },
               {
                 'Id': '976229042405838849',
-                'Name': '其他设置',
+                'Name': '问题反馈',
                 'ParentId': '976247111765495809',
                 'Type': 1,
-                'Url': 'User',
+                'Url': '',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['User01', 'User02', 'User03']
+              },
+              {
+                'Id': '976229042405838850',
+                'Name': '系统消息',
+                'ParentId': '976247111765495809',
+                'Type': 1,
+                'Url': '',
                 'Icon': null,
                 'SortCode': 20,
                 'Children': [],
@@ -383,6 +458,79 @@ const actions = {
               //   'Children': [],
               //   'Btns': ['Permission01', 'Permission02', 'Permission03']
               // },
+            ]
+          },
+          {
+            'Id': '976247111765495810',
+            'Name': '资费管理',
+            'Url': 'Postage',
+            'Type': 4,
+            'Icon': 'zifei',
+            'Children': [
+              {
+                'Id': '976247111765495811',
+                'Name': '资费概况',
+                'ParentId': '976247111765495810',
+                'Url': 'CompanyInfo',
+                'Type': 1,
+                'Icon': null,
+                'Children': []
+              },
+              {
+                'Id': '976247111765495812',
+                'Name': '购买资源',
+                'ParentId': '976247111765495810',
+                'Type': 1,
+                'Url': 'User',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['User01', 'User02', 'User03']
+              },
+              {
+                'Id': '976247111765495813',
+                'Name': '用量统计',
+                'ParentId': '976247111765495810',
+                'Type': 1,
+                'Url': 'User',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['User01', 'User02', 'User03']
+              },
+              {
+                'Id': '976247111765495814',
+                'Name': '资费配置',
+                'ParentId': '976247111765495810',
+                'Type': 1,
+                'Url': 'User',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['User01', 'User02', 'User03']
+              },
+              {
+                'Id': '976247111765495815',
+                'Name': '设备配额管理',
+                'ParentId': '976247111765495810',
+                'Type': 1,
+                'Url': 'User',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['User01', 'User02', 'User03']
+              },
+              {
+                'Id': '976247111765495816',
+                'Name': '充值记录',
+                'ParentId': '976247111765495810',
+                'Type': 1,
+                'Url': 'User',
+                'Icon': null,
+                'SortCode': 20,
+                'Children': [],
+                'Btns': ['User01', 'User02', 'User03']
+              }
             ]
           }
 

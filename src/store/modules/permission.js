@@ -126,7 +126,7 @@ const actions = {
               findItem(addRoutes, item => {
                 return item.name === 'AlarmRecord'
               }, breadcrumbItem, 'children')
-            } else if (n.Url === 'OrderItem') {
+            } else if (n.Url === 'OrderItem' || n.Url === 'OrderHistory') {
               hidden = true
               activeMenu = '/Alarm/WorkOrder'
               noCache = true
@@ -150,7 +150,7 @@ const actions = {
             } else if (n.Url === 'AlarmRecord') {
               activeTags = '/Alarm/AlarmHistroy'
             } else if (n.Url === 'WorkOrder') {
-              activeTags = '/Alarm/OrderItem'
+              activeTags = '/Alarm/OrderItem,/Alarm/OrderHistory'
             } else {
               activeTags = ''
             }

@@ -124,13 +124,23 @@ export default {
       tableColumn: [
         {
           prop: 'IMEI',
-          label: 'IMEI',
-          width: 120
+          label: 'IMEI'
         },
         {
-          prop: '所属单位',
-          label: 'IMEI',
-          width: 120
+          prop: 'azdname',
+          label: '安装点名称'
+        },
+        {
+          prop: 'comname',
+          label: '所属单位'
+        },
+        {
+          prop: 'jzwname',
+          label: '建筑物名称'
+        },
+        {
+          prop: 'lcname',
+          label: '楼层名称'
         }
       ],
       formRules: {
@@ -171,7 +181,6 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.getCompanyData()
     // this.onSearch({ com: '' })
     // this.getDicsList()
   },

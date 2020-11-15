@@ -45,34 +45,89 @@
       :tableData='tableData'
       :columns="tableColumn")
       template(v-slot:outOperate)
-        el-select(
-          v-model="select"
-          placeholder="选择操作"
-          filterable)
-          el-option(
-            v-for="(list, index) in selectOption"
-            :key="index"
-            :label="list.label"
-            :value="list.value")
         el-button.ml_10(
           type="success"
-          @click='batchHandle') 批量执行
+          @click='exportWorder') 导出工单
+        el-button.ml_10(
+          type="success"
+          @click='addAlarm') 新增报障
+        el-button.ml_10(
+          type="primary"
+          @click='overAlarm') 完结工单
       template(v-slot:operation="{row}")
         el-button(
           type="success"
           plain
           @click.stop="goHistory(row)"
-          ) 历史报警
+          ) 历史记录
         el-button(
           type="success"
           @click.stop="handle(row)"
           ) 处理
+    //- 新增工单
+    el-dialog.add-dialog(
+      title='新增报障工单',
+      :visible.sync='visible'
+      width='550px'
+      @open="open('ruleForm')"
+      :close-on-click-modal="false"
+      :append-to-body="true")
+      el-form.default-input(
+        v-loading="dialogLoading"
+        :model='ruleForm'
+        ref='ruleForm'
+        :rules="dialogRules"
+        label-width='120px')
+        div(style="width:400px")
+          el-form-item(
+            prop='azdid'
+            label="安装点位")
+            el-autocomplete(
+              style="width: 100%"
+              v-model='ruleForm.azdid'
+              :fetch-suggestions="querySearchAsync"
+              placeholder="请输入安装点位")
+          el-form-item(
+            prop='workorderbody'
+            label="故障描述")
+            el-input(
+              style="width: 100%"
+              type='textarea',
+              v-model='ruleForm.workorderbody'
+              :autosize='{ minRows: 4, maxRows: 5}'
+              placeholder="请输入故障描述")
+          el-form-item(
+            prop='wordordertype'
+            label="故障类型")
+            el-select(
+              v-model="ruleForm.wordordertype"
+              placeholder="请选择故障类型"
+              filterable)
+              el-option(
+                v-for="(list, index) in dics.wordordertype"
+                :key="index"
+                :label="list.label"
+                :value="list.value")
+          el-form-item(
+            label="上传附件")
+            el-upload.upload-demo(
+              :action="action"
+              :headers="headers"
+              accept=".jpg, .png, .zip, .rar, .7z"
+              :on-success='handleFileSuccess'
+              :before-upload='beforeFileUpload'
+              :limit='1')
+              el-button(size="small" type="primary") 点击上传
+              span(slot="tip" style='font-size:12px')  多个文件请上传压缩包
+        el-form-item.dia-footer()
+          el-button(type='primary', @click="submitForm('ruleForm')" size="small") 提交
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getAlarmList } from '@/api/alarm'
-
+import { getWorkorder } from '@/api/alarm'
+import { getInstallpointList } from '@/api/place'
+import { getToken } from '@/utils/auth'
 import { mapGetters } from 'vuex'
 export default {
   name: 'WorkOrder',
@@ -159,7 +214,7 @@ export default {
        * 表格
        */
       loading: false,
-      tableData: [],
+      tableData: [{}],
       tableColumn: [
         // {
         //   prop: 'comname',
@@ -179,55 +234,28 @@ export default {
           label: 'IMEI'
         },
         {
-          label: '设备类型',
-          prop: 'shebeitype',
-          formOnly: true
-        },
-        {
-          label: '设备型号',
-          prop: 'xinhaoname'
-        },
-        {
-          label: '设备属性',
-          prop: 'shebeishuxing',
-          formOnly: true
-        },
-        {
           label: '安装点位',
           prop: 'azdname'
         },
         {
-          label: '摄像头',
-          prop: 'shexiang',
-          formOnly: true
+          label: '工单类型',
+          prop: 'wordordertype'
         },
         {
-          label: '责任人',
-          formOnly: true,
-          prop: 'zheren'
+          label: '故障描述',
+          prop: 'workorderbody'
         },
         {
-          label: '报警原因',
-          prop: 'alarmyinyin'
-        },
-
-        {
-          label: '电话通知',
-          formOnly: true,
-          prop: 'telTz'
+          label: '申报人',
+          prop: 'putUser'
         },
         {
-          label: '短信通知',
-          formOnly: true,
-          prop: 'msgTz'
+          label: '创建时间',
+          prop: 'creatTime'
         },
         {
-          label: '报警时间',
-          prop: 'alarmtime'
-        },
-        {
-          label: '处理人',
-          prop: 'douser'
+          label: '状态',
+          prop: 'workordervalue'
         },
         {
           prop: 'addtime',
@@ -245,13 +273,27 @@ export default {
       pageSize: 9000,
       total: 0,
       formLoading: false,
-      // 其他
-      select: '',
-      selectOption: []
+      // 弹窗
+      visible: false,
+      dialogLoading: false,
+      ruleForm: {},
+      dialogRules: {
+        azdid: [{ required: true, message: '请输入安装点', tigger: 'change' }],
+        workorderbody: [{ required: true, message: '请输入故障描述', tigger: 'blur' }],
+        wordordertype: [{ required: true, message: '请选择故障类型', tigger: 'change' }]
+      }
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    action() {
+      return `${process.env.VUE_APP_BASE_API}/api/common/photo/upload/single`
+    },
+    headers() {
+      return {
+        Authorization: 'Bearer ' + getToken()
+      }
+    }
   },
   created() {
     // this.onSearch({})
@@ -302,12 +344,12 @@ export default {
     },
     getDataList() {
       const params = {
-        PageIndex: 1,
-        PageSize: 9999,
+        PageIndex: this.currentPage,
+        PageSize: this.pageSize,
         ...this.query
       }
       this.loading = true
-      getAlarmList(params).then(res => {
+      getWorkorder(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
@@ -322,14 +364,57 @@ export default {
     },
     goHistory(row) {
       this.$router.push(
-        { path: '/Alarm/AlarmHistroy', query: {
-          IMEI: row.IMEI
+        { path: '/Alarm/OrderHistory', query: {
+          Workorderid: row.Workorderid
         }})
     },
-    batchHandle() {
+    addAlarm() {
+      this.visible = true
+    },
+    overAlarm() {
 
     },
-    handle() {
+    exportWorder() {
+
+    },
+    handle(row) {
+      // 跳转到工单详情
+      this.$router.push(
+        { path: '/Alarm/OrderItem', query: {
+          Workorderid: row.Workorderid || 111111
+        }})
+    },
+    open(ruleForm) {
+      this.$nextTick(() => {
+        if (this.$refs[ruleForm]) {
+          this.$refs[ruleForm].clearValidate()
+        }
+      })
+    },
+    querySearchAsync(queryString, cb) {
+      const params = {
+        PageIndex: 1,
+        PageSize: 99999,
+        azdname: queryString
+      }
+      getInstallpointList(params).then(res => {
+        cb(res.Data.Models)
+      }).catch(err => {
+        console.error(err)
+      })
+    },
+    handleFileSuccess(res) {
+      if (res.Status === 200) {
+        const url = res.Data
+        this.$set(this.ruleForm, 'imglist', url)
+      } else {
+        this.$message.error(res.Msg)
+      }
+    },
+    beforeFileUpload() {
+
+    },
+    submitForm(formName) {
 
     }
   }
@@ -345,5 +430,16 @@ export default {
 }
 .query{
  width: 100%;
+}
+.add-dialog{
+  ::v-deep .el-dialog__body{
+    padding: 10px 30px;
+    .el-form-item__label{
+      font-weight: normal;
+    }
+  }
+}
+.dia-footer{
+  text-align: right;
 }
 </style>

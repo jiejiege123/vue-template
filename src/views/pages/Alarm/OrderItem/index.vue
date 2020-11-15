@@ -7,56 +7,85 @@
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
 -->
 <template lang="pug">
-.content.layout-column
+.content
   //- 返回单位管理查单
-  .hearer-breadcrumb(v-if="IMEI")
-    el-button(type="text" style="padding: 0" @click="goAlarm") 单位管理
+  .hearer-breadcrumb(v-if="Workorderid")
+    el-button(type="text" style="padding: 0" @click="goAlarm") 工单处理
     i.el-icon-arrow-right
-    span 角色列表
-    span.ml_20(style="color: #000") {{comname}}
-  .header.layout-row__between
-    .query.layout-row.mb_15
-      Query(
-        :queryList="queryList"
-        :btnLoading="loading"
-        @onSearch="onSearch")
-  edit-table-form(
-    :loading='loading'
-    :inline="true"
-    operateWidth='280'
-    :hasPages="true"
-    :currentPage="currentPage"
-    :total="total"
-    :pageSize="pageSize"
-    :dics="dics"
-    dialogWidth='800px'
-    has01="Company01"
-    has02="Company02"
-    has03="Company03"
-    :formStyle={width: '220px'}
-    :showSelection="false"
-    :showBatchDel="false"
-    :showView="true"
-    :showDel="false"
-    :showEdit="false"
-    :showIndex="true"
-    :showAdd="false"
-    @onHandleCurrentChange="handleCurrentChange"
-    @onHandleSizeChange="handleSizeChange"
-    :formLoading="formLoading"
-    :formRules="formRules"
-    :tableData='tableData'
-    :columns="tableColumn")
-    template(v-slot:operation="{row}")
-      el-button(
-        type="success"
-        @click.stop="handle(row)"
-        ) 处理
+    span 工单详情
+    //- span.ml_20(style="color: #000") {{comname}}
+  .form-warp
+    el-form.default-input.layout-row.flex-wrap(
+      v-loading="formLoading"
+      :model='ruleForm'
+      ref='ruleForm'
+      label-width='120px')
+      div(
+          style="width: 33%"
+          v-for="(item,index) in formColumns"
+          :key="index")
+          el-form-item(
+            :prop='item.prop'
+            :label="item.label+ ':'")
+            div()
+              span {{ruleForm[item.prop]}}
+      //- 附件 下载
+      el-form-item(
+        style="width: 33%"
+        prop='files'
+        label="附件:")
+        el-button(type="primary" @click="download(ruleForm.files)") 点击下载
+  //- 处理情况
+  p.mb_10 处理情况
+  el-table(
+    :data='tableData'
+    style='width: 100%'
+    :header-cell-style='headerStyle'
+    border
+    ref="reftable"
+    :cell-class-name="cellClassName"
+    empty-text="没有数据")
+    el-table-column(
+      v-for="(item,index) in tableColumns"
+      :key="index"
+      :prop="item.prop"
+      :label="item.label"
+      :align="item.align"
+      :min-width="item.minWidth"
+      :width="item.width")
+  p.mb_10 反馈内容
+  el-input(
+    type='textarea',
+    placeholder="请输入反馈内容"
+    :autosize='{ minRows: 5, maxRows: 6}'
+    v-model='fknr')
+  p.mb_10 上传附件
+  div
+    el-upload.upload-demo(
+      :action="action"
+      :headers="headers"
+      accept=".jpg, .png, gif, .doc, .docx, .xls, .xlsx, .pfd, .mp4, .zip, .rar, .7z"
+      :on-success='handleFileSuccess'
+      :before-upload='beforeFileUpload'
+      :limit='1')
+      el-button(size="small" type="primary") 点击上传
+      span(slot="tip" style='font-size:12px')  多个文件请上传压缩包
+  div.mt_15.text-center()
+    el-button(
+      type="primary"
+      plain
+      @click.stop="goHistory(row)"
+      ) 反馈工单
+    el-button(
+      type="success"
+      @click.stop="handle(row)"
+      ) 完结工单
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getAlarmHistory } from '@/api/alarm'
+import { getToken } from '@/utils/auth'
 
 // import { getDicsByName } from '@/api/commom'
 
@@ -72,110 +101,85 @@ export default {
   },
   data() {
     return {
-      /**
-       * 查询
-       */
-      input: '',
-      queryList: [
-        {
-          label: '',
-          hiddenLabel: true,
-          prop: 'date',
-          holder: '请选择日期',
-          type: 'date',
-          queryType: false
-        }
-      ],
-      query: {},
-      /**
-       * 表格
-       */
-      loading: false,
-      tableData: [],
-      tableColumn: [
+
+      formLoading: false,
+      formColumns: [
         {
           prop: 'IMEI',
           label: 'IMEI'
-        },
-        {
-          label: '设备类型',
-          prop: 'shebeitype',
-          formOnly: true
-        },
-        {
-          label: '设备型号',
-          prop: 'xinhaoname'
-        },
-        {
-          label: '设备属性',
-          prop: 'shebeishuxing',
-          formOnly: true
         },
         {
           label: '安装点位',
           prop: 'azdname'
         },
         {
-          label: '摄像头',
-          prop: 'shexiang',
-          formOnly: true
+          label: '工单类型',
+          prop: 'worderType'
         },
         {
-          label: '责任人',
-          formOnly: true,
-          prop: 'zheren'
+          label: '故障描述',
+          prop: 'workorderbody'
         },
         {
-          label: '报警原因',
-          prop: 'alarmyinyin'
+          label: '申报人',
+          prop: 'sbUser'
         },
 
         {
-          label: '电话通知',
-          formOnly: true,
-          prop: 'telTz'
+          label: '状态',
+          prop: 'worderStatus'
         },
         {
-          label: '短信通知',
-          formOnly: true,
-          prop: 'msgTz'
+          label: '创建时间',
+          prop: 'creattime'
         },
         {
-          label: '报警时间',
-          prop: 'alarmtime'
+          label: '更新时间',
+          prop: 'updatetime'
+        }
+      ],
+
+      Workorderid: '',
+      ruleForm: {},
+      tableData: [],
+      tableColumns: [
+        {
+          prop: 'fkbody',
+          label: '反馈内容',
+          width: '500px'
         },
         {
-          label: '处理人',
-          prop: 'douser'
+          prop: 'files',
+          label: '附件'
         },
         {
-          prop: 'addtime',
-          label: '最后处理时间',
-          tableOnly: true
+          prop: 'douser',
+          label: '处理人'
+        },
+        {
+          prop: 'fktime',
+          label: '反馈时间'
         }
 
       ],
-      formRules: {
-      },
-      dics: {
-
-      },
-      currentPage: 1,
-      pageSize: 9000,
-      total: 0,
-      formLoading: false,
-      IMEI: ''
+      fknr: ''
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo']),
+    action() {
+      return `${process.env.VUE_APP_BASE_API}/api/common/photo/upload/single`
+    },
+    headers() {
+      return {
+        Authorization: 'Bearer ' + getToken()
+      }
+    }
   },
   created() {
-    this.IMEI = this.$route.query.IMEI
-    this.preTableData = JSON.parse(localStorage.getItem('routers'))
-    console.log(this.preTableData)
-    this.onSearch({ Name: '' })
-    this.getDicsList()
+    this.Workorderid = this.$route.query.Workorderid
+    // this.onSearch({})
+    // this.getDicsList()
   },
   activated() {
     // 保持半缓存
@@ -216,6 +220,17 @@ export default {
       this.pageSize = 20
       this.query = query
       this.getDataList()
+    },
+    handleFileSuccess(res) {
+      if (res.Status === 200) {
+        const url = res.Data
+        this.$set(this.ruleForm, 'files', url)
+      } else {
+        this.$message.error(res.Msg)
+      }
+    },
+    beforeFileUpload() {
+
     },
     getDicsList() {
       // const params = {
@@ -259,10 +274,19 @@ export default {
     },
 
     goAlarm() {
-      this.$router.push('/Alarm/AlarmRecord')
+      this.$router.push('/Alarm/WorkOrder')
     },
     handle() {
 
+    },
+    download(url) {
+      let ur
+      if (url.includes('http')) {
+        ur = url
+      } else {
+        ur = process.env.VUE_APP_BASE_API + url
+      }
+      window.open(ur)
     }
 
   }
@@ -285,17 +309,20 @@ export default {
 
 }
 
-.add-dialog{
-  ::v-deep .el-dialog__body{
-    height: calc(100vh - 200px);
-    overflow-y: auto;
-    padding-top: 10px;
-    display: flex;
-    flex-direction: column;
-  }
-}
 .footer{
   text-align: right;
   margin-top: 15px;
+}
+.form-warp{
+  ::v-deep .el-form{
+    .el-form-item{
+      width: 100%;
+      .el-form-item__label{
+        font-weight: normal;
+      }
+    }
+
+  }
+
 }
 </style>
