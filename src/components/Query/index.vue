@@ -56,8 +56,8 @@
             el-option(
               v-for="(list,index) in dics[item.prop]"
               :key="index"
-              :label="list.label"
-              :value="list.value")
+              :label="list.label || list[item.selectLabel]"
+              :value="list.value || list[item.selectValue]")
           el-cascader.mr_15(
             v-else-if="item.type === 'cascader'"
             :options='dics[item.prop]',

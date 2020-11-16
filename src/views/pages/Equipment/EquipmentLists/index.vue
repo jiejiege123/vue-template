@@ -18,7 +18,7 @@ div(style="width:100%; height:100%")
       :currentPage="currentPage"
       :total="total"
       :pageSize="pageSize"
-      :dics="dicsForm"
+      :dics="dics"
       :showIndex="true"
       dialogWidth='800px'
       has01="Company01"
@@ -61,24 +61,24 @@ div(style="width:100%; height:100%")
         el-button(
           type="primary"
           size="small"
-          @click='addRow') 新增
+          @click='addRow') 添加
 
         el-dropdown.ml_10(@command="dropCommand")
-          el-button(type="primary" size="small" :disabled="moreDisable")
+          el-button(type="primary" size="small")
             | 更多菜单
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu.more-opeareat(slot="dropdown")
-            el-dropdown-item(command="editRow" :disabled="moreOne" style="width:120px") 修改设备
-            el-dropdown-item(command="delRow" style="width:120px") 删除设备
-            el-dropdown-item(command="guohu" style="width:120px") 设备过户
+            el-dropdown-item(command="delRow" style="width:120px" :disabled="moreDisable") 删除设备
+            el-dropdown-item(command="guohu" style="width:120px" :disabled="moreDisable") 设备过户
             el-dropdown-item(command="import" style="width:120px") 批量导入
-            el-dropdown-item(command="export" style="width:120px") 导出设备
-            el-dropdown-item(command="eventRecord" :disabled="moreOne" style="width:120px") 事件记录
-            el-dropdown-item(command="faultRecord" :disabled="moreOne" style="width:120px") 故障记录
-            el-dropdown-item(command="deviceLog" :disabled="moreOne" style="width:120px") 设备日志
+            el-dropdown-item(command="export"
+            :disabled='moreDisable' style="width:120px") 导出设备
+            el-dropdown-item(command="eventRecord" :disabled="moreOne || moreDisable" style="width:120px") 事件记录
+            el-dropdown-item(command="faultRecord" :disabled="moreOne || moreDisable" style="width:120px") 故障记录
+            el-dropdown-item(command="deviceLog" :disabled="moreOne || moreDisable" style="width:120px") 设备日志
             el-dropdown-item(command="print" style="width:120px") 打印编码
-            el-dropdown-item(command="personalModel" style="width:120px") 设为个人模式
-            el-dropdown-item(command="EngineerModel" style="width:120px") 设为工程模式
+            el-dropdown-item(command="personalModel" style="width:120px" :disabled="moreOne || moreDisable") 设为个人模式
+            el-dropdown-item(command="EngineerModel" style="width:120px" :disabled="moreOne || moreDisable") 设为工程模式
             el-dropdown-item(command="resetStatus" style="width:120px") 状态复位
       template(v-slot:operation="{row}")
         svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr(row.IMEI)")
@@ -129,17 +129,17 @@ div(style="width:100%; height:100%")
             filterable)
         el-form-item(
           v-if="rowStatus === 'import'"
-          prop='pici'
+          prop='piciid'
           label="批次")
           el-select(
-            v-model="ruleForm.pici"
+            v-model="ruleForm.piciid"
             placeholder="请选择批次"
             filterable)
             el-option(
-              v-for="(list, index) in dics.pici"
+              v-for="(list, index) in dics.piciid"
               :key="index"
-              :label="list.label"
-              :value="list.value")
+              :label="list.piciname"
+              :value="list.piciid")
         el-form-item(
           v-if="rowStatus === 'import'"
           prop='xinhaoid'
@@ -151,8 +151,8 @@ div(style="width:100%; height:100%")
             el-option(
               v-for="(list, index) in dics.xinhaoid"
               :key="index"
-              :label="list.label"
-              :value="list.value")
+              :label="list.xinhaoname"
+              :value="list.xinhaoid")
         el-form-item(
           v-if="rowStatus === 'import'"
           prop='file'
@@ -205,7 +205,7 @@ div(style="width:100%; height:100%")
           :currentPage="tableCurrentPage"
           :total="tableTotal"
           :pageSize="tablePageSize"
-          :dics="tableDics"
+          :dics="dics"
           @onHandleCurrentChange="handleCurrentChangeTable"
           @onHandleSizeChange="handleSizeChangeTable")
     //- 绑定弹窗
@@ -224,7 +224,7 @@ import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import BangdDialog from '@/components/BangdDialog'
 import { getToken } from '@/utils/auth'
-import { getEquiList, addEqui, delEqui, updateEqui } from '@/api/equipment.js'
+import { getEquiList, addEqui, delEqui, updateEqui, getPiciList, getModelList, batchDelPici } from '@/api/equipment.js'
 import { getCompany } from '@/api/com'
 import { getBuildingList, getInstallpointList } from '@/api/place'
 import { getDicsByName } from '@/api/commom'
@@ -277,7 +277,7 @@ export default {
             emitPath: false,
             checkStrictly: true
           },
-          selectClear: ['jzwid', 'azdid', 'pici', 'xinhaoid']
+          selectClear: ['jzwid', 'azdid', 'piciid', 'xinhaoid']
         },
         {
           label: '单位限制',
@@ -292,11 +292,15 @@ export default {
           prop: 'piciid',
           holder: '请选择批次',
           type: 'select',
+          clearable: true,
+          selectLabel: 'piciname',
+          selectValue: 'piciid',
           queryType: true
         },
         {
           label: '模式',
           prop: 'mode',
+          clearable: true,
           holder: '请选择模式',
           type: 'select',
           queryType: true
@@ -304,6 +308,7 @@ export default {
         {
           label: '类型',
           prop: 'devicetype',
+          clearable: true,
           holder: '请选择类型',
           type: 'select',
           queryType: true
@@ -311,8 +316,11 @@ export default {
         {
           label: '设备型号',
           prop: 'xinhaoid',
-          holder: '请选择公司',
+          clearable: true,
+          holder: '请选择设备型号',
           type: 'select',
+          selectLabel: 'xinhaoname',
+          selectValue: 'xinhaoid',
           queryType: true
         },
         {
@@ -333,25 +341,25 @@ export default {
         {
           label: '设备状态',
           prop: 'devicevalue',
-          default: '',
-          holder: '请选择设备型号',
+          clearable: true,
+          holder: '请选择设备状态',
           type: 'select',
           queryType: true
         },
         {
           label: '绑定状态',
           prop: 'bangding',
-          holder: '请选择公司',
+          clearable: true,
+          holder: '请选择绑定状态',
           type: 'select',
-          default: '',
           queryType: true
         },
         {
           label: '库存状态',
           prop: 'kcvalue',
-          holder: '请选择公司',
+          clearable: true,
+          holder: '请选择库存状态',
           type: 'select',
-          default: '',
           queryType: true
         }
       ],
@@ -361,15 +369,15 @@ export default {
        */
       loading: false,
       tableData: [
-        {
-          IMEI: '867884040554676',
-          devicetypezh: '门磁',
-          xinhaozh: 'RT-M11-N',
-          picizh: '333-201031-01',
-          comname: '最高公司',
-          modezh: '工程',
-          devicevaluezh: '正常'
-        }
+        // {
+        //   IMEI: '867884040554676',
+        //   devicetypezh: '门磁',
+        //   xinhaozh: 'RT-M11-N',
+        //   picizh: '333-201031-01',
+        //   comname: '最高公司',
+        //   modezh: '工程',
+        //   devicevaluezh: '正常'
+        // }
       ],
       tableColumn: [
         {
@@ -392,27 +400,45 @@ export default {
         },
         {
           label: '批次',
-          prop: 'pici',
+          prop: 'piciid',
+          editAble: true,
+          selectLabel: 'piciname',
+          selectValue: 'piciid',
+          type: 'select',
+          formOnly: true
+        },
+        {
+          label: '模式',
+          prop: 'mode',
           editAble: true,
           type: 'select',
           formOnly: true
         },
         {
           label: '模式',
-          addDisable: true,
-          prop: 'modezh'
+          prop: 'modezh',
+          tableOnly: true
         },
         {
           label: '类型',
-          addDisable: true,
-          prop: 'devicetypezh'
+          prop: 'devicetypezh',
+          tableOnly: true
+        },
+        {
+          label: '类型',
+          prop: 'devicetype',
+          editAble: true,
+          type: 'select',
+          formOnly: true
         },
         {
           label: '设备型号',
           editAble: true,
-          formOnley: true,
+          formOnly: true,
           type: 'select',
-          prop: 'xinhaoid'
+          prop: 'xinhaoid',
+          selectLabel: 'xinhaoname',
+          selectValue: 'xinhaoid'
         },
         {
           label: '设备型号',
@@ -431,8 +457,10 @@ export default {
       ],
       formRules: {
         IMEI: [{ required: true, message: '请输入设备IMEI', trigger: 'blur' }],
-        pici: [{ required: true, message: '请选择批次', trigger: 'change' }],
+        piciid: [{ required: true, message: '请选择批次', trigger: 'change' }],
         xinhaoid: [{ required: true, message: '请选择设备型号', trigger: 'change' }],
+        mode: [{ required: true, message: '请选择设备型号', trigger: 'change' }],
+        devicetype: [{ required: true, message: '请选择设备型号', trigger: 'change' }],
         // comname: [
         //   { required: true, message: '请输入活动名称', trigger: 'blur' },
         //   { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
@@ -451,10 +479,8 @@ export default {
             value: 0,
             label: '仅本单位用户'
           }
-        ],
-        comcode: [],
-        comtype: [],
-        mode: []
+        ]
+
       },
       dicsForm: {
         CompanyLimit: [
@@ -488,7 +514,7 @@ export default {
         comcode: [
           { required: true, message: '请选择单位', trigger: 'change' }
         ],
-        pici: [
+        piciid: [
           { required: true, message: '请选择批次', trigger: 'change' }
         ],
         xinhaoid: [
@@ -548,12 +574,12 @@ export default {
     // 获取单位
     this.getCompanyData()
     // 批次
-    // this.getCompanyData()
-    // // 设备型号
-    // this.getCompanyData()
+    this.getPiciData()
+    // 设备型号
+    this.getModelListData()
 
     this.getDicsList()
-    // this.onSearch({ com: '' })
+    this.onSearch({})
   },
   activated() {
     // 保持半缓存
@@ -594,7 +620,7 @@ export default {
     },
     getDicsList() {
       const params = {
-        names: '公司类型;设备模式;设备类型'
+        names: '公司类型;设备模式;设备类型;设备运行状态;设备安装状态'
       }
       getDicsByName(params).then(res => {
         // console.log(res)
@@ -602,7 +628,10 @@ export default {
         const dicsData = {
           comtype: [],
           mode: [],
-          devicetype: []
+          devicetype: [],
+          devicevalue: [],
+          bangding: []
+
         }
         dics.forEach(n => {
           n.value = n.dicvalue
@@ -617,6 +646,13 @@ export default {
             case '设备类型':
               dicsData.devicetype.push(n)
               break
+            case '设备运行状态':
+              dicsData.devicevalue.push(n)
+              break
+            case '设备安装状态':
+              dicsData.bangding.push(n)
+              break
+
             default:
               break
           }
@@ -624,6 +660,8 @@ export default {
           this.$set(this.dics, 'comtype', dicsData.comtype)
           this.$set(this.dics, 'mode', dicsData.mode)
           this.$set(this.dics, 'devicetype', dicsData.devicetype)
+          this.$set(this.dics, 'devicevalue', dicsData.devicevalue)
+          this.$set(this.dics, 'bangding', dicsData.bangding)
         })
       })
     },
@@ -631,7 +669,7 @@ export default {
       const params = {
         PageIndex: this.currentPage,
         PageSize: this.pageSize,
-        Keywords: this.query.com
+        ...this.query
       }
       this.loading = true
       getEquiList(params).then(res => {
@@ -654,8 +692,12 @@ export default {
     },
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
-      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType) ? this.dics.comType.find(n => n.value === params.comType).label : ''
-      params.pcodename = this.tableData.find(n => n.comcode === params.pcode) ? this.tableData.find(n => n.comcode === params.pcode).comname : ''
+
+      params.modezh = this.dics.mode.find(n => n.value === params.mode) ? this.dics.mode.find(n => n.value === params.mode).label : ''
+      params.devicetypezh = this.dics.devicetype.find(n => n.value === params.devicetype) ? this.dics.devicetype.find(n => n.value === params.devicetype).label : ''
+
+      params.piciname = this.dics.piciid.find(n => n.piciid === params.piciid) ? this.dics.piciid.find(n => n.piciid === params.piciid).piciname : ''
+      params.xinhaozh = this.dics.xinhaoid.find(n => n.xinhaoid === params.xinhaoid) ? this.dics.xinhaoid.find(n => n.xinhaoid === params.xinhaoid).xinhaoname : ''
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
@@ -663,8 +705,10 @@ export default {
       } else {
         methods = updateEqui
       }
+      // console.log(params)
       methods(params).then(res => {
         this.formLoading = true
+        this.getDataList()
         cb(true)
       }).catch((err) => {
         this.$message.error(err)
@@ -796,20 +840,42 @@ export default {
         this.loading = false
       })
     },
+    getPiciData() {
+      const params = {
+        'PageIndex': 1,
+        'PageSize': 9999
+      }
+      getPiciList(params).then(res => {
+        this.$set(this.dics, 'piciid', res.Data.Models)
+      }).catch(err => {
+        console.error(err)
+      })
+    },
+    getModelListData() {
+      const params = {
+        'PageIndex': 1,
+        'PageSize': 9999
+      }
+      getModelList(params).then(res => {
+        this.$set(this.dics, 'xinhaoid', res.Data.Models)
+      }).catch(err => {
+        console.error(err)
+      })
+    },
     getBuildingListData(comname) {
       const params = {
         PageIndex: 1,
         PageSize: 9999,
         comname: comname
       }
-      this.loading = true
+      // this.loading = true
 
       this.$set(this.dics, 'jzwid', [])
       this.$set(this.dics, 'azdid', [])
 
       getBuildingList(params).then(res => {
         this.$nextTick(() => {
-          this.loading = false
+          // this.loading = false
         })
         const data = res.Data.Models
         data.forEach(n => {
@@ -819,7 +885,7 @@ export default {
         this.$set(this.dics, 'jzwid', data)
       }).catch((err) => {
         this.$message.error(err)
-        this.loading = false
+        // this.loading = false
       })
     },
     getInstallpointListData(jzwid) {
@@ -828,12 +894,12 @@ export default {
         PageSize: 9999,
         jzwid: jzwid
       }
-      this.loading = true
+      // this.loading = true
 
       this.$set(this.dics, 'azdid', [])
       getInstallpointList(params).then(res => {
         this.$nextTick(() => {
-          this.loading = false
+          // this.loading = false
         })
         const data = res.Data.Models
         data.forEach(n => {
@@ -843,7 +909,7 @@ export default {
         this.$set(this.dics, 'azdid', data)
       }).catch((err) => {
         this.$message.error(err)
-        this.loading = false
+        // this.loading = false
       })
     },
     submitForm(formName) {
@@ -867,7 +933,7 @@ export default {
         const comname = this.comData.find(n => n.comcode === e).comname
         this.getBuildingListData(comname)
       } else if (prop === 'jzwid') {
-        this.getBuildingListData(e)
+        this.getInstallpointListData(e)
       }
     },
     showBangding(row) {
@@ -885,10 +951,24 @@ export default {
           type: 'error'
         }).then(() => {
           // 调用接口
-          const params = {
-            deviceid: this.row[0].deviceid
+          let methods
+          let params
+          if (this.row.length > 1) {
+            methods = batchDelPici
+            const rows = []
+            this.row.forEach(n => {
+              rows.push(n.deviceid)
+            })
+            params = {
+              deviceids: rows
+            }
+          } else {
+            methods = delEqui
+            params = {
+              deviceid: this.row[0].deviceid
+            }
           }
-          delEqui(params).then(res => {
+          methods(params).then(res => {
             // console.log();
             this.$message({
               type: 'success',

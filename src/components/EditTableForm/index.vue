@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-13 12:06:08
+ * @LastEditTime: 2020-11-16 10:09:35
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -158,8 +158,8 @@
               el-option(
                 v-for="(list, index) in dics[item.prop]"
                 :key="index"
-                :label="list.label"
-                :value="list.value")
+                :label="list.label || list[item.selectLabel]"
+                :value="list.value || list[item.selectValue]")
             el-date-picker(
               v-else-if="item.type === 'date'"
               v-model="ruleForm[item.prop]"

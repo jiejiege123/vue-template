@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-09 10:08:59
+ * @LastEditTime: 2020-11-16 09:21:06
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -29,6 +29,7 @@ div(style="width:100%; height:100%")
       :showSelection="false"
       :showBatchDel="false"
       :showIndex="true"
+      :showAdd="false"
       @onHandleCurrentChange="handleCurrentChange"
       @onHandleSizeChange="handleSizeChange"
       @onSubmitForm="onSubmitForm"
@@ -37,14 +38,29 @@ div(style="width:100%; height:100%")
       :formRules="formRules"
       :tableData='tableData'
       :columns="tableColumn")
+      template(v-slot:outOperate)
+        el-button(
+          type="primary"
+          size="small"
+          @click.stop='showBangding') 新增
       template(v-slot:operation="{row}")
-
+    //- 新增弹窗
+    BangdDialog(
+      :dialogTitle="bangdTitle"
+      :dialogVisible="bangdVisible"
+      :dialogType="bangdType"
+      :comcode="userInfo.comcode"
+      :comname="userInfo.comname"
+      :comData='comData'
+      :imei="imei"
+    )
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getCompany, addCom, delCom, updateCom } from '@/api/com'
 // import { getDicsByName } from '@/api/commom'
+import BangdDialog from '@/components/BangdDialog'
 
 import { checkPhone } from '@/utils/index'
 import { mapGetters } from 'vuex'
@@ -52,7 +68,8 @@ export default {
   name: 'Installpoint',
   components: {
     Query,
-    EditTableForm
+    EditTableForm,
+    BangdDialog
   },
   filters: {
 
@@ -174,7 +191,12 @@ export default {
       pageSize: 9000,
       total: 0,
       formLoading: false,
-      showss: true
+      // 新增弹窗
+      bangdTitle: '新增安装点',
+      bangdVisible: false,
+      bangdType: 'azd',
+      comData: [],
+      imei: ''
     }
   },
   computed: {
@@ -283,6 +305,9 @@ export default {
       }).catch(err => {
         console.error(err)
       })
+    },
+    showBangding() {
+      this.bangdVisible = true
     }
 
   }

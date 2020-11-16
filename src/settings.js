@@ -1,13 +1,13 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-03 14:44:21
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-16 14:47:26
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\settings.js
  */
 module.exports = {
-  title: 'Vue Element Admin',
+  title: '智能监控云平台',
 
   /**
    * @type {boolean} true | false

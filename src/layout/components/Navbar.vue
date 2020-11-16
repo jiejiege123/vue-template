@@ -53,6 +53,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+
     <el-dialog
       title="修改密码"
       :visible.sync="dialogFormVisible"
@@ -329,6 +330,32 @@ export default {
         }
       }
     }
+  }
+}
+.sidebar-Info{
+  float: right;
+  width: 400px;
+  font-size: 14px;
+  background: #2b2f3a;
+  text-align: center;
+  color: #fff;
+  padding: 20px;
+  border-top: 1px solid rgb(90, 89, 89);
+  .user-name{
+    font-size: 14px;
+    color: #5fa4f5;
+    line-height: 41px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .shebei{
+    line-height: 40px;
+  height: 40px;
+  background-color: rgba(95,164,245,.2);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 20px;
   }
 }
 </style>
