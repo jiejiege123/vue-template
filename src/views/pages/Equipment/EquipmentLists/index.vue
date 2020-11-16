@@ -46,8 +46,8 @@ div(style="width:100%; height:100%")
           template(slot-scope='scope')
             .layout-row.align-center
               span#imei(onselectstart="return false" style="-moz-user-select:none;") {{scope.row.IMEI}}
-              svg-icon.clr_b2.hand(icon-class="copy"
-              onselectstart="return false" style="font-size: 20px;margin-left:5px;-moz-user-select:none" @click.stop="copyImei(scope.row.IMEI)")
+              //- svg-icon.clr_b2.hand(icon-class="copy"
+              //- onselectstart="return false" style="font-size: 20px;margin-left:5px;-moz-user-select:none" @click.stop="copyImei(scope.row.IMEI)")
       template(v-slot:columnFoot)
         el-table-column(label="设备状态" align="center" width="80px" type="index" prop="devicevaluezh")
           template(slot-scope='scope')
@@ -83,6 +83,8 @@ div(style="width:100%; height:100%")
       template(v-slot:operation="{row}")
         svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr(row.IMEI)")
         el-button.ml_10(type="primary" size="small" @click.stop="goDetail(row)") 详情
+
+        el-button.ml_10(type="success" size="small" @click.stop="showAlarmuser(row)") 接警联系人
     //- 二维码 弹窗
     el-dialog.dialog-pr(
       title="二维码"
@@ -168,6 +170,15 @@ div(style="width:100%; height:100%")
               el-button(size="small" type="primary") 点击上传
               span(slot="tip" style='font-size:12px')  只能上传Excel格式文件
             el-button.ml_10(type="text" @click="downLoad") 下载模板
+        el-form-item(
+          v-if="rowStatus === 'jiejin'"
+          prop='jjlxrids'
+          label="")
+          el-checkbox(:indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange") 全选
+          div(style="margin: 15px 0;")
+          el-checkbox-group(v-model="checkedUsers" @change="handleCheckedCitiesChange")
+            el-checkbox(v-for="(item,index) in usersOptions"
+            :label="item.jjlxrid" :key="index") {{item.username}}({{item.usertel}})
         el-form-item.dia-footer()
           el-button(@click="dialogVisible = false" size="small") 取消
           el-button(type='primary', @click="submitForm('ruleForm')" size="small") 提交
@@ -224,13 +235,26 @@ import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import BangdDialog from '@/components/BangdDialog'
 import { getToken } from '@/utils/auth'
-import { getEquiList, addEqui, delEqui, updateEqui, getPiciList, getModelList, batchDelPici } from '@/api/equipment.js'
+import {
+  getEquiList,
+  addEqui,
+  delEqui,
+  updateEqui,
+  getPiciList,
+  getModelList,
+  batchDelEqui,
+  getAlarmuser,
+  bindAlarmuser,
+  unbindAlarmuser
+} from '@/api/equipment.js'
 import { getCompany } from '@/api/com'
 import { getBuildingList, getInstallpointList } from '@/api/place'
 import { getDicsByName } from '@/api/commom'
 import VueQr from 'vue-qr'
 import { checkPhone, toTree, deepClone } from '@/utils/index'
 import { mapGetters } from 'vuex'
+import { getAlarmuserList } from '@/api/place'
+
 export default {
   name: 'EquipmentLists',
   components: {
@@ -373,7 +397,7 @@ export default {
         //   IMEI: '867884040554676',
         //   devicetypezh: '门磁',
         //   xinhaozh: 'RT-M11-N',
-        //   picizh: '333-201031-01',
+        //   piciname: '333-201031-01',
         //   comname: '最高公司',
         //   modezh: '工程',
         //   devicevaluezh: '正常'
@@ -395,7 +419,7 @@ export default {
         },
         {
           label: '批次',
-          prop: 'picizh',
+          prop: 'piciname',
           tableOnly: true
         },
         {
@@ -555,8 +579,13 @@ export default {
       imei: '',
       // 勾选行数据
       row: {},
-      rowStatus: ''
-
+      rowStatus: '',
+      // 接警人
+      checkAll: false,
+      checkedUsers: [],
+      usersOptions: [],
+      isIndeterminate: false,
+      oldCheckedUsers: []
     }
   },
   computed: {
@@ -767,17 +796,17 @@ export default {
           IMEI: row.IMEI
         }})
     },
-    copyImei(imei) {
-      var val = document.getElementById('imei')// 此处为需要复制文本的包裹元素
-      window.getSelection().selectAllChildren(val)
-      document.execCommand('Copy')
-      this.$notify({
-        title: '复制成功',
-        message: imei,
-        type: 'success',
-        duration: 2000
-      })
-    },
+    // copyImei(imei) {
+    //   var val = document.getElementById('imei')// 此处为需要复制文本的包裹元素
+    //   window.getSelection().selectAllChildren(val)
+    //   document.execCommand('Copy')
+    //   this.$notify({
+    //     title: '复制成功',
+    //     message: imei,
+    //     type: 'success',
+    //     duration: 2000
+    //   })
+    // },
     showTableDialog(type) {
       this.tableType = type
       this.tableDialogVisible = true
@@ -919,6 +948,34 @@ export default {
             console.log(this.ruleForm)
           } else if (this.rowStatus === 'gouhu') {
             console.log(this.ruleForm)
+          } else if (this.rowStatus === 'jiejin') {
+            // TODO: 判断哪些是被勾选的 那些是被取消的
+            // this.oldCheckedUsers // 之前勾选的
+            // this.checkedUsers // 当前勾选的
+            // 取消勾选
+            const unAddUsers = this.oldCheckedUsers.filter(n => this.checkedUsers.indexOf(n) === -1)
+            const addUsers = this.checkedUsers.filter(n => this.oldCheckedUsers.indexOf(n) === -1)
+            this.formLoadingDia = true
+            if (addUsers.length > 0) {
+              bindAlarmuser({ 'deviceid': this.ruleForm.deviceid,
+                'jjlxrids': addUsers }).then(res => {
+                this.formLoadingDia = false
+                this.dialogVisible = false
+              }).catch(err => {
+                this.formLoadingDia = false
+                console.error(err)
+              })
+            }
+            if (unAddUsers.length > 0) {
+              unbindAlarmuser({ 'deviceid': this.ruleForm.deviceid,
+                'jjlxrids': unAddUsers }).then(res => {
+                this.formLoadingDia = false
+                this.dialogVisible = false
+              }).catch(err => {
+                this.formLoadingDia = false
+                console.error(err)
+              })
+            }
           }
         } else {
           this.$message.error('请将加*内容填写完整')
@@ -954,7 +1011,7 @@ export default {
           let methods
           let params
           if (this.row.length > 1) {
-            methods = batchDelPici
+            methods = batchDelEqui
             const rows = []
             this.row.forEach(n => {
               rows.push(n.deviceid)
@@ -1051,6 +1108,66 @@ export default {
     downLoad() {
       const url = process.env.VUE_APP_BASE_API + 'file'
       window.open(url)
+    },
+    showAlarmuser(row) {
+      this.ruleForm = Object.assign({}, row)
+      this.rowStatus = 'jiejin'
+      this.dialogVisible = true
+      this.dialogTitle = '选择接警联系人'
+      this.getAlarmuserListData(row)
+    },
+    getAlarmuserListData(row) {
+      const params = {
+        PageIndex: 1,
+        PageSize: 9999
+      }
+      this.formLoadingDia = true
+      getAlarmuserList(params).then(res => {
+        const data = res.Data.Models
+        this.usersOptions = data
+        // let usersOptions = []
+        // data.forEach(n => {
+        //   usersOptions.push(n.jjlxrid)
+        // });
+        // this.usersOptions = usersOptions
+        getAlarmuser({ deviceid: row.deviceid }).then(resA => {
+          console.log(resA)
+          const data = resA.Data
+          const userList = []
+          data.forEach(n => {
+            userList.push(n.jjlxrid)
+          })
+          console.log(userList)
+          this.checkedUsers = userList
+          this.oldCheckedUsers = deepClone(userList)
+          this.formLoadingDia = false
+        }).catch((err) => {
+          this.$message.error(err)
+          this.formLoadingDia = false
+        })
+      }).catch((err) => {
+        this.$message.error(err)
+        this.formLoadingDia = false
+      })
+    },
+    handleCheckAllChange(val) {
+      console.log(val)
+      if (val) {
+        const checkedUsers = []
+        this.usersOptions.forEach(n => {
+          checkedUsers.push(n.jjlxrid)
+        })
+        this.checkedUsers = checkedUsers
+      } else {
+        this.checkedUsers = []
+      }
+      this.isIndeterminate = false
+    },
+    handleCheckedCitiesChange(value) {
+      console.log(value)
+      const checkedCount = value.length
+      this.checkAll = checkedCount === this.usersOptions.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.usersOptions.length
     }
 
   }

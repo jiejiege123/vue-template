@@ -153,3 +153,42 @@ export function getConfigInstallpoint(params) {
     params
   })
 }
+
+// 接警联系人
+export function getAlarmuserList(data) {
+  return request({
+    url: '/api/alarmuser/search',
+    method: 'post',
+    data
+  })
+}
+
+export function addAlarmuser(data) {
+  return request({
+    url: '/api/alarmuser/add',
+    method: 'post',
+    data
+  })
+}
+export function updateAlarmuser(data) {
+  return request({
+    url: '/api/alarmuser/update',
+    method: 'post',
+    data
+  })
+}
+export function delAlarmuser(params) {
+  return request({
+    url: '/api/alarmuser/delete',
+    method: 'get',
+    params
+  })
+}
+
+export function batchdelAlarmuser(data) {
+  return request({
+    url: '/api/alarmuser/batch/delete',
+    method: 'post',
+    data
+  })
+}

@@ -39,6 +39,14 @@ export function delEqui(params) {
   })
 }
 
+export function batchDelEqui(data) {
+  return request({
+    url: '/api/device/batch/delete',
+    method: 'post',
+    data
+  })
+}
+
 // 批次管理
 export function getPiciList(data) {
   return request({
@@ -72,14 +80,6 @@ export function delPici(params) {
   })
 }
 
-export function batchDelPici(params) {
-  return request({
-    url: '/api/device/batch/delete',
-    method: 'get',
-    params
-  })
-}
-
 // 型号管理
 export function getModelList(data) {
   return request({
@@ -108,5 +108,30 @@ export function delModel(params) {
     url: '/api/model/delete',
     method: 'get',
     params
+  })
+}
+
+// 获取当前接警人
+export function getAlarmuser(params) {
+  return request({
+    url: '/api/device/alarmuser/get',
+    method: 'get',
+    params
+  })
+}
+
+export function bindAlarmuser(data) {
+  return request({
+    url: '/api/device/alarmuser/bind',
+    method: 'post',
+    data
+  })
+}
+
+export function unbindAlarmuser(data) {
+  return request({
+    url: '/api/device/alarmuser/unbind',
+    method: 'post',
+    data
   })
 }

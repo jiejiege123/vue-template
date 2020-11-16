@@ -14,17 +14,38 @@
     :dics="dics"
     dialogWidth='800px'
     :formStyle={width: '220px'}
-    :showSelection="false"
-    :showBatchDel="false"
+    :showSelection="true"
+    :showBatchDel="true"
+    has02="Company02"
     :showIndex='true'
     :showEdit='false'
     :showAdd="false"
     :showDel="false"
     :showView="false"
+    @onDeleted="onDeleted"
     @onHandleCurrentChange="handleCurrentChange"
     @onHandleSizeChange="handleSizeChange"
     :tableData='tableData'
     :columns="tableColumn")
+    template(v-slot:columnFoot)
+      el-table-column(label="电话通知" align="center" width="80px" type="index" prop="isphonenotice")
+        template(slot-scope='scope')
+          el-switch(v-model="scope.row.isphonenotice"
+            @change="switchChange($event, 'isphonenotice', scope.row)"
+            active-color="#13ce66"
+            inactive-color="#ff4949")
+      el-table-column(label="短信通知" align="center" width="80px" type="index" prop="issmsnotice")
+        template(slot-scope='scope')
+          el-switch(v-model="scope.row.issmsnotice"
+            @change="switchChange($event, 'issmsnotice', scope.row)"
+            active-color="#13ce66"
+            inactive-color="#ff4949")
+      el-table-column(label="公众号" align="center" width="80px" type="index" prop="isgzhnotice")
+        template(slot-scope='scope')
+          el-switch(v-model="scope.row.isgzhnotice"
+            @change="switchChange($event, 'isgzhnotice', scope.row)"
+            active-color="#13ce66"
+            inactive-color="#ff4949")
     template(v-slot:outOperate)
       el-button.ml_10(
         type="primary"
@@ -70,22 +91,23 @@
             v-model="ruleForm.comcode"
             placeholder="请选择公司"
             filterable)
-        el-form-item(prop="name" label='姓名')
+        el-form-item(prop="username" label='姓名')
           el-input(
             placeholder="请输入姓名"
-            v-model='ruleForm.name')
-        el-form-item(prop="tel" label='报警电话')
+            v-model='ruleForm.username')
+        el-form-item(prop="usertel" label='报警电话')
           el-input(
             placeholder="请输入电话"
-            v-model='ruleForm.tel')
+            v-model='ruleForm.usertel')
           .tel-span 请您确保填写的接警号码真实有效，填入未经授权使用的号码带来的法律责任需自行承担
         el-form-item(label='通知方式')
-          el-checkbox(border v-model="ruleForm.telway") 电话
-          el-checkbox(border v-model="ruleForm.msgway") 短信
-        el-form-item(label='头衔' prop='touhead')
+          el-checkbox(border v-model="ruleForm.isphonenotice") 电话
+          el-checkbox(border v-model="ruleForm.issmsnotice") 短信
+          //- el-checkbox(border v-model="ruleForm.isgzhnotice") 公众号
+        el-form-item(label='头衔' prop='title')
           el-input(
             placeholder="请输入头衔"
-            v-model='ruleForm.touhead')
+            v-model='ruleForm.title')
         el-form-item(label='邮箱' prop='email')
           el-input(
             placeholder="请输入邮箱"
@@ -98,8 +120,9 @@
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { mapGetters } from 'vuex'
-import { getCompany, addCom, delCom, updateCom } from '@/api/com'
-import { checkPhone, toTree } from '@/utils/index'
+import { getCompany } from '@/api/com'
+import { getAlarmuserList, addAlarmuser, delAlarmuser, updateAlarmuser, batchdelAlarmuser } from '@/api/place'
+import { checkPhone, toTree, deepClone } from '@/utils/index'
 
 export default {
   name: 'Linkman',
@@ -140,7 +163,7 @@ export default {
       tableData: [],
       tableColumn: [
         {
-          prop: 'name',
+          prop: 'username',
           label: '姓名'
         },
         {
@@ -162,32 +185,45 @@ export default {
           }
         },
         {
-          prop: 'touhead',
-          label: '头衔'
+          prop: 'usertel',
+          label: '电话'
         },
         {
-          prop: 'tel',
-          label: '电话'
+          prop: 'title',
+          label: '头衔'
         },
         {
           prop: 'email',
           label: '邮箱'
         },
         {
-          prop: 'bingdstatus',
-          label: '绑定状态'
+          prop: 'status',
+          label: '绑定状态',
+          filter: true
         }
       ],
-      dics: {},
+      dics: {
+        status: [
+          {
+            value: 0,
+            label: '未绑定'
+          },
+          {
+            value: 1,
+            label: '已绑定'
+          }
+        ]
+      },
       // 表单
       formRules: {
         comcode: [{ required: true, message: '请选择所属单位', trigger: 'change' }],
-        name: [{ required: true, message: '请输入报警人姓名', trigger: 'blur' }],
-        tel: [{ validator: isPhone, required: true, trigger: 'blur' }]
+        username: [{ required: true, message: '请输入报警人姓名', trigger: 'blur' }],
+        usertel: [{ validator: isPhone, required: true, trigger: 'blur' }]
       },
       ruleForm: {
-        telway: true,
-        msgway: true
+        isphonenotice: true,
+        issmsnotice: true
+        // isgzhnotice: true
       },
       title: '',
       visible: false,
@@ -195,6 +231,7 @@ export default {
       dialogType: 'add',
       labelWidth: '120px',
       comData: [],
+      oldComData: [],
       comProps: {
         label: 'comname',
         value: 'comcode',
@@ -208,7 +245,8 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-
+    this.getCompanyData()
+    this.getDataList()
   },
   mounted() {
 
@@ -229,18 +267,18 @@ export default {
       this.query = query
       this.getDataList()
     },
-    getDataList() {
+    getCompanyData() {
       const params = {
         PageIndex: 1,
         PageSize: 9999,
         Keywords: this.query.com
       }
-      this.loading = true
       getCompany(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
         const data = res.Data.Models
+        this.oldComData = deepClone(res.Data.Models)
         // 遍历树形菜单
         data.forEach(n => {
           if (n.comcode === this.userInfo.comcode) {
@@ -249,9 +287,26 @@ export default {
         })
 
         const setData = toTree(data)
-        console.log(setData)
-        this.tableData = setData
-        this.$set(this.dics, 'pcode', setData)
+        this.comData = setData
+        this.$set(this.dics, 'comcode', setData)
+      }).catch((err) => {
+        this.$message.error(err)
+        this.loading = false
+      })
+    },
+    getDataList() {
+      const params = {
+        PageIndex: this.currentPage,
+        PageSize: this.pageSize,
+        ...this.query
+      }
+      this.loading = true
+      getAlarmuserList(params).then(res => {
+        this.$nextTick(() => {
+          this.loading = false
+        })
+        const data = res.Data.Models
+        this.tableData = data
         this.total = res.Data.TotalCount
       }).catch((err) => {
         this.$message.error(err)
@@ -263,10 +318,11 @@ export default {
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
-        methods = addCom
+        methods = addAlarmuser
       } else {
-        methods = updateCom
+        methods = updateAlarmuser
       }
+      params.comname = this.oldComData.find(n => n.comcode === params.comcode).comname
       methods(params).then(res => {
         this.formLoading = true
         this.getDataList()
@@ -277,10 +333,24 @@ export default {
       })
     },
     onDeleted(row) {
-      const params = {
-        comid: row.comid
+      console.log(row)
+      let params, methods
+      if (row.length > 1) {
+        methods = batchdelAlarmuser
+        const ids = []
+        row.forEach(n => {
+          ids.push(n.jjlxrid)
+        })
+        params = {
+          jjlxrids: ids
+        }
+      } else {
+        methods = delAlarmuser
+        params = {
+          jjlxrid: row.jjlxrid
+        }
       }
-      delCom(params).then(res => {
+      methods(params).then(res => {
         this.$message({
           type: 'success',
           message: '删除成功!'
@@ -293,8 +363,9 @@ export default {
     addRow() {
       this.visible = true
       const ruleForm = {
-        telway: true,
-        msgway: true
+        isphonenotice: true,
+        // isgzhnotice: true,
+        issmsnotice: true
       }
       this.ruleForm = Object.assign({}, ruleForm)
       this.title = '添加'
@@ -318,7 +389,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$emit('onDeleted', row)
+        this.onDeleted(row)
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -337,8 +408,60 @@ export default {
       this.ruleForm = {}
       this.visible = false
     },
-    submitForm() {
-
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.onSubmitForm(this.ruleForm, 'add', (pd) => {
+            if (pd) {
+              this.visible = false
+            }
+          })
+        } else {
+          this.$message.error('请将加*内容填写完整')
+          console.error('error submit!!')
+          return false
+        }
+      })
+    },
+    switchChange(e, prop, row) {
+      let tip
+      if (prop === 'isphonenotice') {
+        if (e) {
+          tip = '开启电话接收，此联系人将接收到平台发出的报警或故障电话，请您确认是否继续操作？'
+        } else {
+          tip = '关闭电话接收，此联系人将无法收到平台发出的报警或故障电话，请您知晓该操作带来的影响？'
+        }
+      } else if (prop === 'issmsnotice') {
+        if (e) {
+          tip = '开启公众号通知，此联系人可通过微信端收到平台发出的报警或故障消息通知，请您确保关注微信公众号“消防物联网云平台”，并至少登录过一次微信小程序“消防物联网云助手”。'
+        } else {
+          tip = '关闭公众号通知，此联系人将无法在微信端收到平台发出的报警或故障消息通知，相关责任自行承担！'
+        }
+      } else {
+        if (e) {
+          tip = '开启短信接收，此联系人将接收到平台发出的报警或故障短信，请您确认是否继续操作？'
+        } else {
+          tip = '关闭短信接收，此联系人将无法收到平台发出的报警或故障短信，请您知晓该操作带来的影响？'
+        }
+      }
+      this.$confirm(tip, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.onSubmitForm(row, 'update', (pd) => {
+          if (pd) {
+            this.getDataList()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+        // e = !e
+        row[prop] = !e
+      })
     }
   }
 }
