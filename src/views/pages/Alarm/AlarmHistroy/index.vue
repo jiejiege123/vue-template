@@ -10,9 +10,9 @@
 .content.layout-column
   //- 返回单位管理查单
   .hearer-breadcrumb(v-if="IMEI")
-    el-button(type="text" style="padding: 0" @click="goAlarm") 单位管理
+    el-button(type="text" style="padding: 0" @click="goAlarm") 报警记录
     i.el-icon-arrow-right
-    span 角色列表
+    span 历史记录
     span.ml_20(style="color: #000") {{comname}}
   .header.layout-row__between
     .query.layout-row.mb_15

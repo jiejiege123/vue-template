@@ -4,7 +4,6 @@
     min-height: 100%;
     -webkit-transition: margin-left .28s;
     -o-transition: margin-left .28s;
-    -moz-transition: margin-left .28s;
     transition: margin-left .28s;
     margin-left: $sideBarWidth;
     position: relative;
@@ -13,7 +12,6 @@
   .sidebar-container {
     -webkit-transition: width 0.28s;
     -o-transition: width 0.28s;
-    -moz-transition: width 0.28s;
     transition: width 0.28s;
     width: $sideBarWidth !important;
     background-color: $menuBg;
@@ -30,7 +28,6 @@
     .horizontal-collapse-transition {
       -webkit-transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
       -o-transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
-      -moz-transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
       transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
     }
 
@@ -48,9 +45,7 @@
 
     &.has-logo {
       .el-scrollbar {
-        height: -webkit-calc(100% - 270px);
-        height: -moz-calc(100% - 270px);
-        height: calc(100% - 270px);
+        height: calc(100% - 260px);
       }
     }
 
@@ -177,9 +172,9 @@
       -webkit-transition: -webkit-transform .28s;
       transition: -webkit-transform .28s;
       -o-transition: -o-transform .28s;
-      -moz-transition: transform .28s, -moz-transform .28s;
+      -o-transition: transform .28s;
       transition: transform .28s;
-      transition: transform .28s, -webkit-transform .28s, -moz-transform .28s, -o-transform .28s;
+      transition: transform .28s, -webkit-transform .28s;
       width: $sideBarWidth !important;
     }
 
@@ -187,11 +182,9 @@
       .sidebar-container {
         pointer-events: none;
         -webkit-transition-duration: 0.3s;
-           -moz-transition-duration: 0.3s;
              -o-transition-duration: 0.3s;
                 transition-duration: 0.3s;
         -webkit-transform: translate3d(-$sideBarWidth, 0, 0);
-           -moz-transform: translate3d(-$sideBarWidth, 0, 0);
                 transform: translate3d(-$sideBarWidth, 0, 0);
       }
     }
@@ -203,7 +196,6 @@
     .sidebar-container {
       -webkit-transition: none;
       -o-transition: none;
-      -moz-transition: none;
       transition: none;
     }
   }

@@ -1,7 +1,7 @@
 <template lang="pug">
 el-dialog.dialog-class.list-class.default-input(
   :title='dialogTitle',
-  :visible.sync='dialogVisible'
+  :visible='dialogVisible'
   width='70%'
   min-width="1000px"
   append-to-body

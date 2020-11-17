@@ -63,7 +63,7 @@ div(style="width:100%; height:100%")
           size="small"
           @click='addRow') 添加
 
-        el-dropdown.ml_10(@command="dropCommand")
+        el-dropdown.ml_10.mr_10(@command="dropCommand")
           el-button(type="primary" size="small")
             | 更多菜单
             i.el-icon-arrow-down.el-icon--right
@@ -228,6 +228,7 @@ div(style="width:100%; height:100%")
       :comname="userInfo.comname"
       :comData='comData'
       :imei="imei"
+      @onCloseDialog="onCloseDialog"
       @onSubmitForm="onSubmitFormBangDing"
     )
 </template>
@@ -776,8 +777,8 @@ export default {
     addRow() {
       this.dialogTitle = '新增'
       this.rowStatus = 'add'
-
       this.dialogVisible = true
+      this.ruleForm = {}
     },
     open(ruleForm) {
       this.$nextTick(() => {
@@ -962,6 +963,7 @@ export default {
                 'jjlxrids': addUsers }).then(res => {
                 this.formLoadingDia = false
                 this.dialogVisible = false
+                this.$message.success('接警联系人设置成功')
               }).catch(err => {
                 this.formLoadingDia = false
                 console.error(err)
@@ -1172,6 +1174,10 @@ export default {
     },
     onSubmitFormBangDing(ruleform, dialogType, cb) {
       // 调用绑定接口
+
+    },
+    onCloseDialog() {
+      this.bangdVisible = false
     }
 
   }
