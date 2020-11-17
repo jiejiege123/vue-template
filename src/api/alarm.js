@@ -6,7 +6,7 @@ import request from '@/utils/request'
 
 export function getAlarmList(data) {
   return request({
-    url: '/api/alarm/search',
+    url: '/api/alarmrecord/search',
     method: 'post',
     data
   })

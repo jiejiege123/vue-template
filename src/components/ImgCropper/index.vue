@@ -118,11 +118,13 @@ export default {
   watch: {
     srcOpen: {
       handler(newVal) {
-        console.log(newVal)
-        if (newVal) {
-          console.log(newVal)
-          this.imgFile = newVal
-        }
+        this.imgFile = newVal
+
+        // console.log(newVal)
+        // if (newVal) {
+        //   console.log(newVal)
+        //   this.imgFile = newVal
+        // }
       },
       deep: true,
       immediate: true

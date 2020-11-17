@@ -2,7 +2,7 @@
   <div :class="{fullscreen:fullscreen}" class="tinymce-container" :style="{width:containerWidth}">
     <textarea :id="tinymceId" class="tinymce-textarea" />
     <div class="editor-custom-btn-container">
-      <editorImage color="#1890ff" class="editor-upload-btn" @successCBK="imageSuccessCBK" />
+      <editorImage v-if="!isEdite" color="#1890ff" class="editor-upload-btn" @successCBK="imageSuccessCBK" />
     </div>
   </div>
 </template>
@@ -54,6 +54,14 @@ export default {
       type: [Number, String],
       required: false,
       default: 'auto'
+    },
+    open: {
+      type: Boolean,
+      default: false
+    },
+    isEdite: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -71,9 +79,6 @@ export default {
     }
   },
   computed: {
-    language() {
-      return this.languageTypeList[this.$store.getters.language]
-    },
     containerWidth() {
       const width = this.width
       if (/^[\d]+(\.[\d]+)?$/.test(width)) { // matches `100`, `'100'`
@@ -89,9 +94,12 @@ export default {
           window.tinymce.get(this.tinymceId).setContent(val || ''))
       }
     },
-    language() {
-      this.destroyTinymce()
-      this.$nextTick(() => this.initTinymce())
+    open(val) {
+      if (val) {
+        this.init()
+      } else {
+        this.destroyTinymce()
+      }
     }
   },
   mounted() {
@@ -122,8 +130,8 @@ export default {
     initTinymce() {
       const _this = this
       window.tinymce.init({
-        language: this.language,
         selector: `#${this.tinymceId}`,
+        language: this.languageTypeList['zh'],
         height: this.height,
         body_class: 'panel-body ',
         object_resizing: false,
@@ -140,6 +148,7 @@ export default {
         default_link_target: '_blank',
         link_title: false,
         nonbreaking_force_tab: true, // inserting nonbreaking space &nbsp; need Nonbreaking Space Plugin
+        readonly: this.isEdite,
         init_instance_callback: editor => {
           if (_this.value) {
             editor.setContent(_this.value)
@@ -154,11 +163,7 @@ export default {
           editor.on('FullscreenStateChanged', (e) => {
             _this.fullscreen = e.state
           })
-        },
-        // it will try to keep these URLs intact
-        // https://www.tiny.cloud/docs-3x/reference/configuration/Configuration3x@convert_urls/
-        // https://stackoverflow.com/questions/5196205/disable-tinymce-absolute-to-relative-url-conversions
-        convert_urls: false
+        }
         // 整合七牛上传
         // images_dataimg_filter(img) {
         //   setTimeout(() => {
@@ -199,7 +204,6 @@ export default {
       if (this.fullscreen) {
         tinymce.execCommand('mceFullScreen')
       }
-
       if (tinymce) {
         tinymce.destroy()
       }
@@ -211,44 +215,44 @@ export default {
       window.tinymce.get(this.tinymceId).getContent()
     },
     imageSuccessCBK(arr) {
-      arr.forEach(v => window.tinymce.get(this.tinymceId).insertContent(`<img class="wscnph" src="${v.url}" >`))
+      const _this = this
+      arr.forEach(v => {
+        v.url = process.env.VUE_APP_BASE_API + v.url
+        window.tinymce.get(_this.tinymceId).insertContent(`<img class="wscnph" src="${v.url}" >`)
+      })
+
+      // 将数据传到
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .tinymce-container {
   position: relative;
   line-height: normal;
 }
-
-.tinymce-container {
-  ::v-deep {
-    .mce-fullscreen {
-      z-index: 10000;
-    }
-  }
+.tinymce-container>>>.mce-fullscreen {
+  z-index: 10000;
 }
-
 .tinymce-textarea {
   visibility: hidden;
   z-index: -1;
 }
-
 .editor-custom-btn-container {
   position: absolute;
   right: 4px;
   top: 4px;
   /*z-index: 2005;*/
 }
-
 .fullscreen .editor-custom-btn-container {
   z-index: 10000;
   position: fixed;
 }
-
 .editor-upload-btn {
   display: inline-block;
+}
+.wscnph{
+  max-width: 100%;
 }
 </style>

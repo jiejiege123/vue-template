@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-13 16:06:17
+ * @LastEditTime: 2020-11-17 09:43:28
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -184,7 +184,8 @@ export default {
         // },
         {
           prop: 'IMEI',
-          label: 'IMEI'
+          label: 'IMEI',
+          width: 150
         },
         {
           label: '设备类型',
@@ -239,6 +240,7 @@ export default {
         },
         {
           prop: 'addtime',
+          width: 150,
           label: '最后处理时间',
           tableOnly: true
         }
@@ -247,7 +249,16 @@ export default {
 
       },
       dics: {
-
+        CompanyLimit: [
+          {
+            value: 1,
+            label: '包含下级单位用户'
+          },
+          {
+            value: 0,
+            label: '仅本单位用户'
+          }
+        ]
       },
       currentPage: 1,
       pageSize: 9000,
@@ -262,13 +273,13 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    // this.onSearch({})
+    this.onSearch({})
     this.getDicsList()
   },
   activated() {
     // 保持半缓存
-    this.onSearch({})
-    this.getDicsList()
+    // this.onSearch({})
+    // this.getDicsList()
   },
   mounted() {
   },
@@ -310,8 +321,8 @@ export default {
     },
     getDataList() {
       const params = {
-        PageIndex: 1,
-        PageSize: 9999,
+        PageIndex: this.currentPage,
+        PageSize: this.pageSize,
         ...this.query
       }
       this.loading = true

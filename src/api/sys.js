@@ -19,3 +19,43 @@ export function getComInfo(params) {
     params
   })
 }
+
+// 系统消息列表
+export function getSysMessage(data) {
+  return request({
+    url: '/api/message/search',
+    method: 'post',
+    data
+  })
+}
+
+export function batchDelSmg(data) {
+  return request({
+    url: '/api/message/batch/delete',
+    method: 'post',
+    data
+  })
+}
+
+export function delSmg(params) {
+  return request({
+    url: '/api/message/delete',
+    method: 'get',
+    params
+  })
+}
+
+export function addSmg(data) {
+  return request({
+    url: '/api/message/add',
+    method: 'post',
+    data
+  })
+}
+export function updateSmg(data) {
+  return request({
+    url: '/api/message/update',
+    method: 'post',
+    data
+  })
+}

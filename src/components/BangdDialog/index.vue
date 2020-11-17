@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-16 10:00:44
+ * @LastEditTime: 2020-11-17 09:09:05
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -306,21 +306,32 @@ export default {
         }
       })
     },
-    addTimePicker() {
-      this.TimeRanges.push({})
-    },
-    delPicker(index) {
-      this.TimeRanges.splice(index, 1)
-    },
-    submitForm() {
-      const TimeRanges = []
-      this.TimeRanges.forEach(n => {
-        TimeRanges.push({
-          StartTime: n.time[0],
-          EndTime: n.time[1]
-        })
+
+    submitForm(formName) {
+      if (this.imei) {
+        this.$set(this.ruleForm, 'IMEI', this.imei)
+      }
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$emit('onSubmitForm', this.ruleForm, this.dialogType, (ok) => {
+            if (ok) {
+              this.visible = false
+            } else { return }
+          })
+        } else {
+          this.$message.error('请将加*内容填写完整')
+          console.error('error submit!!')
+          return false
+        }
       })
-      this.$emit('onArmed', TimeRanges)
+      // const TimeRanges = []
+      // this.TimeRanges.forEach(n => {
+      //   TimeRanges.push({
+      //     StartTime: n.time[0],
+      //     EndTime: n.time[1]
+      //   })
+      // })
+      // this.$emit('onArmed', TimeRanges)
     },
     querySearchAsync(queryString, cb) {
       // 根据输入调用接口 查询公司下的IMEI号

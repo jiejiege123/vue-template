@@ -22,7 +22,6 @@ export function addEqui(data) {
   })
 }
 
-// 更新设备
 export function updateEqui(data) {
   return request({
     url: '/api/device/update',
@@ -30,7 +29,7 @@ export function updateEqui(data) {
     data
   })
 }
-// 删除设备
+
 export function delEqui(params) {
   return request({
     url: '/api/device/delete',
@@ -47,6 +46,13 @@ export function batchDelEqui(data) {
   })
 }
 
+export function getEquiByid(params) {
+  return request({
+    url: '/api/device/get',
+    method: 'get',
+    params
+  })
+}
 // 批次管理
 export function getPiciList(data) {
   return request({

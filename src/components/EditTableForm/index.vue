@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-16 10:09:35
+ * @LastEditTime: 2020-11-17 16:00:52
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -9,6 +9,7 @@
 <template lang="pug">
   .table-warp.flex1.layout-column(v-show="!hiddenTable" v-loading="loading")
     .operate(v-if="hasOutOperat")
+      slot(name="outOperate")
       el-button(
         v-if="showAdd"
         v-has="has01"
@@ -23,7 +24,6 @@
         size="small"
         :disabled="batchDelDisAble"
         @click="batchDel") 删除
-      slot(name="outOperate")
 
     el-table.flex1(
       v-if="!hiddenTable"
@@ -219,7 +219,7 @@
               :limit='1')
               el-button(size="small" type="primary") 点击上传
               span(slot="tip" style='font-size:12px')  只能上传一个文件
-            ImgCropper(v-else-if="item.type === 'imgCut'" @getUrl="getImgCutUrl($event, item.prop)")
+            ImgCropper(v-else-if="item.type === 'imgCut'" @getUrl="getImgCutUrl($event, item.prop)" :srcOpen="ruleForm[item.prop]" )
             el-input(
               :style="[formStyle, item.formStyle]"
               v-else-if="item.type === 'map'"

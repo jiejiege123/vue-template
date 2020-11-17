@@ -228,6 +228,7 @@ div(style="width:100%; height:100%")
       :comname="userInfo.comname"
       :comData='comData'
       :imei="imei"
+      @onSubmitForm="onSubmitFormBangDing"
     )
 </template>
 <script >
@@ -793,7 +794,7 @@ export default {
     goDetail(row) {
       this.$router.push(
         { path: '/Equipment/EquipmentItem', query: {
-          IMEI: row.IMEI
+          deviceid: row.deviceid
         }})
     },
     // copyImei(imei) {
@@ -1168,6 +1169,9 @@ export default {
       const checkedCount = value.length
       this.checkAll = checkedCount === this.usersOptions.length
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.usersOptions.length
+    },
+    onSubmitFormBangDing(ruleform, dialogType, cb) {
+      // 调用绑定接口
     }
 
   }

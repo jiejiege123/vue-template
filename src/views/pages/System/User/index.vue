@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-12 08:57:17
+ * @LastEditTime: 2020-11-17 12:18:31
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -429,6 +429,7 @@ export default {
     },
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
+      params.userrole = this.dics.userroleid.find(n => n.Id === params.userroleid).Name
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
@@ -437,10 +438,9 @@ export default {
         methods = updateUser
       }
       methods(params).then(res => {
-        console.log(res)
-        this.getDataList()
-        this.formLoading = true
         cb(true)
+        this.formLoading = false
+        this.getDataList()
       }).catch((err) => {
         this.$message.error(err)
         this.formLoading = false

@@ -10,7 +10,6 @@
             :placeholder="item.holder"
             filterable
             style="padding-right:15px; width:160px"
-
             clearable)
             el-option(
               v-for="(list,index) in item.dics"

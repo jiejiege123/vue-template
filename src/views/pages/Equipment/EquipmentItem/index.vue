@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-13 10:37:05
+ * @LastEditTime: 2020-11-17 08:58:54
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -44,14 +44,14 @@
               span {{ruleForm.menci}}
           div.card-form(style="width: 360px")
             el-form-item(
-              prop='menci'
+              prop='xinghaozh'
               label="信号强度")
-              span {{ruleForm.menci}}
+              span {{ruleForm.xinghaozh}}
           div.card-form(style="width: 360px")
             el-form-item(
-              prop='menci'
+              prop='dianya'
               label="电池电压")
-              span {{ruleForm.menci}}
+              span {{ruleForm.dianya}}
     //- 型号强度
     el-radio-group.mb_10(v-model="radio1")
       el-radio-button(label="信号强度")
@@ -76,7 +76,7 @@
             :hasAdvQuery='false'
             :dics="tableQueryDics"
             :btnLoading="tableLoading"
-            @onSearch="onSearchTable")
+            @onSearch="onSearch")
       edit-table-form(
         :loading='tableLoading'
         :hasOutOperat="false"
@@ -94,14 +94,14 @@
         :total="tableTotal"
         :pageSize="tablePageSize"
         :dics="tableDics"
-        @onHandleCurrentChange="handleCurrentChangeTable"
-        @onHandleSizeChange="handleSizeChangeTable")
+        @onHandleCurrentChange="handleCurrentChange"
+        @onHandleSizeChange="handleSizeChange")
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getUserList } from '@/api/com'
-import { getDicsByName } from '@/api/commom'
+import { getEquiByid } from '@/api/equipment'
+// import { getDicsByName } from '@/api/commom'
 import MsgChart from '@/components/Charts/MsgChart'
 import MsgLineChart from '@/components/Charts/MsgLineChart'
 // import { checkPhone } from '@/utils/index'
@@ -154,12 +154,9 @@ export default {
           prop: 'comname',
           label: '所属单位'
         },
+
         {
-          prop: 'IMEI',
-          label: 'IMEI'
-        },
-        {
-          prop: 'jzwname',
+          prop: 'jzwzh',
           label: '建筑物'
         },
         {
@@ -191,15 +188,15 @@ export default {
           label: '绑定状态'
         },
         {
-          prop: 'azdid',
+          prop: 'azdzh',
           label: '安装位置'
         },
         {
-          prop: 'xinhaoid',
+          prop: 'xinhaoname',
           label: '设备型号'
         },
         {
-          prop: 'zhucetiem',
+          prop: 'regtime',
           label: '注册日期'
         },
         {
@@ -227,7 +224,7 @@ export default {
           label: '出货时间'
         },
         {
-          prop: 'sxtid',
+          prop: 'installtime',
           label: '首次安装时间'
         },
         {
@@ -280,10 +277,10 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.IMEI = this.$route.query.IMEI
+    this.deviceid = this.$route.query.deviceid
     // this.comcode = this.$route.query.comcode
-    // this.onSearch({ com: '' })
-    // this.getDicsList()
+    this.onSearch({})
+    this.getDicsList()
   },
   mounted() {
   },
@@ -303,45 +300,40 @@ export default {
       this.getDataList()
     },
     getDicsList() {
-      const params = {
-        names: '公司类型'
-      }
-      getDicsByName(params).then(res => {
-        // console.log(res)
-        const dics = res.Data
-        dics.forEach(n => {
-          n.value = n.dicvalue
-          n.label = n.diczh
-          switch (n.groupzh) {
-            case '公司类型':
-              this.dics.comType.push(n)
-              break
-            default:
-              break
-          }
-        })
-      })
+      // const params = {
+      //   names: '公司类型'
+      // }
+      // getDicsByName(params).then(res => {
+      //   // console.log(res)
+      //   const dics = res.Data
+      //   dics.forEach(n => {
+      //     n.value = n.dicvalue
+      //     n.label = n.diczh
+      //     switch (n.groupzh) {
+      //       case '公司类型':
+      //         this.dics.comtype.push(n)
+      //         break
+      //       default:
+      //         break
+      //     }
+      //   })
+      // })
     },
     getDataList() {
       const params = {
-        PageIndex: this.currentPage,
-        PageSize: this.pageSize,
-        Keywords: this.query.com
+        deviceid: this.deviceid
+        // PageIndex: this.currentPage,
+        // PageSize: this.pageSize,
+        // ...this.query
       }
       this.loading = true
-      getUserList(params).then(res => {
+      getEquiByid(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
-        const data = res.Data.Models
-        data.forEach(n => {
-          if (n.comcode === this.userInfo.comcode) {
-            n.delDisabled = true
-          }
-        })
-        this.tableData = res.Data.Models
-        this.$set(this.dics, 'pcode', res.Data.Models)
-        this.total = res.Data.TotalCount
+        const data = res.Data
+
+        this.ruleForm = data
       }).catch((err) => {
         this.$message.error(err)
         this.loading = false
