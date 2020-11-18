@@ -53,6 +53,23 @@ export function getEquiByid(params) {
     params
   })
 }
+// 过户
+export function transferEqui(data) {
+  return request({
+    url: '/api/device/transfer',
+    method: 'post',
+    data
+  })
+}
+
+export function importEqui(data) {
+  return request({
+    url: '/api/device/batch/import',
+    method: 'post',
+    data
+  })
+}
+
 // 批次管理
 export function getPiciList(data) {
   return request({

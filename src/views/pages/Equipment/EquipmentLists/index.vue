@@ -114,10 +114,11 @@ div(style="width:100%; height:100%")
           v-if="rowStatus === 'add'"
           prop='IMEI'
           label="IMEI")
-          el-input(
+          el-autocomplete(
             style="width: 400px"
             v-model='ruleForm.IMEI'
-            placeholder="请输入要添加到IMEI号")
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入要添加的IMEI号")
         el-form-item(
           v-if="rowStatus === 'guohu'"
           prop='comcode'
@@ -129,6 +130,7 @@ div(style="width:100%; height:100%")
             v-model="ruleForm.comcode"
             placeholder="请选择公司"
             filterable)
+        //- 只有生产厂家有 批次和设备型号选项 根据 comtype === '1' 判断
         el-form-item(
           v-if="rowStatus === 'import'"
           prop='piciid'
@@ -161,7 +163,7 @@ div(style="width:100%; height:100%")
           label="文件")
           .layout-row
             el-upload.upload-demo(
-              :action="action"
+              :action="importAction"
               :headers="headers"
               accept=".xls, .xlsx"
               :on-success='handleFileSuccess'
@@ -239,6 +241,7 @@ import BangdDialog from '@/components/BangdDialog'
 import { getToken } from '@/utils/auth'
 import {
   getEquiList,
+  getEquiByid,
   addEqui,
   delEqui,
   updateEqui,
@@ -247,7 +250,9 @@ import {
   batchDelEqui,
   getAlarmuser,
   bindAlarmuser,
-  unbindAlarmuser
+  unbindAlarmuser,
+  transferEqui
+  // importEqui
 } from '@/api/equipment.js'
 import { getCompany } from '@/api/com'
 import { getBuildingList, getInstallpointList } from '@/api/place'
@@ -594,6 +599,9 @@ export default {
     ...mapGetters(['userInfo']),
     action() { // 上传文件
       return `${process.env.VUE_APP_BASE_API}/api/common/photo/upload/single`
+    },
+    importAction() {
+      return `${process.env.VUE_APP_BASE_API}/api/device/batch/import`
     },
     headers() {
       return {
@@ -948,8 +956,26 @@ export default {
         if (valid) {
           if (this.rowStatus === 'add') {
             console.log(this.ruleForm)
-          } else if (this.rowStatus === 'gouhu') {
+          } else if (this.rowStatus === 'guohu') {
             console.log(this.ruleForm)
+            const DeviceIds = []
+            this.row.forEach(n => {
+              DeviceIds.push(n.deviceid)
+            })
+            const params = {
+              DeviceIds: DeviceIds,
+              ComCode: this.ruleForm.comcode
+            }
+            this.formLoadingDia = true
+            transferEqui(params).then(res => {
+              console.log(res)
+              this.formLoadingDia = false
+              this.dialogVisible = false
+              this.getDataList()
+            }).catch(err => {
+              console.log(err)
+              this.formLoadingDia = false
+            })
           } else if (this.rowStatus === 'jiejin') {
             // TODO: 判断哪些是被勾选的 那些是被取消的
             // this.oldCheckedUsers // 之前勾选的
@@ -979,6 +1005,8 @@ export default {
                 console.error(err)
               })
             }
+          } else if (this.rowStatus === 'import') {
+            //
           }
         } else {
           this.$message.error('请将加*内容填写完整')
@@ -1019,9 +1047,10 @@ export default {
             this.row.forEach(n => {
               rows.push(n.deviceid)
             })
-            params = {
-              deviceids: rows
-            }
+            // params = {
+            //   deviceids: rows
+            // }
+            params = this.row[0].deviceid
           } else {
             methods = delEqui
             params = {
@@ -1178,6 +1207,18 @@ export default {
     },
     onCloseDialog() {
       this.bangdVisible = false
+    },
+    querySearchAsync(queryString, cb) {
+      const params = {
+        PageIndex: 1,
+        PageSize: 99999,
+        deviceid: queryString
+      }
+      getEquiByid(params).then(res => {
+        cb(res.Data)
+      }).catch(err => {
+        console.error(err)
+      })
     }
 
   }
