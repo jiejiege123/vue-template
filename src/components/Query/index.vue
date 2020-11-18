@@ -50,7 +50,6 @@
             filterable
             :style="{width: inputWidth}"
             :clearable="item.clearable"
-
             )
             el-option(
               v-for="(list,index) in dics[item.prop]"
@@ -87,12 +86,10 @@
       //- 干掉分开的东西 免得不方便
       .layout-row.align-center.mb_10(style="text-align: right;justify-content: flex-start;")
         el-button(
-
           @click='reset') 重置
         el-button(
           :loading="btnLoading"
           type="primary"
-
           @click='search') 查询
         div.ml_10(@click="queryTypeChange" v-if="hasAdvQuery")
           span.el-dropdown-link

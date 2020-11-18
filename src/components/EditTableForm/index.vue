@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-17 16:00:52
+ * @LastEditTime: 2020-11-18 10:51:58
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -45,7 +45,7 @@
         type="selection"
         align="center"
         width="55")
-      el-table-column(v-if="showIndex" label="#" align="center" type="index")
+      el-table-column(v-if="showIndex" label="#" align="center" type="index" :index="indexMethod")
       slot(name="columnHead")
       el-table-column(
         v-for="(item,index) in tableColumns"

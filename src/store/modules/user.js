@@ -289,36 +289,36 @@ const actions = {
             'Icon': 'tongji',
             'Children': [
               {
-                'Id': '985247111765495821',
-                'Name': '故障设备分析',
-                'ParentId': '985247111765495820',
-                'Url': 'Building',
-                'Type': 1,
-                'Icon': null,
-                'Children': [],
-                'Btns': ['Building01', 'Building02', 'Building03']
-              },
-              {
                 'Id': '985247111765495822',
                 'Name': '设备报警分析',
                 'ParentId': '985247111765495820',
                 'Type': 1,
-                'Url': 'Floor',
+                'Url': 'AlarmAnalyze',
                 'Icon': null,
                 'SortCode': 20,
                 'Children': [],
-                'Btns': ['Floor01', 'Floor02', 'Floor03']
+                'Btns': ['AlarmAnalyze01', 'AlarmAnalyze02', 'AlarmAnalyze03']
+              },
+              {
+                'Id': '985247111765495821',
+                'Name': '故障设备分析',
+                'ParentId': '985247111765495820',
+                'Url': 'FaultAnalyze',
+                'Type': 1,
+                'Icon': null,
+                'Children': [],
+                'Btns': ['FaultAnalyze01', 'FaultAnalyze02', 'FaultAnalyze03']
               },
               {
                 'Id': '985247111765495823',
                 'Name': '设备状态分析',
                 'ParentId': '985247111765495820',
                 'Type': 1,
-                'Url': 'Installpoint',
+                'Url': 'StatusAnalyze',
                 'Icon': null,
                 'SortCode': 20,
                 'Children': [],
-                'Btns': ['Installpoint01', 'Installpoint02', 'Installpoint03']
+                'Btns': ['StatusAnalyze01', 'StatusAnalyze02', 'StatusAnalyze03']
               }
             ]
 

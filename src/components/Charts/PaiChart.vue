@@ -43,9 +43,12 @@ export default {
       }
     },
     legend: {
-      type: Array,
+      type: Object,
       default() {
-        return []
+        return {
+          top: '20px',
+          data: []
+        }
       }
     },
     colorList: {
@@ -55,8 +58,14 @@ export default {
       }
     },
     title: {
-      type: String,
-      default: '设备状态曲线图'
+      type: Object,
+      default() {
+        return {
+          text: '设备状态曲线图',
+          left: '10px',
+          top: '10px'
+        }
+      }
     },
     grid: {
       type: Object,
@@ -97,19 +106,12 @@ export default {
 
       this.chart.setOption({
         color: this.colorList,
-        title: {
-          text: this.title,
-          left: '10px',
-          top: '10px'
-        },
+        title: this.title,
         tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b}: {c} ({d}%)'
         },
-        legend: {
-          data: this.legend,
-          top: '20px'
-        },
+        legend: this.legend,
         grid: this.grid,
         series: this.seriesData
       })
