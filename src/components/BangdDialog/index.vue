@@ -10,9 +10,10 @@
   el-dialog.add-dialog(
     :title='dialogTitle',
     width="700px"
-    :visible.sync='dialogVisible'
+    :visible='dialogVisible'
     @open="open('ruleForm')"
     :close-on-click-modal="false"
+    @close="closeDialog"
     :append-to-body="true")
     el-form.default-input(
       v-loading="dialogLoading"
@@ -429,6 +430,9 @@ export default {
           this.formLoading = false
         })
       }
+    },
+    closeDialog() {
+      this.$emit('onCloseDialog')
     }
   }
 }

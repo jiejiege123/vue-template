@@ -10,7 +10,7 @@
       <div>{{ userInfo.comname }}</div>
       <div class="user-name">● {{ userInfo.realname || userInfo.username }}({{ userInfo.userrole }})</div>
       <!-- 设备数 -->
-      <div class="shebei">
+      <div class="shebei" style="margin-top: 10px">
         <div class="icon-warp">
           <svg-icon icon-class="shebeinum" style="margin: 0 auto" />
         </div>
