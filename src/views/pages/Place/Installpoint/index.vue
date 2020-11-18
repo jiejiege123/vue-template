@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-16 09:21:06
+ * @LastEditTime: 2020-11-18 16:52:31
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -53,12 +53,14 @@ div(style="width:100%; height:100%")
       :comname="userInfo.comname"
       :comData='comData'
       :imei="imei"
+      @onCloseDialog="bangdVisible = false"
     )
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
 import { getCompany, addCom, delCom, updateCom } from '@/api/com'
+import { getInstallpointList, addInstallpoint, updateInstallpoint, deleteInstallpoint } from '@/api/place'
 // import { getDicsByName } from '@/api/commom'
 import BangdDialog from '@/components/BangdDialog'
 
@@ -203,7 +205,7 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    // this.onSearch({ com: '' })
+    this.onSearch({})
     // this.getDicsList()
   },
   activated() {
@@ -252,21 +254,20 @@ export default {
       const params = {
         PageIndex: this.currentPage,
         PageSize: this.pageSize,
-        Keywords: this.query.com
+        ...this.query
       }
       this.loading = true
-      getCompany(params).then(res => {
+      getInstallpointList(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
-        const data = res.Data.Models
-        data.forEach(n => {
-          if (n.comcode === this.userInfo.comcode) {
-            n.delDisabled = true
-          }
-        })
+        // const data = res.Data.Models
+        // data.forEach(n => {
+        //   if (n.comcode === this.userInfo.comcode) {
+        //     n.delDisabled = true
+        //   }
+        // })
         this.tableData = res.Data.Models
-        this.$set(this.dics, 'pcode', res.Data.Models)
         this.total = res.Data.TotalCount
       }).catch((err) => {
         this.$message.error(err)

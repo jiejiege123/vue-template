@@ -934,7 +934,7 @@ export default {
         })
         const data = res.Data.Models
         data.forEach(n => {
-          n.label = n.azdid
+          n.label = n.azdname
           n.value = n.azdid
         })
         this.$set(this.dics, 'azdid', data)
