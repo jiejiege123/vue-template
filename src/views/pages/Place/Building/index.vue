@@ -160,7 +160,7 @@ export default {
         //   formOnly: true
         // },
         {
-          prop: 'jwzname',
+          prop: 'jzwname',
           label: '建筑物名称',
           editAble: true,
           minWidth: 200,
@@ -190,7 +190,7 @@ export default {
           formOnly: true
         },
         {
-          prop: 'jwzaddress',
+          prop: 'jzwaddress',
           label: '详细地址',
           editAble: true,
           online: true,
@@ -234,7 +234,7 @@ export default {
 
       ],
       formRules: {
-        jwzname: [{ required: true, message: '请输入建筑名称', trigger: 'blur' }],
+        jzwname: [{ required: true, message: '请输入建筑名称', trigger: 'blur' }],
         comcode: [{ required: true, message: '请选择所属单位', trigger: 'change' }],
         longitude: [{ required: true, message: '请点击图标输入查询', trigger: 'blur' }],
         latitude: [{ required: true, message: '请点击图标输入查询', trigger: 'blur' }],
@@ -242,7 +242,7 @@ export default {
         //   { required: true, message: '请输入活动名称', trigger: 'blur' },
         //   { min: 1, max: 25, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         // ],
-        jwzaddress: [{ required: true, message: '请输入详细地址', trigger: 'blur' }],
+        jzwaddress: [{ required: true, message: '请输入详细地址', trigger: 'blur' }],
         lxr: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
         lcsnum: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
         lxrtel: [{ validator: isPhone, required: true, trigger: 'blur' }]

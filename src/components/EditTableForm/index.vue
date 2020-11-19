@@ -677,7 +677,7 @@ export default {
     mapSure(address, longitude, latitude) {
       this.dialogMapVisible = false
       console.log(address, longitude, latitude)
-      this.$set(this.ruleForm, 'jwzaddress', address)
+      this.$set(this.ruleForm, 'jzwaddress', address)
       this.$set(this.ruleForm, 'longitude', longitude)
       this.$set(this.ruleForm, 'latitude', latitude)
     }

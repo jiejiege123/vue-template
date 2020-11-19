@@ -154,6 +154,15 @@ export function getConfigInstallpoint(params) {
   })
 }
 
+// 绑定安装点
+export function bindInstallpoint(data) {
+  return request({
+    url: '/api/installpoint/bind',
+    method: 'post',
+    data
+  })
+}
+
 // 接警联系人
 export function getAlarmuserList(data) {
   return request({

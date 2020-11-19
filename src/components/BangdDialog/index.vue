@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-17 09:09:05
+ * @LastEditTime: 2020-11-19 16:32:07
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -28,7 +28,7 @@
         el-autocomplete(
           v-else
           style="width: 400px"
-          v-model='ruleForm.imei'
+          v-model='ruleForm.IMEI'
           :fetch-suggestions="querySearchAsync"
           placeholder="请输入要添加到IMEI号")
       el-form-item(
@@ -56,7 +56,7 @@
           el-option(
             v-for="(list, index) in jzwData"
             :key="index"
-            :label="list.jwzname"
+            :label="list.jzwname"
             :value="list.jzwid")
         el-button.ml_10(type="primary" icon="el-icon-plus" circle @click='addJzw')
       el-form-item(
@@ -66,6 +66,7 @@
           v-model="ruleForm.lcid"
           placeholder="请选择建筑物"
           style="width: 400px"
+          @change="lcChange"
           filterable)
           el-option(
             v-for="(list, index) in lcData"
@@ -74,12 +75,22 @@
             :value="list.lcid")
         el-button.ml_10(type="primary" icon="el-icon-plus" circle @click='addLc')
       el-form-item(
-        prop='azdname'
+        prop='azdid'
         label="安装点")
-        el-input(
+        //- el-input(
+        //-   style="width: 400px"
+        //-   v-model='ruleForm.azdid'
+        //-   placeholder="请输入安装点名称")
+        el-select(
+          v-model="ruleForm.azdid"
+          placeholder="请选择安装点"
           style="width: 400px"
-          v-model='ruleForm.azdname'
-          placeholder="请输入安装点名称")
+          filterable)
+          el-option(
+            v-for="(list, index) in azdData"
+            :key="index"
+            :label="list.azdname"
+            :value="list.azdid")
     .dia-footer()
       el-button.mr_10(type='primary', @click="submitForm('ruleForm')" size="small") 提交
 
@@ -100,7 +111,13 @@
 <script>
 import EditTableForm from '@/components/EditTableForm'
 import { checkPhone, toTree } from '@/utils/index'
-import { getBuildingList, addBuilding, getFloorList, addFloor } from '@/api/place'
+import {
+  getBuildingList,
+  addBuilding,
+  getFloorList,
+  addFloor,
+  // bindInstallpoint,
+  getInstallpointList } from '@/api/place'
 export default {
   name: 'BangdDialog',
   components: {
@@ -174,7 +191,7 @@ export default {
         comcode: [{ required: true, message: '请选择安装单位', trigger: 'change' }],
         jzwid: [{ required: true, message: '请选择建筑物' }],
         lcid: [{ required: true, message: '请选择楼层' }],
-        azdname: [{ required: true, message: '请输入安装点', trigger: 'blur' }]
+        azdid: [{ required: true, message: '请输入安装点', trigger: 'blur' }]
       },
       icascaderProps: {
         label: 'comname',
@@ -184,6 +201,7 @@ export default {
       },
       comSetData: [],
       jzwData: [],
+      azdData: [],
       lcData: [],
       // 新增弹窗
       tableColumn: [],
@@ -191,7 +209,7 @@ export default {
       formLoading: false,
       jzwColumn: [
         {
-          prop: 'jwzname',
+          prop: 'jzwname',
           label: '建筑物名称',
           editAble: true,
           minWidth: 200,
@@ -215,7 +233,7 @@ export default {
           formOnly: true
         },
         {
-          prop: 'jwzaddress',
+          prop: 'jzwaddress',
           label: '详细地址',
           editAble: true,
           online: true,
@@ -244,12 +262,12 @@ export default {
         }
       ],
       jzwRules: {
-        jwzname: [{ required: true, message: '请输入建筑名称', trigger: 'blur' }],
+        jzwname: [{ required: true, message: '请输入建筑名称', trigger: 'blur' }],
         comcode: [{ required: true, message: '请选择所属单位', trigger: 'change' }],
         longitude: [{ required: true, message: '请点击图标输入查询', trigger: 'blur' }],
         latitude: [{ required: true, message: '请点击图标输入查询', trigger: 'blur' }],
 
-        jwzaddress: [{ required: true, message: '请输入详细地址', trigger: 'blur' }],
+        jzwaddress: [{ required: true, message: '请输入详细地址', trigger: 'blur' }],
         lxr: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
         lcsnum: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
         lxrtel: [{ validator: isPhone, required: true, trigger: 'blur' }]
@@ -311,6 +329,7 @@ export default {
     submitForm(formName) {
       if (this.imei) {
         this.$set(this.ruleForm, 'IMEI', this.imei)
+        this.$set(this.ruleForm, 'deviceid', this.deviceid)
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -319,6 +338,11 @@ export default {
               this.visible = false
             } else { return }
           })
+
+          // 不需要 emit 现在直接绑定
+          // bindInstallpoint(this.ruleForm).then(res => {
+
+          // })
         } else {
           this.$message.error('请将加*内容填写完整')
           console.error('error submit!!')
@@ -377,7 +401,7 @@ export default {
         this.lcData = []
         this.$set(this.ruleForm, 'lcid', '')
         params = {
-          jzwname: this.jzwData.find(n => n.jzwid === e).jwzname,
+          jzwname: this.jzwData.find(n => n.jzwid === e).jzwname,
           PageIndex: 1,
           PageSize: 99999
         }
@@ -391,6 +415,17 @@ export default {
 
       getFloorList(params).then(res => {
         this.lcData = res.Data.Models
+      }).catch(err => {
+        console.error(err)
+      })
+    },
+    lcChange(e) {
+      // 根据条件查询安装的
+      const params = this.ruleForm
+      getInstallpointList(params).then(res => {
+        // console.log(res)
+        // this.$set(this.dics, '', res.Data.Models)
+        this.azdData = res.Data.Models
       }).catch(err => {
         console.error(err)
       })
@@ -421,10 +456,10 @@ export default {
         })
       } else {
         params = Object.assign({}, ruleForm)
-        params.jzwname = this.ruleForm.jwzname
+        params.jzwname = this.ruleForm.jzwname
         addFloor(params).then(res => {
           this.formLoading = true
-          this.jzwidChange(this.ruleForm.jwzname, 'change')
+          this.jzwidChange(this.ruleForm.jzwname, 'change')
         }).catch((err) => {
           this.$message.error(err)
           this.formLoading = false

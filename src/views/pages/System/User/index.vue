@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-17 12:18:31
+ * @LastEditTime: 2020-11-19 10:59:10
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -346,7 +346,11 @@ export default {
     // 获取角色列表
     this.getRoleList()
     // 获取公司列表 获取角色列表
-    this.onSearch({ CompanyLimit: 0 })
+    if (this.comname) {
+      this.onSearch({ CompanyLimit: 0, comname: this.comname })
+    } else {
+      this.onSearch({ CompanyLimit: 0 })
+    }
     this.getDicsList()
   },
   mounted() {
@@ -430,6 +434,8 @@ export default {
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
       params.userrole = this.dics.userroleid.find(n => n.Id === params.userroleid).Name
+
+      params.comcode = this.comcode || this.userInfo.comcode
       this.formLoading = true
       let methods
       if (dialogType === 'add') {

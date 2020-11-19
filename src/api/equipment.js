@@ -22,6 +22,15 @@ export function addEqui(data) {
   })
 }
 
+// 添加设备到本公司
+export function imeiAddEqui(params) {
+  return request({
+    url: '/api/device/imei/add',
+    method: 'get',
+    params
+  })
+}
+
 export function updateEqui(data) {
   return request({
     url: '/api/device/update',
@@ -67,6 +76,22 @@ export function importEqui(data) {
     url: '/api/device/batch/import',
     method: 'post',
     data
+  })
+}
+
+export function exportEqui(data) {
+  return request({
+    url: '/api/device/export',
+    method: 'post',
+    data
+  })
+}
+
+export function setModeEqui(params) {
+  return request({
+    url: '/api/device/mode/get',
+    method: 'get',
+    params
   })
 }
 

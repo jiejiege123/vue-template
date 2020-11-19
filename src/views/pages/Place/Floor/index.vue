@@ -238,7 +238,7 @@ export default {
     },
     getDataList() {
       if (this.query.jzwid) {
-        this.query.jzwname = this.dics.jzwid.find(n => n.value === this.query.jzwid).jwzname
+        this.query.jzwname = this.dics.jzwid.find(n => n.value === this.query.jzwid).jzwname
       }
       this.query.jzwid
       const params = {
@@ -263,7 +263,7 @@ export default {
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
 
-      params.jzwname = this.dics.jzwid.find(n => n.value === params.jzwid).jwzname
+      params.jzwname = this.dics.jzwid.find(n => n.value === params.jzwid).jzwname
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
@@ -305,7 +305,7 @@ export default {
         const data = res.Data.Models
         data.forEach(n => {
           n.value = n.jzwid
-          n.label = n.jwzname
+          n.label = n.jzwname
         })
         this.$set(this.dics, 'jzwid', data)
       }).catch((err) => {

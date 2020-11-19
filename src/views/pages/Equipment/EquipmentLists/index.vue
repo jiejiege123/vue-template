@@ -72,14 +72,14 @@ div(style="width:100%; height:100%")
             el-dropdown-item(command="guohu" style="width:120px" :disabled="moreDisable") 设备过户
             el-dropdown-item(command="import" style="width:120px") 批量导入
             el-dropdown-item(command="export"
-            :disabled='moreDisable' style="width:120px") 导出设备
+             style="width:120px") 导出设备
             el-dropdown-item(command="eventRecord" :disabled="moreOne || moreDisable" style="width:120px") 事件记录
             el-dropdown-item(command="faultRecord" :disabled="moreOne || moreDisable" style="width:120px") 故障记录
             el-dropdown-item(command="deviceLog" :disabled="moreOne || moreDisable" style="width:120px") 设备日志
-            el-dropdown-item(command="print" style="width:120px") 打印编码
+            el-dropdown-item(:disabled="true" command="print" style="width:120px") 打印编码
             el-dropdown-item(command="personalModel" style="width:120px" :disabled="moreOne || moreDisable") 设为个人模式
             el-dropdown-item(command="EngineerModel" style="width:120px" :disabled="moreOne || moreDisable") 设为工程模式
-            el-dropdown-item(command="resetStatus" style="width:120px") 状态复位
+            el-dropdown-item(:disabled="moreOne || moreDisable" command="resetStatus" style="width:120px") 状态复位
       template(v-slot:operation="{row}")
         svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr(row.IMEI)")
         el-button.ml_10(type="primary" size="small" @click.stop="goDetail(row)") 详情
@@ -118,6 +118,7 @@ div(style="width:100%; height:100%")
             style="width: 400px"
             v-model='ruleForm.IMEI'
             :fetch-suggestions="querySearchAsync"
+            @select="handleSelectIMEI"
             placeholder="请输入要添加的IMEI号")
         el-form-item(
           v-if="rowStatus === 'guohu'"
@@ -226,10 +227,12 @@ div(style="width:100%; height:100%")
       :dialogTitle="bangdTitle"
       :dialogVisible="bangdVisible"
       :dialogType="bangdType"
+      :dialogLoading="bangdLoading"
       :comcode="userInfo.comcode"
       :comname="userInfo.comname"
       :comData='comData'
       :imei="imei"
+      :deviceid='deviceid'
       @onCloseDialog="onCloseDialog"
       @onSubmitForm="onSubmitFormBangDing"
     )
@@ -241,7 +244,7 @@ import BangdDialog from '@/components/BangdDialog'
 import { getToken } from '@/utils/auth'
 import {
   getEquiList,
-  getEquiByid,
+  // getEquiByid,
   addEqui,
   delEqui,
   updateEqui,
@@ -251,7 +254,9 @@ import {
   getAlarmuser,
   bindAlarmuser,
   unbindAlarmuser,
-  transferEqui
+  transferEqui,
+  setModeEqui,
+  exportEqui
   // importEqui
 } from '@/api/equipment.js'
 import { getCompany } from '@/api/com'
@@ -260,7 +265,7 @@ import { getDicsByName } from '@/api/commom'
 import VueQr from 'vue-qr'
 import { checkPhone, toTree, deepClone } from '@/utils/index'
 import { mapGetters } from 'vuex'
-import { getAlarmuserList } from '@/api/place'
+import { getAlarmuserList, bindInstallpoint } from '@/api/place'
 
 export default {
   name: 'EquipmentLists',
@@ -426,6 +431,7 @@ export default {
         },
         {
           label: '批次',
+          width: 135,
           prop: 'piciname',
           tableOnly: true
         },
@@ -555,8 +561,8 @@ export default {
           { required: true, message: '请上传文件' }
         ],
         IMEI: [
-          { required: true, message: '请输入IMEI号码', trigger: 'blur' },
-          { min: 1, max: 25, message: '长度在 3 到 25 个字符', trigger: 'blur' }
+          { required: true, message: '请输入IMEI号码', trigger: 'change' },
+          { min: 1, max: 25, message: '长度在 3 到 25 个字符', trigger: 'change' }
         ]
       },
       moreOne: false,
@@ -581,9 +587,10 @@ export default {
       bangdTitle: '绑定安装点',
       bangdVisible: false,
       bangdType: 'shebei',
-
+      bangdLoading: false,
       comData: [],
       imei: '',
+      deviceid: '',
       // 勾选行数据
       row: {},
       rowStatus: '',
@@ -720,6 +727,9 @@ export default {
           if (n.comcode === this.userInfo.comcode) {
             n.delDisabled = true
           }
+          n.piciname = n.picizh
+          n.xinhaozh = n.xinghaoname
+          n.xinhaoid = n.xinghaoid
         })
         this.tableData = res.Data.Models
         this.$set(this.dics, 'pcode', res.Data.Models)
@@ -735,8 +745,12 @@ export default {
       params.modezh = this.dics.mode.find(n => n.value === params.mode) ? this.dics.mode.find(n => n.value === params.mode).label : ''
       params.devicetypezh = this.dics.devicetype.find(n => n.value === params.devicetype) ? this.dics.devicetype.find(n => n.value === params.devicetype).label : ''
 
-      params.piciname = this.dics.piciid.find(n => n.piciid === params.piciid) ? this.dics.piciid.find(n => n.piciid === params.piciid).piciname : ''
-      params.xinhaozh = this.dics.xinhaoid.find(n => n.xinhaoid === params.xinhaoid) ? this.dics.xinhaoid.find(n => n.xinhaoid === params.xinhaoid).xinhaoname : ''
+      params.picizh = this.dics.piciid.find(n => n.piciid === params.piciid) ? this.dics.piciid.find(n => n.piciid === params.piciid).piciname : ''
+
+      params.xinghaoname = this.dics.xinhaoid.find(n => n.xinhaoid === params.xinhaoid) ? this.dics.xinhaoid.find(n => n.xinhaoid === params.xinhaoid).xinhaoname : ''
+
+      params.xinghaoid = params.xinhaoid
+
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
@@ -918,7 +932,7 @@ export default {
         })
         const data = res.Data.Models
         data.forEach(n => {
-          n.label = n.jwzname
+          n.label = n.jzwname
           n.value = n.jzwid
         })
         this.$set(this.dics, 'jzwid', data)
@@ -1000,6 +1014,7 @@ export default {
                 'jjlxrids': unAddUsers }).then(res => {
                 this.formLoadingDia = false
                 this.dialogVisible = false
+                this.$message.success('接警联系人解绑成功')
               }).catch(err => {
                 this.formLoadingDia = false
                 console.error(err)
@@ -1027,6 +1042,7 @@ export default {
     showBangding(row) {
       this.bangdVisible = true
       this.imei = row.IMEI
+      this.deviceid = row.deviceid
     },
     dropCommand(e) {
       this.rowStatus = e
@@ -1050,7 +1066,7 @@ export default {
             // params = {
             //   deviceids: rows
             // }
-            params = this.row[0].deviceid
+            params = rows
           } else {
             methods = delEqui
             params = {
@@ -1078,12 +1094,24 @@ export default {
         this.dialogVisible = true
         this.dialogTitle = '设备类型'
       } else if (e === 'export') { // 导出
-        this.$confirm('确定要导出设备吗？', '提示', {
+        this.$confirm('将根据当前查询结果要导出设备, 确定吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // this.$emit('onDeleted', row)
+          // 直接根据查询条件导出数据
+          const params = this.query
+          exportEqui(params).then(res => {
+            console.log(res.Data)
+            const url = res.Data
+            let ur
+            if (url.includes('http')) {
+              ur = url
+            } else {
+              ur = process.env.VUE_APP_BASE_API + url
+            }
+            window.open(ur)
+          })
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -1116,6 +1144,19 @@ export default {
           }
         ]
         this.tableDialogVisible = true
+      } else if (e === 'EngineerModel' || e === 'personalModel') {
+        const Mode = e === 'EngineerModel' ? 2 : 1
+        const DeviceIds = []
+        this.row.forEach(n => {
+          DeviceIds.push(n.deviceid)
+        })
+        const params = {
+          DeviceIds: DeviceIds,
+          Mode: Mode
+        }
+        setModeEqui(params).then(res => {
+          console.log(res)
+        })
       }
     },
     handleFileSuccess(res) {
@@ -1144,6 +1185,7 @@ export default {
     showAlarmuser(row) {
       this.ruleForm = Object.assign({}, row)
       this.rowStatus = 'jiejin'
+      this.checkedUsers = []
       this.dialogVisible = true
       this.dialogTitle = '选择接警联系人'
       this.getAlarmuserListData(row)
@@ -1203,7 +1245,20 @@ export default {
     },
     onSubmitFormBangDing(ruleform, dialogType, cb) {
       // 调用绑定接口
-
+      const params = {
+        azdid: ruleform.azdid,
+        deviceid: this.deviceid
+      }
+      this.bangdLoading = true
+      bindInstallpoint(params).then(res => {
+        this.bangdLoading = false
+        this.bangdVisible = false
+        this.$message.success('绑定成功')
+        this.getDicsList()
+      }).catch(err => {
+        this.bangdLoading = false
+        console.error(err)
+      })
     },
     onCloseDialog() {
       this.bangdVisible = false
@@ -1212,13 +1267,23 @@ export default {
       const params = {
         PageIndex: 1,
         PageSize: 99999,
-        deviceid: queryString
+        IMEI: queryString
       }
-      getEquiByid(params).then(res => {
-        cb(res.Data)
+      getEquiList(params).then(res => {
+        console.log(res.Data.Models)
+        const data = res.Data.Models
+        data.forEach(n => {
+          n.value = n.IMEI
+        })
+        cb(data)
       }).catch(err => {
         console.error(err)
       })
+    },
+    handleSelectIMEI(e) {
+      console.log(e)
+      console.log(this.ruleForm.IMEI)
+      // this.ruleForm.IMEI = e.IMEI
     }
 
   }
