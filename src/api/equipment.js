@@ -94,6 +94,21 @@ export function setModeEqui(params) {
     params
   })
 }
+export function setConfigEqui(data) {
+  return request({
+    url: '/api/device/config',
+    method: 'post',
+    data
+  })
+}
+
+export function getConfigEqui(params) {
+  return request({
+    url: '/api/device/config/get',
+    method: 'get',
+    params
+  })
+}
 
 // 批次管理
 export function getPiciList(data) {

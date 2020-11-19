@@ -73,7 +73,7 @@
             :key="index"
             :label="list.lcname"
             :value="list.lcid")
-        el-button.ml_10(type="primary" icon="el-icon-plus" circle @click='addLc')
+        el-button.ml_10(type="primary" icon="el-icon-plus" circle @click='addLc' :disabled="!ruleForm.jzwid")
       el-form-item(
         prop='azdid'
         label="安装点")
@@ -442,23 +442,27 @@ export default {
       this.formRules = this.lcRules
       this.$refs.addDialog.addRow()
     },
-    onSubmitForm(ruleForm) {
+    onSubmitForm(ruleForm, type, cb) {
       let params = {}
       if (this.type === 'jzw') {
         params = Object.assign({}, ruleForm)
         params.comname = this.ruleForm.comname
         addBuilding(params).then(res => {
-          this.formLoading = true
+          this.formLoading = false
+          cb(true)
           this.comcodeChange(this.ruleForm.comname, 'change')
         }).catch((err) => {
           this.$message.error(err)
           this.formLoading = false
         })
       } else {
-        params = Object.assign({}, ruleForm)
-        params.jzwname = this.ruleForm.jzwname
+        params = Object.assign({}, ruleForm, this.ruleForm)
+        params.jzwname = this.ruleForm.jzwname || this.jzwData.find(n => n.jzwid === this.ruleForm.jzwid).jzwname
+        console.log(params)
+
         addFloor(params).then(res => {
-          this.formLoading = true
+          this.formLoading = false
+          cb(true)
           this.jzwidChange(this.ruleForm.jzwname, 'change')
         }).catch((err) => {
           this.$message.error(err)

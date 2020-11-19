@@ -1254,6 +1254,7 @@ export default {
         this.bangdLoading = false
         this.bangdVisible = false
         this.$message.success('绑定成功')
+        cb(true)
         this.getDicsList()
       }).catch(err => {
         this.bangdLoading = false
