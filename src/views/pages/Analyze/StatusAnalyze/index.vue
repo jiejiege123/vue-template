@@ -3,12 +3,12 @@
  * @LastEditors: zzz
 -->
 <template lang="pug">
-analyze(:lineData="lineData" :paiData="paiData" :tableColumns="tableColumns" :tableData='tableData' :barData="barData")
+analyze(:lineData="lineData" :paiData="paiData" :tableColumns="tableColumns" :tableData='tableData' :barData="barData" :noEquiType="true")
 </template>
 <script>
 import Analyze from '@/components/Analyze'
 export default {
-  name: 'AlarmAnalyze',
+  name: 'StatusAnalyze',
   components: {
     Analyze
   },
@@ -21,10 +21,26 @@ export default {
           prop: 'date',
           label: '日期'
         },
-        // {
-        //   prop: 'type',
-        //   label: '人工保障'
-        // },
+        {
+          prop: 'zc',
+          label: '正常'
+        },
+        {
+          prop: 'type',
+          label: '故障'
+        },
+        {
+          prop: 'type',
+          label: '报警'
+        },
+        {
+          prop: 'type',
+          label: '手动报警'
+        },
+        {
+          prop: 'type',
+          label: '离线'
+        },
         {
           prop: 'all',
           label: '汇总'
@@ -95,7 +111,7 @@ export default {
         colorList: colorList,
         seriesData: seriesData,
         title: {
-          text: '设备报警分析曲线图',
+          text: '设备状态分析曲线图',
           left: '3%',
           top: '10px'
         }
@@ -144,7 +160,7 @@ export default {
       const pData = {
         seriesData: paiData,
         title: {
-          text: '设备报警分析扇形图',
+          text: '设备状态分析扇形图',
           left: '50px',
           top: '10px'
         }
@@ -154,7 +170,7 @@ export default {
       // 设置 bar 数据
       const barData = {
         title: {
-          text: '设备报警分析柱状图',
+          text: '设备状态分析柱状图',
           left: '3%',
           top: '10px'
         },

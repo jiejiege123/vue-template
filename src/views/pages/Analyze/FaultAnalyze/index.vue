@@ -8,7 +8,7 @@ analyze(:lineData="lineData" :paiData="paiData" :tableColumns="tableColumns" :ta
 <script>
 import Analyze from '@/components/Analyze'
 export default {
-  name: 'AlarmAnalyze',
+  name: 'FaultAnalyze',
   components: {
     Analyze
   },
@@ -21,10 +21,10 @@ export default {
           prop: 'date',
           label: '日期'
         },
-        // {
-        //   prop: 'type',
-        //   label: '人工保障'
-        // },
+        {
+          prop: 'type',
+          label: '人工报障'
+        },
         {
           prop: 'all',
           label: '汇总'
@@ -95,7 +95,7 @@ export default {
         colorList: colorList,
         seriesData: seriesData,
         title: {
-          text: '设备报警分析曲线图',
+          text: '设备故障分析曲线图',
           left: '3%',
           top: '10px'
         }
@@ -144,7 +144,7 @@ export default {
       const pData = {
         seriesData: paiData,
         title: {
-          text: '设备报警分析扇形图',
+          text: '设备故障分析扇形图',
           left: '50px',
           top: '10px'
         }
@@ -154,7 +154,7 @@ export default {
       // 设置 bar 数据
       const barData = {
         title: {
-          text: '设备报警分析柱状图',
+          text: '设备故障分析柱状图',
           left: '3%',
           top: '10px'
         },

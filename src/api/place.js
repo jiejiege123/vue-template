@@ -201,3 +201,20 @@ export function batchdelAlarmuser(data) {
     data
   })
 }
+
+// 系统 安装点设置
+export function setAzdConfig(data) {
+  return request({
+    url: '/api/installpoint/config',
+    method: 'post',
+    data
+  })
+}
+export function getAzdConfig(params) {
+  return request({
+    url: '/api/installpoint/config/get',
+    method: 'get',
+    params
+  })
+}
+

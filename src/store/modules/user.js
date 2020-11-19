@@ -289,6 +289,16 @@ const actions = {
             'Icon': 'tongji',
             'Children': [
               {
+                'Id': '985247111765495821',
+                'Name': '设备故障分析',
+                'ParentId': '985247111765495820',
+                'Url': 'FaultAnalyze',
+                'Type': 1,
+                'Icon': null,
+                'Children': [],
+                'Btns': ['FaultAnalyze01', 'FaultAnalyze02', 'FaultAnalyze03']
+              },
+              {
                 'Id': '985247111765495822',
                 'Name': '设备报警分析',
                 'ParentId': '985247111765495820',
@@ -298,16 +308,6 @@ const actions = {
                 'SortCode': 20,
                 'Children': [],
                 'Btns': ['AlarmAnalyze01', 'AlarmAnalyze02', 'AlarmAnalyze03']
-              },
-              {
-                'Id': '985247111765495821',
-                'Name': '故障设备分析',
-                'ParentId': '985247111765495820',
-                'Url': 'FaultAnalyze',
-                'Type': 1,
-                'Icon': null,
-                'Children': [],
-                'Btns': ['FaultAnalyze01', 'FaultAnalyze02', 'FaultAnalyze03']
               },
               {
                 'Id': '985247111765495823',

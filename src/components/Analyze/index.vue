@@ -6,7 +6,7 @@
 div(style="width:100%; height:100%")
   .content.layout-column
     .query.layout-row
-      .layout-row.align-center.mb_10
+      .layout-row.align-center.mb_10(v-if="!noEquiType")
         span.span-style(style="width: 80px") 设备型号：
         el-select(
           v-model="query.equiType"
@@ -149,6 +149,10 @@ export default {
       default() {
         return []
       }
+    },
+    noEquiType: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
