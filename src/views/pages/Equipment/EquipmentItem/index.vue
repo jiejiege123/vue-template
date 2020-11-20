@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-17 08:58:54
+ * @LastEditTime: 2020-11-20 10:02:36
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -21,13 +21,18 @@
         v-loading="listLoading"
         :model='ruleForm'
         ref='ruleForm'
-        label-width='120px')
+        label-width='130px')
         .layout-row.flex-wrap
-          div.card-form(v-for="item in formList" :key="item.id" style="width: 360px")
+          div.card-form(v-for="item in formList" :key="item.id" style="width: 30%")
             el-form-item(
+              style="height: 36px"
               :prop='item.prop'
               :label="item.label")
-              span {{ruleForm[item.prop]}}
+              span.span-style.clr_b2.hand(
+                v-if="item.prop === 'dwaddress'"
+                @click="dialogMapVisible = true"
+                style="width:100%") {{ruleForm[item.prop]}}
+              span.span-style(v-else style="width:100%") {{ruleForm[item.prop]}}
     el-card.box-card.mb_10
       div.clr_b2(slot="header") 设备属性
       //- 数据开始了
@@ -39,19 +44,20 @@
         .layout-row.flex-wrap
           div.card-form(style="width: 360px")
             el-form-item(
-              prop='menci'
+               v-if="ruleForm.devicetype === 11"
+              prop='menciType'
               label="门磁状态")
-              span {{ruleForm.menci}}
+              span {{ruleForm.menciType}}
           div.card-form(style="width: 360px")
             el-form-item(
-              prop='xinghaozh'
+              prop='xinhaozh'
               label="信号强度")
-              span {{ruleForm.xinghaozh}}
+              span {{ruleForm.xinhaozh}}
           div.card-form(style="width: 360px")
             el-form-item(
               prop='dianya'
               label="电池电压")
-              span {{ruleForm.dianya}}
+              span {{ruleForm.dianya}}V
     //- 型号强度
     el-radio-group.mb_10(v-model="radio1")
       el-radio-button(label="信号强度")
@@ -96,10 +102,22 @@
         :dics="tableDics"
         @onHandleCurrentChange="handleCurrentChange"
         @onHandleSizeChange="handleSizeChange")
+    //- 地图弹窗
+    MapDialog(
+      dialogTitle="地图"
+      :hasQuery="false"
+      :showLnglat="true"
+      :dialogMapVisible="dialogMapVisible"
+      :longitude="ruleForm.longitude"
+      :latitude="ruleForm.latitude"
+      :address="ruleForm.dwaddress"
+      @closeDialog="dialogMapVisible = false"
+    )
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
+import MapDialog from '@/components/MapDialog'
 import { getEquiByid } from '@/api/equipment'
 // import { getDicsByName } from '@/api/commom'
 import MsgChart from '@/components/Charts/MsgChart'
@@ -112,7 +130,8 @@ export default {
     Query,
     EditTableForm,
     MsgChart,
-    MsgLineChart
+    MsgLineChart,
+    MapDialog
   },
   filters: {
 
@@ -176,7 +195,7 @@ export default {
           label: '状态'
         },
         {
-          prop: 'louce',
+          prop: 'lcname',
           label: '楼层'
         },
         {
@@ -192,7 +211,7 @@ export default {
           label: '安装位置'
         },
         {
-          prop: 'xinhaoname',
+          prop: 'xinghaoname',
           label: '设备型号'
         },
         {
@@ -200,41 +219,84 @@ export default {
           label: '注册日期'
         },
         {
-          prop: 'sxtid',
-          label: '摄像头'
-        },
-        {
-          prop: 'kucunid',
-          label: '库存状态'
-        },
-        {
-          prop: 'sxtid',
-          label: '摄像头'
-        },
-        {
-          prop: 'sxtid',
-          label: '最近事件时间'
-        },
-        {
-          prop: 'sxtid',
-          label: '责任人'
-        },
-        {
-          prop: 'sxtid',
-          label: '出货时间'
-        },
-        {
           prop: 'installtime',
-          label: '首次安装时间'
+          label: '安装时间'
         },
         {
-          prop: 'sxtid',
-          label: '其他责任人'
+          prop: 'strattime',
+          label: '服务开始时间'
         },
         {
-          prop: 'sxtid',
-          label: '经纬度'
+          prop: 'endtime',
+          label: '服务到期时间'
+        },
+        {
+          prop: 'fristnum',
+          label: '首次开通服务时间'
+        },
+        {
+          prop: 'alarmtime',
+          label: '最近报警时间'
+        },
+        {
+          prop: 'hearttime',
+          label: '最近心跳时间'
+        },
+        // {
+        //   prop: 'kcvaluezh',
+        //   label: '库存状态'
+        // },
+
+        {
+          prop: 'modezh',
+          label: '模式'
+        },
+
+        {
+          prop: 'onlinevaluezh',
+          label: '在线状态'
+        },
+
+        {
+          prop: 'swichvaluezh',
+          label: '开关状态'
+        },
+        {
+          prop: 'protectvaluezh',
+          label: '布防状态'
+        },
+        {
+          prop: 'dwaddress',
+          label: '定位地址'
         }
+        // {
+        //   prop: 'sxtid',
+        //   label: '摄像头'
+        // },
+        // {
+        //   prop: 'sxtid',
+        //   label: '最近事件时间'
+        // },
+        // {
+        //   prop: 'sxtid',
+        //   label: '责任人'
+        // },
+        // {
+        //   prop: 'sxtid',
+        //   label: '出货时间'
+        // },
+        // {
+        //   prop: 'installtime',
+        //   label: '首次安装时间'
+        // },
+        // {
+        //   prop: 'sxtid',
+        //   label: '其他责任人'
+        // },
+        // {
+        //   prop: 'sxtid',
+        //   label: '经纬度'
+        // }
 
       ],
       radio1: '信号强度',
@@ -270,7 +332,9 @@ export default {
       tableTotal: 1,
       tablePageSize: 20,
       tableDics: {},
-      tableLoading: false
+      tableLoading: false,
+      // 地图
+      dialogMapVisible: false
     }
   },
   computed: {
@@ -334,6 +398,11 @@ export default {
         const data = res.Data
 
         this.ruleForm = data
+        // TODO: 测试 设置地址 经纬度
+
+        this.$set(this.ruleForm, 'dwaddress', '四川省成都市武侯区益州大道中段1800号')
+        this.$set(this.ruleForm, 'latitude', '30.538572')
+        this.$set(this.ruleForm, 'longitude', '104.056046')
       }).catch((err) => {
         this.$message.error(err)
         this.loading = false
@@ -342,6 +411,9 @@ export default {
 
     goBack() {
       this.$router.push('/Equipment/EquipmentLists')
+    },
+    showMap() {
+
     }
   }
 }

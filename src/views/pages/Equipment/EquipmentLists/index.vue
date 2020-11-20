@@ -52,9 +52,9 @@ div(style="width:100%; height:100%")
         el-table-column(label="设备状态" align="center" width="80px" type="index" prop="devicevaluezh")
           template(slot-scope='scope')
             span.hand(@click="showTableDialog('devicevalue')") {{scope.row.devicevaluezh}}
-        el-table-column(label="安装点位" align="center" width="80px" type="index" prop="anzhungdid")
+        el-table-column(label="安装点位" align="center" width="80px" type="index" prop="azdzh")
           template(slot-scope='scope')
-            span.hand.clr_b2(v-if="scope.row.anzhungdid") {{scope.row.anzhungdid}}
+            span.hand.clr_b2(v-if="scope.row.azdzh" @click="goAzd(scope.row)") {{scope.row.azdzh}}
             el-button(v-else type="primary" size="small" @click.stop='showBangding(scope.row)') 绑定
             //- svg vue-qr(:text="scope.row.IMEI" :size="25")
       template(v-slot:outOperate)
@@ -1255,7 +1255,7 @@ export default {
         this.bangdVisible = false
         this.$message.success('绑定成功')
         cb(true)
-        this.getDicsList()
+        this.getDataList()
       }).catch(err => {
         this.bangdLoading = false
         console.error(err)
@@ -1285,6 +1285,13 @@ export default {
       console.log(e)
       console.log(this.ruleForm.IMEI)
       // this.ruleForm.IMEI = e.IMEI
+    },
+    goAzd(row) {
+      this.$router.push(
+        { path: '/Place/Installpoint', query: {
+          IMEI: row.IMEI
+        }}
+      )
     }
 
   }
