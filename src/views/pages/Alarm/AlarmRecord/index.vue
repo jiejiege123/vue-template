@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-17 09:43:28
+ * @LastEditTime: 2020-11-20 12:05:04
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -123,7 +123,7 @@ export default {
           prop: 'CompanyLimit',
           clearable: false,
           type: 'select',
-          default: 1,
+          default: 0,
           queryType: true
         },
         {
@@ -251,11 +251,11 @@ export default {
       dics: {
         CompanyLimit: [
           {
-            value: 1,
+            value: 0,
             label: '包含下级单位用户'
           },
           {
-            value: 0,
+            value: 1,
             label: '仅本单位用户'
           }
         ]

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-11 14:46:28
+ * @LastEditTime: 2020-11-20 11:18:55
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -19,7 +19,7 @@ div(style="width:100%; height:100%")
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu(slot='dropdown')
             el-dropdown-item(command="comname") 单位名称
-            el-dropdown-item(command="comcode") 单位ID
+            //- el-dropdown-item(command="comcode") 单位ID
 
         el-input.mr_15(
           style="width: 200px"
@@ -29,7 +29,7 @@ div(style="width:100%; height:100%")
         el-button(
           :loading="loading"
           type="primary"
-          @click='search') 查询
+          @click='onSearch({comname: search})') 查询
 
     edit-table-form(
       :loading='loading'
@@ -114,12 +114,12 @@ export default {
       loading: false,
       tableData: [],
       tableColumn: [
-        {
-          prop: 'comcode',
-          label: '单位ID',
-          width: 200,
-          tableOnly: true
-        },
+        // {
+        //   prop: 'comcode',
+        //   label: '单位ID',
+        //   width: 200,
+        //   tableOnly: true
+        // },
         {
           prop: 'pcode',
           label: '上级单位',
@@ -142,7 +142,8 @@ export default {
           prop: 'comname',
           label: '单位名称',
           editAble: true,
-          minWidth: 250
+          minWidth: 220
+          // minWidth: 220
         },
         {
           prop: 'comtype',
@@ -263,12 +264,12 @@ export default {
     ...mapGetters(['userInfo'])
   },
   created() {
-    this.onSearch({ com: '' })
+    this.onSearch({ comname: '' })
     this.getDicsList()
   },
   activated() {
     // 保持半缓存
-    this.onSearch({ com: '' })
+    this.onSearch({ comname: '' })
     this.getDicsList()
   },
   mounted() {
@@ -328,7 +329,7 @@ export default {
       const params = {
         PageIndex: 1,
         PageSize: 9999,
-        Keywords: this.query.com
+        ...this.query
       }
       this.loading = true
       getCompany(params).then(res => {

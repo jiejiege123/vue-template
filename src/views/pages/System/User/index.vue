@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-19 10:59:10
+ * @LastEditTime: 2020-11-20 14:28:56
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -126,8 +126,8 @@ export default {
         {
           label: '角色',
           prop: 'userrole',
-          holder: '请选择角色',
-          type: 'select',
+          holder: '请输入角色',
+          // type: 'select',
           queryType: false
         },
         {
@@ -135,7 +135,7 @@ export default {
           prop: 'CompanyLimit',
           holder: '请输入单位限制',
           type: 'select',
-          default: 1,
+          default: 0,
           clearable: false,
           queryType: false
         }
@@ -145,11 +145,11 @@ export default {
         userrole: [],
         CompanyLimit: [
           {
-            value: 1,
+            value: 0,
             label: '包含下级单位用户'
           },
           {
-            value: 0,
+            value: 1,
             label: '仅本单位用户'
           }
         ],
@@ -181,7 +181,7 @@ export default {
         {
           prop: 'userpass',
           label: '用户密码',
-          editAble: true,
+          editAble: false,
           type: 'password',
           formOnly: true
 
@@ -419,7 +419,7 @@ export default {
         })
         const data = res.Data.Models
         data.forEach(n => {
-          if (n.comcode === this.userInfo.comcode) {
+          if (n.userid === this.userInfo.userid) {
             n.delDisabled = true
           }
         })
@@ -506,6 +506,7 @@ export default {
         })
         const setData = res.Data.Models
         setData.forEach(n => {
+          // n.value = n.Id
           n.value = n.Id
           n.label = n.Name
         })

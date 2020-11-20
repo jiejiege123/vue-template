@@ -158,7 +158,7 @@ export default {
           }
         })
       },
-      immediate: true,
+      // immediate: true
       deep: true
     }
   },
@@ -213,19 +213,25 @@ export default {
         // eslint-disable-next-line no-prototype-builtins
         if (this.query.hasOwnProperty(key)) {
           const rse = this.queryShow.find(n => n.prop === key)
-          console.log(rse)
-
           if (rse) {
-            this.$set(this.query, [key], rse.default || '')
+            let val
+            if (rse.default !== null) {
+              val = rse.default
+            } else {
+              val = ''
+            }
+            this.$set(this.query, [key], val)
           }
         }
       }
     },
     selectChange(e, item) {
       // 清空一些改清空的值
-      item.selectClear.forEach(n => {
-        this.$set(this.query, n, '')
-      })
+      if (item.selectClear) {
+        item.selectClear.forEach(n => {
+          this.$set(this.query, n, '')
+        })
+      }
       this.$emit('selectChange', e, item.prop, this.query)
     }
   }

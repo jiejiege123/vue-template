@@ -320,7 +320,7 @@ export default {
           prop: 'CompanyLimit',
           clearable: false,
           type: 'select',
-          default: 1,
+          default: 0,
           queryType: true
         },
         {
@@ -509,11 +509,11 @@ export default {
       dics: {
         CompanyLimit: [
           {
-            value: 1,
+            value: 0,
             label: '包含下级单位用户'
           },
           {
-            value: 0,
+            value: 1,
             label: '仅本单位用户'
           }
         ]
@@ -522,11 +522,11 @@ export default {
       dicsForm: {
         CompanyLimit: [
           {
-            value: 1,
+            value: 0,
             label: '包含下级单位用户'
           },
           {
-            value: 0,
+            value: 1,
             label: '仅本单位用户'
           }
         ],
@@ -1179,7 +1179,7 @@ export default {
       return (xls || xlsx)
     },
     downLoad() {
-      const url = process.env.VUE_APP_BASE_API + 'file'
+      const url = process.env.VUE_APP_BASE_API + '/files/templates/设备导入模板.xlsx'
       window.open(url)
     },
     showAlarmuser(row) {

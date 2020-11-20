@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-12 08:53:01
+ * @LastEditTime: 2020-11-20 15:49:08
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -138,16 +138,23 @@ export default {
         // }
       ],
       tableColumn: [
-        {
-          prop: 'Id',
-          label: 'ID',
-          width: 100,
-          tableOnly: true
-        },
+        // {
+        //   prop: 'Id',
+        //   label: 'ID',
+        //   width: 100,
+        //   tableOnly: true
+        // },
+
         {
           prop: 'Name',
           label: '角色名称',
           editAble: true
+        },
+        {
+          prop: 'ComTypeZh',
+          label: '公司类型',
+          editAble: false,
+          tableOnly: true
         },
         {
           prop: 'PermissionIds',
