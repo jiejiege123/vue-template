@@ -527,19 +527,22 @@ export default {
             label: {
               show: true,
               fontSize: '30',
-              fontWeight: 'bold',
+              fontWeight: 400,
               formatter() {
                 return proData.total
-              }
+              },
+              color: '#333'
             }
           },
           label: {
             position: 'center',
             fontSize: '30',
-            fontWeight: 'bold',
+            fontWeight: 400,
             formatter() {
               return proData.total
-            }
+            },
+            color: '#333'
+
           },
           labelLine: {
             show: false
