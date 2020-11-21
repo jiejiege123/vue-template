@@ -61,7 +61,7 @@ export default {
       type: Object,
       default() {
         return {
-          text: '设备状态曲线图',
+          text: '产品分类占比',
           left: '10px',
           top: '10px'
         }
@@ -71,7 +71,7 @@ export default {
       type: Object,
       default() {
         return {
-          left: '3%',
+          left: '20%',
           right: '5%',
           bottom: '3%',
           top: '18%',
@@ -103,7 +103,6 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(document.getElementById(this.id))
-
       this.chart.setOption({
         color: this.colorList,
         title: this.title,

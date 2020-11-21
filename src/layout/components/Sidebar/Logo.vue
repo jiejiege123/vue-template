@@ -10,7 +10,7 @@
         <h1 v-else class="sidebar-title">{{ title }} </h1>
 
       </router-link>
-      <router-link v-else key="expand" class="sidebar-logo-link" to="/">
+      <router-link v-else key="expand" class="sidebar-logo-link" to="/home">
         <img v-if="logo" :src="logo" class="sidebar-logo">
         <h1 class="sidebar-title">{{ title }} </h1>
 
