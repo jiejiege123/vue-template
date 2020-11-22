@@ -256,8 +256,8 @@ import {
   unbindAlarmuser,
   transferEqui,
   setModeEqui,
-  exportEqui,
-  addEquiByImei
+  exportEqui
+  // addEquiByImei
   // importEqui
 } from '@/api/equipment.js'
 import { getCompany } from '@/api/com'

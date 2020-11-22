@@ -22,6 +22,7 @@
       :rules="rules"
       label-width='120px')
       el-form-item(
+        v-if="!disIMEI"
         prop='IMEI'
         label="IMEI")
         span(v-if="imei") {{imei}}({{ruleForm.comname}})
@@ -48,6 +49,7 @@
         prop='jzwid'
         label="安装至建筑物")
         el-select(
+          v-loading='jzwLoading'
           v-model="ruleForm.jzwid"
           style="width: 400px"
           placeholder="请选择建筑物"
@@ -63,6 +65,7 @@
         prop='lcid'
         label="安装至楼层")
         el-select(
+          v-loading="lcLoading"
           v-model="ruleForm.lcid"
           placeholder="请选择建筑物"
           style="width: 400px"
@@ -75,13 +78,19 @@
             :value="list.lcid")
         el-button.ml_10(type="primary" icon="el-icon-plus" circle @click='addLc' :disabled="!ruleForm.jzwid")
       el-form-item(
+        v-if="disIMEI"
+        prop='azdname'
+        label="安装点")
+        el-input(
+          style="width: 400px"
+          v-model='ruleForm.azdname'
+          placeholder="请输入安装点名称")
+      el-form-item(
+        v-else
         prop='azdid'
         label="安装点")
-        //- el-input(
-        //-   style="width: 400px"
-        //-   v-model='ruleForm.azdid'
-        //-   placeholder="请输入安装点名称")
         el-select(
+          v-loading="azdLoading"
           v-model="ruleForm.azdid"
           placeholder="请选择安装点"
           style="width: 400px"
@@ -171,6 +180,16 @@ export default {
     imei: {
       type: String,
       default: ''
+    },
+    disIMEI: {
+      type: Boolean,
+      default: false
+    },
+    bangform: {
+      type: Object,
+      default() {
+        return {}
+      }
     }
   },
   data() {
@@ -191,6 +210,7 @@ export default {
         comcode: [{ required: true, message: '请选择安装单位', trigger: 'change' }],
         jzwid: [{ required: true, message: '请选择建筑物' }],
         lcid: [{ required: true, message: '请选择楼层' }],
+        azdname: [{ required: true, message: '请输入安装点名称' }],
         azdid: [{ required: true, message: '请输入安装点', trigger: 'blur' }]
       },
       icascaderProps: {
@@ -201,8 +221,11 @@ export default {
       },
       comSetData: [],
       jzwData: [],
+      jzwLoading: false,
       azdData: [],
+      azdLoading: false,
       lcData: [],
+      lcLoading: false,
       // 新增弹窗
       tableColumn: [],
       formRules: {},
@@ -313,6 +336,17 @@ export default {
       },
       deep: true,
       immediate: true
+    },
+    bangform: {
+      handler(newVal) {
+        if (newVal.azdid) {
+          this.ruleForm = newVal
+          this.getBuildingData(this.ruleForm.comname)
+          this.getFloorData(this.ruleForm.jzwname)
+        }
+      }
+      // deep: true,
+      // immediate: true
     }
   },
   created() {
@@ -333,6 +367,9 @@ export default {
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          // 获取jzwname jzwid    lcname lcid
+          this.ruleForm.jzwname = this.jzwData.find(n => n.jzwid === this.ruleForm.jzwid).jzwname
+          this.ruleForm.lcname = this.lcData.find(n => n.lcid === this.ruleForm.lcid).lcname
           this.$emit('onSubmitForm', this.ruleForm, this.dialogType, (ok) => {
             if (ok) {
               this.visible = false
@@ -369,7 +406,7 @@ export default {
       // }, 3000 * Math.random())
     },
     comcodeChange(e, change) {
-      let params = {}
+      let comname = ''
       if (change !== 'change') {
         this.jzwData = []
         this.lcData = []
@@ -377,56 +414,65 @@ export default {
         this.$set(this.ruleForm, 'lcid', '')
         const now = this.comData.find(n => n.comcode === e)
         this.$set(this.ruleForm, 'comname', now.comname)
-        params = {
-          comname: now.comname,
-          PageIndex: 1,
-          PageSize: 99999
-        }
+        comname = now.comname
       } else {
-        params = {
-          comname: e,
-          PageIndex: 1,
-          PageSize: 99999
-        }
+        comname = e
       }
-      getBuildingList(params).then(res => {
-        this.jzwData = res.Data.Models
-      }).catch(err => {
-        console.error(err)
-      })
+      this.getBuildingData(comname)
     },
     jzwidChange(e, change) {
-      let params = {}
+      console.log('123')
+      let jzwname = ''
       if (change !== 'change') {
         this.lcData = []
         this.$set(this.ruleForm, 'lcid', '')
-        params = {
-          jzwname: this.jzwData.find(n => n.jzwid === e).jzwname,
-          PageIndex: 1,
-          PageSize: 99999
-        }
+        jzwname = this.jzwData.find(n => n.jzwid === e).jzwname
       } else {
-        params = {
-          jzwname: e,
-          PageIndex: 1,
-          PageSize: 99999
-        }
+        jzwname = e
       }
-
-      getFloorList(params).then(res => {
-        this.lcData = res.Data.Models
-      }).catch(err => {
-        console.error(err)
-      })
+      this.getFloorData(jzwname)
     },
     lcChange(e) {
       // 根据条件查询安装的
       const params = this.ruleForm
+      this.azdLoading = true
       getInstallpointList(params).then(res => {
         // console.log(res)
         // this.$set(this.dics, '', res.Data.Models)
+        this.azdLoading = false
         this.azdData = res.Data.Models
       }).catch(err => {
+        this.azdLoading = false
+        console.error(err)
+      })
+    },
+    getBuildingData(comname) {
+      this.jzwLoading = true
+      const params = {
+        comname: comname,
+        PageIndex: 1,
+        PageSize: 99999
+      }
+      getBuildingList(params).then(res => {
+        this.jzwLoading = false
+        this.jzwData = res.Data.Models
+      }).catch(err => {
+        this.jzwLoading = false
+        console.error(err)
+      })
+    },
+    getFloorData(jzwname) {
+      this.lcLoading = true
+      const params = {
+        jzwname: jzwname,
+        PageIndex: 1,
+        PageSize: 99999
+      }
+      getFloorList(params).then(res => {
+        this.lcLoading = false
+        this.lcData = res.Data.Models
+      }).catch(err => {
+        this.lcLoading = false
         console.error(err)
       })
     },

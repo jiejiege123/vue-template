@@ -138,6 +138,14 @@ export function deleteInstallpoint(params) {
   })
 }
 
+export function batchDeleteInstallpoint(params) {
+  return request({
+    url: '/api/installpoint/batch/delete',
+    method: 'get',
+    params
+  })
+}
+
 export function configInstallpoint(data) {
   return request({
     url: '/api/installpoint/config',
@@ -158,6 +166,30 @@ export function getConfigInstallpoint(params) {
 export function bindInstallpoint(data) {
   return request({
     url: '/api/installpoint/bind',
+    method: 'post',
+    data
+  })
+}
+
+export function unbindInstallpoint(data) {
+  return request({
+    url: '/api/installpoint/unbind',
+    method: 'post',
+    data
+  })
+}
+
+export function armedInstallpoint(data) {
+  return request({
+    url: '/api/installpoint/armed',
+    method: 'post',
+    data
+  })
+}
+
+export function disarmInstallpoint(data) {
+  return request({
+    url: '/api/installpoint/disarm',
     method: 'post',
     data
   })

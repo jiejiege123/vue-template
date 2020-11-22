@@ -152,7 +152,6 @@ export default {
   watch: {
     queryList: {
       handler(newVal) {
-        console.log(newVal)
         if (newVal.length > 0) {
           newVal.forEach(n => {
             if (n.default !== undefined) {
