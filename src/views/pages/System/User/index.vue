@@ -306,7 +306,6 @@ export default {
     this.comcode = this.$route.query.comcode
     // 如果没有 comcode 新增时 就有获取所有单位
     if (!this.comcode) {
-      console.log(this.tableColumn)
       this.tableColumn.unshift({
         prop: 'comcode',
         label: '所属单位',
@@ -407,6 +406,12 @@ export default {
       })
     },
     getDataList() {
+      if (!this.query.CompanyLimit) {
+        this.query.CompanyLimit = 0
+      }
+      if (this.comname) {
+        this.query.comname = this.comname
+      }
       const params = {
         PageIndex: this.currentPage,
         PageSize: this.pageSize,

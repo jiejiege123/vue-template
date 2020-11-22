@@ -256,7 +256,8 @@ import {
   unbindAlarmuser,
   transferEqui,
   setModeEqui,
-  exportEqui
+  exportEqui,
+  addEquiByImei
   // importEqui
 } from '@/api/equipment.js'
 import { getCompany } from '@/api/com'
@@ -970,6 +971,7 @@ export default {
         if (valid) {
           if (this.rowStatus === 'add') {
             console.log(this.ruleForm)
+            // TODO: 调用的是添加 addequibyimei 的接口
           } else if (this.rowStatus === 'guohu') {
             console.log(this.ruleForm)
             const DeviceIds = []
@@ -991,10 +993,6 @@ export default {
               this.formLoadingDia = false
             })
           } else if (this.rowStatus === 'jiejin') {
-            // TODO: 判断哪些是被勾选的 那些是被取消的
-            // this.oldCheckedUsers // 之前勾选的
-            // this.checkedUsers // 当前勾选的
-            // 取消勾选
             const unAddUsers = this.oldCheckedUsers.filter(n => this.checkedUsers.indexOf(n) === -1)
             const addUsers = this.checkedUsers.filter(n => this.oldCheckedUsers.indexOf(n) === -1)
             this.formLoadingDia = true
@@ -1156,6 +1154,11 @@ export default {
         }
         setModeEqui(params).then(res => {
           console.log(res)
+          this.getDataList()
+          this.$message.success('设备模式设置成功')
+          // this.
+        }).catch(err => {
+          console.error(err)
         })
       }
     },
@@ -1266,20 +1269,20 @@ export default {
     },
     querySearchAsync(queryString, cb) {
       const params = {
-        PageIndex: 1,
-        PageSize: 99999,
         IMEI: queryString
       }
-      getEquiList(params).then(res => {
-        console.log(res.Data.Models)
-        const data = res.Data.Models
-        data.forEach(n => {
-          n.value = n.IMEI
-        })
-        cb(data)
-      }).catch(err => {
-        console.error(err)
-      })
+      // TODO: 这个接口是不对的
+      this.$message.error('该查询接口还没有确定')
+      // addEquiByImei(params).then(res => {
+      //   console.log(res.Data.Models)
+      //   const data = res.Data.Models
+      //   data.forEach(n => {
+      //     n.value = n.IMEI
+      //   })
+      //   cb(data)
+      // }).catch(err => {
+      //   console.error(err)
+      // })
     },
     handleSelectIMEI(e) {
       console.log(e)

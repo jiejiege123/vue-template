@@ -87,11 +87,11 @@ export function exportEqui(data) {
   })
 }
 
-export function setModeEqui(params) {
+export function setModeEqui(data) {
   return request({
-    url: '/api/device/mode/get',
-    method: 'get',
-    params
+    url: '/api/device/mode/set',
+    method: 'post',
+    data
   })
 }
 export function setConfigEqui(data) {
@@ -105,6 +105,14 @@ export function setConfigEqui(data) {
 export function getConfigEqui(params) {
   return request({
     url: '/api/device/config/get',
+    method: 'get',
+    params
+  })
+}
+
+export function addEquiByImei(params) {
+  return request({
+    url: '/api/device/imei/add',
     method: 'get',
     params
   })

@@ -152,13 +152,16 @@ export default {
   watch: {
     queryList: {
       handler(newVal) {
-        newVal.forEach(n => {
-          if (n.default !== undefined) {
-            this.$set(this.query, n.prop, n.default)
-          }
-        })
+        console.log(newVal)
+        if (newVal.length > 0) {
+          newVal.forEach(n => {
+            if (n.default !== undefined) {
+              this.$set(this.query, n.prop, n.default)
+            }
+          })
+        }
       },
-      // immediate: true
+      // immediate: true,
       deep: true
     }
   },
