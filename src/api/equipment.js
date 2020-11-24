@@ -118,6 +118,24 @@ export function addEquiByImei(params) {
   })
 }
 
+// 设备故障列表
+export function getEquiFalseList(params) {
+  return request({
+    url: '/api/device/malfunction/get',
+    method: 'get',
+    params
+  })
+}
+
+// 设备报警列表
+export function getEquiAlarmList(params) {
+  return request({
+    url: '/api/device/alarmevent/get',
+    method: 'get',
+    params
+  })
+}
+
 // 批次管理
 export function getPiciList(data) {
   return request({

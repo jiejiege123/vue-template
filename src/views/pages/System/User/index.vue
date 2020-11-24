@@ -332,7 +332,7 @@ export default {
           showAllLevels: false,
           props: {
             label: 'comname',
-            value: 'comname',
+            value: 'comcode',
             emitPath: false,
             checkStrictly: true
           },
@@ -345,8 +345,8 @@ export default {
     // 获取角色列表
     this.getRoleList()
     // 获取公司列表 获取角色列表
-    if (this.comname) {
-      this.onSearch({ CompanyLimit: 0, comname: this.comname })
+    if (this.comcode) {
+      this.onSearch({ CompanyLimit: 0, comcode: this.comcode })
     } else {
       this.onSearch({ CompanyLimit: 0 })
     }
@@ -409,8 +409,8 @@ export default {
       if (!this.query.CompanyLimit) {
         this.query.CompanyLimit = 0
       }
-      if (this.comname) {
-        this.query.comname = this.comname
+      if (this.comcode) {
+        this.query.comcode = this.comcode
       }
       const params = {
         PageIndex: this.currentPage,

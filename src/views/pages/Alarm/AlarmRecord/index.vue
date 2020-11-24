@@ -9,7 +9,7 @@
 <template lang="pug">
   .content.layout-column
     .header.layout-row__between
-      .query.layout-row.mb_15
+      .query.layout-row
         Query(
           :hasAdvQuery='true'
           :queryList="queryList"

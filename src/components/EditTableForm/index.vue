@@ -7,7 +7,7 @@
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
 -->
 <template lang="pug">
-  .table-warp.flex1.layout-column(v-show="!hiddenTable" v-loading="loading")
+  .table-warp.flex1.layout-column(v-show="!hiddenTable" v-loading="loading" style="max-height: 100%;")
     .operate(v-if="hasOutOperat")
       slot(name="outOperate")
       el-button(

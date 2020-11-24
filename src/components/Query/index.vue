@@ -222,6 +222,8 @@ export default {
             } else {
               val = ''
             }
+            console.log(val)
+            console.log(this.dics[key])
             this.$set(this.query, [key], val)
           }
         }

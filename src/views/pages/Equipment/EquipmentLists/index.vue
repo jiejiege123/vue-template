@@ -75,11 +75,11 @@ div(style="width:100%; height:100%")
              style="width:120px") 导出设备
             el-dropdown-item(command="eventRecord" :disabled="moreOne || moreDisable" style="width:120px") 事件记录
             el-dropdown-item(command="faultRecord" :disabled="moreOne || moreDisable" style="width:120px") 故障记录
-            el-dropdown-item(command="deviceLog" :disabled="moreOne || moreDisable" style="width:120px") 设备日志
+            el-dropdown-item(command="deviceLog" :disabled="true" style="width:120px") 设备日志
             el-dropdown-item(:disabled="true" command="print" style="width:120px") 打印编码
             el-dropdown-item(command="personalModel" style="width:120px" :disabled="moreOne || moreDisable") 设为个人模式
             el-dropdown-item(command="EngineerModel" style="width:120px" :disabled="moreOne || moreDisable") 设为工程模式
-            el-dropdown-item(:disabled="moreOne || moreDisable" command="resetStatus" style="width:120px") 状态复位
+            el-dropdown-item(:disabled="true" command="resetStatus" style="width:120px") 状态复位
       template(v-slot:operation="{row}")
         svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr(row.IMEI)")
         el-button.ml_10(type="primary" size="small" @click.stop="goDetail(row)") 详情
@@ -194,34 +194,37 @@ div(style="width:100%; height:100%")
       @close="tableDialogVisible === false"
       :top="tableDialogTop"
       :width="tableDialogWidth")
-      .layout-column(style="height: 100%")
-        .header.layout-row__between
+      .layout-column__between(style="height: 100%")
+        .header.layout-row__between(v-if='tablehasAdvQuery')
           .query
             Query(
               :queryList="tableQueryList"
-              :hasAdvQuery='false'
+              :hasAdvQuery="false"
               :dics="tableQueryDics"
               :btnLoading="tableLoading"
               @onSearch="onSearchTable")
-        edit-table-form(
-          :loading='tableLoading'
-          :hasOutOperat="false"
-          :tableData="tableDialogData"
-          :columns="tableDialogColums"
-          :disOperated="tableDisOperated"
-          operateWidth="220"
-          :showSelection="false"
-          :showIndex="false"
-          :showView="false"
-          :showEdit="false"
-          :showDel="false"
-          :hasPages="true"
-          :currentPage="tableCurrentPage"
-          :total="tableTotal"
-          :pageSize="tablePageSize"
-          :dics="dics"
-          @onHandleCurrentChange="handleCurrentChangeTable"
-          @onHandleSizeChange="handleSizeChangeTable")
+        div.layout-column.flex1(style="max-height:100%")
+          edit-table-form(
+            :loading='tableLoading'
+            :hasOutOperat="false"
+            :tableData="tableDialogData"
+            :columns="tableDialogColums"
+            :disOperated="tableDisOperated"
+            operateWidth="120"
+            :showSelection="false"
+            :showIndex="false"
+            :showView="false"
+            :showEdit="false"
+            :showDel="false"
+            :hasPages="true"
+            :currentPage="tableCurrentPage"
+            :total="tableTotal"
+            :pageSize="tablePageSize"
+            :dics="dics"
+            @onHandleCurrentChange="handleCurrentChangeTable"
+            @onHandleSizeChange="handleSizeChangeTable")
+            template(v-slot:operation="{row}" v-if="rowStatus === 'faultRecord'")
+              el-button(type="primary" size="small" @click.stop="goWorder(row)") 处理
     //- 绑定弹窗
     BangdDialog(
       :dialogTitle="bangdTitle"
@@ -256,7 +259,9 @@ import {
   unbindAlarmuser,
   transferEqui,
   setModeEqui,
-  exportEqui
+  exportEqui,
+  getEquiFalseList,
+  getEquiAlarmList
   // addEquiByImei
   // importEqui
 } from '@/api/equipment.js'
@@ -574,6 +579,7 @@ export default {
       tableDialogWidth: '1000px',
       tableDialogTop: '10vh',
       tableQueryList: [],
+      tablehasAdvQuery: true,
       tableQuery: {},
       tableQueryDics: {},
       tableDialogData: [],
@@ -626,7 +632,7 @@ export default {
     this.getModelListData()
 
     this.getDicsList()
-    this.onSearch({})
+    this.onSearch({ CompanyLimit: 0 })
   },
   activated() {
     // 保持半缓存
@@ -713,6 +719,9 @@ export default {
       })
     },
     getDataList() {
+      if (!this.query.CompanyLimit) {
+        this.query.CompanyLimit = 0
+      }
       const params = {
         PageIndex: this.currentPage,
         PageSize: this.pageSize,
@@ -1117,11 +1126,14 @@ export default {
           })
         })
       } else if (e === 'eventRecord') {
-        this.tableDialogTitle = '事件日志'
+        this.tableDialogWidth = '1000px'
+        this.tableDisOperated = true
+        this.tablehasAdvQuery = true
+        this.tableDialogTitle = `事件日志(IMEI: ${this.row[0].IMEI})`
         this.tableQueryList = [
           {
             label: '事件名称',
-            prop: 'IMEI',
+            prop: 'eventtype',
             type: 'select',
             holder: '请选择事件',
             queryType: false
@@ -1129,25 +1141,79 @@ export default {
         ]
         this.tableDialogColums = [
           {
-            label: '事件事件',
-            prop: 'IMEI'
+            label: '事件时间',
+            prop: 'addtime'
           },
           {
             label: '事件名称',
-            prop: 'IMEI'
+            prop: 'eventtypeZh'
           },
           {
             label: '设备上报内容',
-            prop: 'IMEI'
+            prop: 'eventbody'
           }
         ]
         this.tableDialogVisible = true
+        this.tableLoading = true
+        getEquiAlarmList({ imei: this.row[0].IMEI }).then(res => {
+          this.tableLoading = false
+          this.tableDialogData = res.Data.Models
+        }).catch(err => {
+          this.tableLoading = false
+          console.error(err)
+        })
+      } else if (e === 'faultRecord') {
+        console.log(this.rowStatus)
+        this.tableDisOperated = false
+        this.tableDialogWidth = '80%'
+        this.tableDialogTitle = `故障日志(IMEI: ${this.row[0].IMEI})`
+        this.tablehasAdvQuery = false
+        this.tableDialogColums = [
+          {
+            label: '详细地址',
+            prop: 'InstallAddress'
+          },
+          {
+            label: '工单类型',
+            prop: 'wordordertypeZh'
+          },
+          {
+            label: '故障描述',
+            prop: 'workorderbody'
+          },
+          {
+            label: '申报人',
+            prop: 'addusername'
+          },
+          {
+            label: '创建时间',
+            prop: 'adddatetime'
+          },
+          {
+            label: '工单状态',
+            prop: 'workordervaluezh'
+          },
+          {
+            label: '最后处理时间',
+            prop: 'dodatetime'
+          }
+        ]
+        this.tableDialogVisible = true
+        this.tableLoading = true
+        getEquiFalseList({ imei: this.row[0].IMEI }).then(res => {
+          this.tableLoading = false
+          this.tableDialogData = res.Data.Models
+          this.tableDialogData = [{}]
+        }).catch(err => {
+          this.tableLoading = false
+          console.error(err)
+        })
       } else if (e === 'EngineerModel' || e === 'personalModel') {
         const Mode = e === 'EngineerModel' ? 2 : 1
         const DeviceIds = []
-        this.row.forEach(n => {
-          DeviceIds.push(n.deviceid)
-        })
+          [0].IMEI.forEach(n => {
+            DeviceIds.push(n.deviceid)
+          })
         const params = {
           DeviceIds: DeviceIds,
           Mode: Mode
@@ -1295,6 +1361,9 @@ export default {
           IMEI: row.IMEI
         }}
       )
+    },
+    goWorder() {
+
     }
 
   }
