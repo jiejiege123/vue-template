@@ -56,9 +56,11 @@ div(style="width:100%; height:100%")
 
       template(v-slot:operation="{row}")
         el-button(
+          v-if="row.IMEI && (row.protectvalue === 2 || !row.protectvalue)"
           @click.stop="showBufang(row)"
           size="small") 布防
         el-button(
+          v-if="row.IMEI && row.protectvalue === 1"
           type="danger"
           @click.stop="showChefang(row)"
           size="small") 撤防
@@ -518,7 +520,10 @@ export default {
     },
     querySearchAsync(queryString, cb) {
       const params = {
-        IMEI: queryString
+        IMEI: queryString,
+        bangding: 1,
+        PageIndex: 1,
+        PageSize: 99999
       }
       getEquiList(params).then(res => {
         const data = res.Data.Models
@@ -602,7 +607,7 @@ export default {
       this.nowRow = row
     },
     showChefang(row) {
-      this.$confirm('一键撤防将对该建筑物下所有安装点进行撤防，确认后将重置建筑物下所有安装点撤防状态。', {
+      this.$confirm('确认撤防？设备在撤防状态下无法接收到相关报警信息。', {
         title: '操作提示',
         confirmButtonText: '确定',
         cancelButtonText: '取消',

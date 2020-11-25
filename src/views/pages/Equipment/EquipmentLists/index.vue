@@ -1203,7 +1203,7 @@ export default {
         getEquiFalseList({ imei: this.row[0].IMEI }).then(res => {
           this.tableLoading = false
           this.tableDialogData = res.Data.Models
-          this.tableDialogData = [{}]
+          // this.tableDialogData = [{}]
         }).catch(err => {
           this.tableLoading = false
           console.error(err)

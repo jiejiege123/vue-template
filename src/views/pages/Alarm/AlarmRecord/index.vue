@@ -189,7 +189,7 @@ export default {
         },
         {
           label: '设备类型',
-          prop: 'shebeitype',
+          prop: 'devicetypezh',
           formOnly: true
         },
         {
@@ -203,7 +203,7 @@ export default {
         },
         {
           label: '安装点位',
-          prop: 'azdname'
+          prop: 'azdzh'
         },
         {
           label: '摄像头',
@@ -217,7 +217,7 @@ export default {
         },
         {
           label: '报警原因',
-          prop: 'alarmyinyin'
+          prop: 'eventtypeZh'
         },
 
         {
@@ -232,14 +232,15 @@ export default {
         },
         {
           label: '报警时间',
-          prop: 'alarmtime'
+          prop: 'addtime',
+          width: 152
         },
         {
           label: '处理人',
-          prop: 'douser'
+          prop: 'dousername'
         },
         {
-          prop: 'addtime',
+          prop: 'dotime',
           width: 150,
           label: '最后处理时间',
           tableOnly: true

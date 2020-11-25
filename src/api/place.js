@@ -51,6 +51,7 @@ export function disarmBuilding(data) {
     url: '/api/building/disarm',
     method: 'post',
     data
+
   })
 }
 // 楼层管理
