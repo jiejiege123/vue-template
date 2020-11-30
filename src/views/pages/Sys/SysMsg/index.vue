@@ -78,6 +78,7 @@ import RichDialog from '@/components/RichDialog'
 import { getSysMessage, batchDelSmg, delSmg, addSmg, updateSmg } from '@/api/sys'
 
 import { mapGetters } from 'vuex'
+
 export default {
   name: 'SysMsg',
   components: {
@@ -159,13 +160,17 @@ export default {
       dialogTypeRich: 'add',
       formRich: {},
       dialogTitleRich: '',
-      dialogVisibleRich: false
+      dialogVisibleRich: false,
+      megid: '',
+      createded: false
     }
   },
   computed: {
     ...mapGetters(['userInfo'])
   },
   created() {
+    this.megid = this.$route.query.megid
+    this.createded = true
     this.getDataList()
   },
   mounted() {
@@ -215,6 +220,10 @@ export default {
         })
         this.tableData = res.Data.Models
         this.total = res.Data.TotalCount
+        if (this.megid && this.createded) {
+          this.viewRow(this.tableData.find(n => n.megid === this.megid))
+          this.createded = false
+        }
       }).catch((err) => {
         this.$message.error(err)
         this.loading = false

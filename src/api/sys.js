@@ -59,3 +59,21 @@ export function updateSmg(data) {
     data
   })
 }
+
+// 设备占比
+export function getPercent(params) {
+  return request({
+    url: '/api/monitor/device/percent/get',
+    method: 'get',
+    params
+  })
+}
+
+// 大屏 左上角统计
+export function getLefttopdata(params) {
+  return request({
+    url: '/api/monitor/lefttopdata/get',
+    method: 'get',
+    params
+  })
+}

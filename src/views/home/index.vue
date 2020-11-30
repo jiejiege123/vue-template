@@ -29,17 +29,17 @@
           .layout-row__between.equi-row(style="padding-top: 5%")
             .equi-item.layout-row__between.align-center.equi-bor
               div 设备
-              .count-num {{ equiData.equi }}
+              .count-num {{ equiData.DeviceNum }}
             .equi-item.layout-row__between.align-center.equi-bor
               div 单位数
-              div {{ equiData.com }}
+              div {{ equiData.CompanyNum }}
           .layout-row__between.equi-row(style="padding-bottom: 4%")
             .equi-item.layout-row__between.align-center
               div 安装点
-              div {{ equiData.install }}
+              div {{ equiData.InstallPointNum }}
             .equi-item.layout-row__between.align-center
               div 建筑物
-              div {{ equiData.jzw }}
+              div {{ equiData.BuildingNum }}
       //- 设备健康指数 饼状图
       .flex1.healthy(style="width:100%")
         .layout-row__center.align-center.img-wrap
@@ -142,6 +142,9 @@ import TodayStatusChart from '@/components/Charts/TodayStatusChart'
 import MouthStatusChart from '@/components/Charts/MouthStatusChart'
 import PaiChart from '@/components/Charts/PaiChart'
 import { mapGetters } from 'vuex'
+
+import { getLefttopdata } from '@/api/sys'
+
 export default {
   name: 'Home',
   components: {
@@ -176,12 +179,7 @@ export default {
       combg: 'url(' + require('@/assets/img/combg.png') + ')',
       nowTime: '',
       // 设备数据
-      equiData: {
-        equi: 41254,
-        com: 41254,
-        install: 41254,
-        jzw: 41254
-      },
+      equiData: {},
       // 设备健康指数 饼状图
       healthyColorList: ['#0CD48D', '#FF730A'],
       healthytypeData: [],
@@ -337,6 +335,8 @@ export default {
     ...mapGetters(['sysInfo', 'userInfo'])
   },
   created() {
+    // 获取设备数据
+    this.getLefttopData()
     this.nowTimes()
     // 获取饼状图数据
     this.getEquiHealthy()
@@ -698,6 +698,12 @@ export default {
       this.alarmColorList = colorList
       protypeData[0].data = serData
       this.alarmtypeData = protypeData
+    },
+    getLefttopData() {
+      getLefttopdata().then(res => {
+        // console.log(res)
+        this.equiData = res.Data
+      })
     }
   }
 }

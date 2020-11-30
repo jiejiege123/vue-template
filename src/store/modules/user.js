@@ -459,80 +459,89 @@ const actions = {
               //   'Btns': ['Permission01', 'Permission02', 'Permission03']
               // },
             ]
+          },
+          {
+            'Id': '976247111765495810',
+            'Name': '资费管理',
+            'Url': 'Postage',
+            'Type': 4,
+            'Icon': 'zifei',
+            'Children': [
+              {
+                'Id': '976247111765495811',
+                'Name': '充值记录',
+                'ParentId': '976247111765495810',
+                'Url': 'Recharg',
+                'Type': 1,
+                'Icon': null,
+                'Children': []
+              }
+              // {
+              //   'Id': '976247111765495811',
+              //   'Name': '资费概况',
+              //   'ParentId': '976247111765495810',
+              //   'Url': 'CompanyInfo',
+              //   'Type': 1,
+              //   'Icon': null,
+              //   'Children': []
+              // },
+              // {
+              //   'Id': '976247111765495812',
+              //   'Name': '购买资源',
+              //   'ParentId': '976247111765495810',
+              //   'Type': 1,
+              //   'Url': 'User',
+              //   'Icon': null,
+              //   'SortCode': 20,
+              //   'Children': [],
+              //   'Btns': ['User01', 'User02', 'User03']
+              // },
+              // {
+              //   'Id': '976247111765495813',
+              //   'Name': '用量统计',
+              //   'ParentId': '976247111765495810',
+              //   'Type': 1,
+              //   'Url': 'User',
+              //   'Icon': null,
+              //   'SortCode': 20,
+              //   'Children': [],
+              //   'Btns': ['User01', 'User02', 'User03']
+              // },
+              // {
+              //   'Id': '976247111765495814',
+              //   'Name': '资费配置',
+              //   'ParentId': '976247111765495810',
+              //   'Type': 1,
+              //   'Url': 'User',
+              //   'Icon': null,
+              //   'SortCode': 20,
+              //   'Children': [],
+              //   'Btns': ['User01', 'User02', 'User03']
+              // },
+              // {
+              //   'Id': '976247111765495815',
+              //   'Name': '设备配额管理',
+              //   'ParentId': '976247111765495810',
+              //   'Type': 1,
+              //   'Url': 'User',
+              //   'Icon': null,
+              //   'SortCode': 20,
+              //   'Children': [],
+              //   'Btns': ['User01', 'User02', 'User03']
+              // },
+              // {
+              //   'Id': '976247111765495816',
+              //   'Name': '充值记录',
+              //   'ParentId': '976247111765495810',
+              //   'Type': 1,
+              //   'Url': 'User',
+              //   'Icon': null,
+              //   'SortCode': 20,
+              //   'Children': [],
+              //   'Btns': ['User01', 'User02', 'User03']
+              // }
+            ]
           }
-          // {
-          //   'Id': '976247111765495810',
-          //   'Name': '资费管理',
-          //   'Url': 'Postage',
-          //   'Type': 4,
-          //   'Icon': 'zifei',
-          //   'Children': [
-          //     {
-          //       'Id': '976247111765495811',
-          //       'Name': '资费概况',
-          //       'ParentId': '976247111765495810',
-          //       'Url': 'CompanyInfo',
-          //       'Type': 1,
-          //       'Icon': null,
-          //       'Children': []
-          //     },
-          //     {
-          //       'Id': '976247111765495812',
-          //       'Name': '购买资源',
-          //       'ParentId': '976247111765495810',
-          //       'Type': 1,
-          //       'Url': 'User',
-          //       'Icon': null,
-          //       'SortCode': 20,
-          //       'Children': [],
-          //       'Btns': ['User01', 'User02', 'User03']
-          //     },
-          //     {
-          //       'Id': '976247111765495813',
-          //       'Name': '用量统计',
-          //       'ParentId': '976247111765495810',
-          //       'Type': 1,
-          //       'Url': 'User',
-          //       'Icon': null,
-          //       'SortCode': 20,
-          //       'Children': [],
-          //       'Btns': ['User01', 'User02', 'User03']
-          //     },
-          //     {
-          //       'Id': '976247111765495814',
-          //       'Name': '资费配置',
-          //       'ParentId': '976247111765495810',
-          //       'Type': 1,
-          //       'Url': 'User',
-          //       'Icon': null,
-          //       'SortCode': 20,
-          //       'Children': [],
-          //       'Btns': ['User01', 'User02', 'User03']
-          //     },
-          //     {
-          //       'Id': '976247111765495815',
-          //       'Name': '设备配额管理',
-          //       'ParentId': '976247111765495810',
-          //       'Type': 1,
-          //       'Url': 'User',
-          //       'Icon': null,
-          //       'SortCode': 20,
-          //       'Children': [],
-          //       'Btns': ['User01', 'User02', 'User03']
-          //     },
-          //     {
-          //       'Id': '976247111765495816',
-          //       'Name': '充值记录',
-          //       'ParentId': '976247111765495810',
-          //       'Type': 1,
-          //       'Url': 'User',
-          //       'Icon': null,
-          //       'SortCode': 20,
-          //       'Children': [],
-          //       'Btns': ['User01', 'User02', 'User03']
-          //     }
-          //   ]
-          // }
 
         ]
         resolve(router)

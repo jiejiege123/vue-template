@@ -62,6 +62,9 @@ div(style="width:100%; height:100%")
         el-button(
           @click.stop="goRole(row)"
           size="small") 角色
+        //- el-button(
+        //-   @click.stop="goUser(row)"
+        //-   size="small") 用户
 </template>
 <script >
 import Query from '@/components/Query'
