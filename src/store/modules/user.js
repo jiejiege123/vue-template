@@ -1,5 +1,6 @@
 // import { login, logout, getInfo, getRouter } from '@/api/user'
 import { login, logout } from '@/api/user'
+import { getTotalEqui } from '@/api/equipment'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 // import router, { resetRouter } from '@/router'
 import { resetRouter } from '@/router'
@@ -10,7 +11,8 @@ const state = {
   avatar: '',
   introduction: '',
   roles: [],
-  routers: []
+  routers: [],
+  equiNum: ''
 
 }
 
@@ -35,6 +37,9 @@ const mutations = {
   },
   SET_USERINFO: (state, userInfo) => {
     state.userInfo = userInfo
+  },
+  SET_EQUINUM: (state, equiNum) => {
+    state.equiNum = equiNum
   }
 }
 
@@ -556,6 +561,17 @@ const actions = {
       // }).catch(error => {
       //   reject(error)
       // })
+    })
+  },
+  getTotalEqui({ commit }) {
+    return new Promise((resolve, reject) => {
+      getTotalEqui().then(res => {
+        commit('SET_EQUINUM', res.Data)
+        resolve()
+      }).catch(err => {
+        console.error(err)
+        reject(err)
+      })
     })
   }
 }

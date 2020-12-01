@@ -224,3 +224,12 @@ export function unbindAlarmuser(data) {
     data
   })
 }
+
+// 设备总数 /api/device/totalnum/get
+export function getTotalEqui(params) {
+  return request({
+    url: '/api/device/totalnum/get',
+    method: 'get',
+    params
+  })
+}

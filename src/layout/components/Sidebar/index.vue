@@ -15,7 +15,7 @@
           <svg-icon icon-class="shebeinum" style="margin: 0 auto" />
         </div>
         <div class="layout-row__between" style="padding: 0 10px 0 5px">
-          设备总数 <span>{{ shebeiNum }}</span>
+          设备总数 <span>{{ equiNum }}</span>
         </div>
       </div>
       <!-- 报警数 -->
@@ -24,7 +24,7 @@
           <svg-icon icon-class="alarm" style="margin: 0 auto" />
         </div>
         <div class="layout-row__between" style="padding: 0 10px 0 5px">
-          今日报警  <span>{{ todayalarm }}</span>
+          今日报警/故障  <span>{{ todayalarm }}/{{ todaygz }}</span>
         </div>
       </div>
     </div>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Logo from './Logo'
 import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
@@ -66,6 +66,7 @@ export default {
       'sidebar',
       'userInfo'
     ]),
+    ...mapState('user', ['equiNum']),
     activeMenu() {
       const route = this.$route
       const { meta, path } = route
@@ -93,7 +94,7 @@ export default {
     background: #2b2f3a;
     text-align: center;
     color: #fff;
-    padding: 20px;
+    padding: 20px 10px;
     border-top: 1px solid rgb(90, 89, 89);
     .user-name{
       font-size: 14px;
@@ -109,6 +110,7 @@ export default {
       background-color: rgba(95,164,245,.2);
       border-radius: 20px;
       overflow: hidden;
+      font-size: 12px;
       margin-top: 20px;
       .icon-warp{
         float: left;
