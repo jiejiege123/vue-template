@@ -21,8 +21,8 @@
       span.base-info(style="margin-right:15px") 待开票金额:
         span {{baseInfo.wkpNum}}元
     .operate
-      el-button(v-if="userInfo.UserType === 'Company' && userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '3'" type="primary" size="small" @click='createdRow') 充值
-      el-button(v-if="userInfo.UserType === 'Company' && (userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '1' || userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '2')" type="primary" size="small" @click='createdRowKq') 续费
+      el-button(type="primary" size="small" @click='createdRow') 充值
+      //- el-button(type="primary" size="small" @click='createdRowKq') 续费
 
   .flex1.layout-column
     el-table.flex1(
@@ -453,7 +453,7 @@ export default {
     },
     createdRowKq() {
       this.kqDialogVisible = true
-      this.kqDialogTitle = '库区续费'
+      this.kqDialogTitle = '设备续费'
       this.getBaseData()
     },
     /**
@@ -498,49 +498,46 @@ export default {
         pageSize: this.pageSize,
         keyword: this.search
       }
-      this.loading = true
-      // const flag = this.userInfo.Companys[this.userInfo.CompanyCodes[0]].QF003 === '1' || this.userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '2'
-      // let methods
-      // flag ? methods = comkuqulist : methods = getRechargetlist
-      getRechargetlist(params).then(res => {
-        this.$nextTick(() => {
-          this.loading = false
-        })
-        setTimeout(() => {
-          this.$refs.tableList.doLayout()
-        }, 200)
-        const tableData = res.Data.Models
-        tableData.forEach(n => {
-          n.timestamp = parseTime(n.timestamp)
-          n.onlinetype === '0' ? n.onlinetypeZh = '线上支付' : n.onlinetypeZh = '线下支付'
-          // n.rechargettype === '0' ? n.rechargettype = '微信支付' : n.rechargettype = '支付宝支付'
-          switch (n.rechargettype) {
-            case '0':
-              n.rechargettypeZh = '微信支付'
-              break
-            case '1':
-              n.rechargettypeZh = '支付宝支付'
-              break
-            default:
-              n.rechargettypeZh = '线下汇款'
+      // this.loading = true
+      // getRechargetlist(params).then(res => {
+      //   this.$nextTick(() => {
+      //     this.loading = false
+      //   })
+      //   setTimeout(() => {
+      //     this.$refs.tableList.doLayout()
+      //   }, 200)
+      //   const tableData = res.Data.Models
+      //   tableData.forEach(n => {
+      //     n.timestamp = parseTime(n.timestamp)
+      //     n.onlinetype === '0' ? n.onlinetypeZh = '线上支付' : n.onlinetypeZh = '线下支付'
+      //     // n.rechargettype === '0' ? n.rechargettype = '微信支付' : n.rechargettype = '支付宝支付'
+      //     switch (n.rechargettype) {
+      //       case '0':
+      //         n.rechargettypeZh = '微信支付'
+      //         break
+      //       case '1':
+      //         n.rechargettypeZh = '支付宝支付'
+      //         break
+      //       default:
+      //         n.rechargettypeZh = '线下汇款'
 
-              break
-          }
-          if (n.onlinetype === '1') {
-            n.rechargettypeZh = '线下汇款'
-          }
-        })
-        this.tableData = tableData
-        this.total = res.Data.TotalCount
-      }).catch((err) => {
-        console.error(err)
-        this.loading = false
-      })
-      getbaseinfo().then(res => {
-        this.baseInfo = res.Data
-      }).catch(err => {
-        console.error(err)
-      })
+      //         break
+      //     }
+      //     if (n.onlinetype === '1') {
+      //       n.rechargettypeZh = '线下汇款'
+      //     }
+      //   })
+      //   this.tableData = tableData
+      //   this.total = res.Data.TotalCount
+      // }).catch((err) => {
+      //   console.error(err)
+      //   this.loading = false
+      // })
+      // getbaseinfo().then(res => {
+      //   this.baseInfo = res.Data
+      // }).catch(err => {
+      //   console.error(err)
+      // })
     },
     /**
      * @description: 获取字典值
@@ -549,7 +546,7 @@ export default {
      */
     getDicsDataList() {
       const data = ['爆破类型', '项目等级', '企业性质', '人员类型', '物资分类', '线下充值']
-      this.loading = true
+      // this.loading = true
       this.$store.dispatch('dics/getDicData', data).then(res => {
         const dics = {}
         for (const key in res) {

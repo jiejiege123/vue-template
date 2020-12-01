@@ -873,99 +873,99 @@ export default {
         pageSize: this.pageSize,
         keyword: this.search
       }
-      this.loading = true
-      invoicelist(params).then(res => {
-        this.$nextTick(() => {
-          this.loading = false
-        })
-        setTimeout(() => {
-          this.$refs.tableList.doLayout()
-        }, 200)
-        const tableData = res.Data.Models
-        tableData.forEach(n => {
-          n.timestamp = parseTime(n.timestamp)
-          n.price = (n.price * 0.01).toFixed(2)
-          switch (n.invoicetype) {
-            case '0':
-              n.invoicetypeZh = '普通发票'
-              break
-            case '1':
-              n.invoicetypeZh = '增值税专用发票'
-              break
-            default:
-              break
-          }
-          switch (n.state) {
-            case 0:
-              n.stateZh = '未开票'
-              break
-            case 1:
-              n.stateZh = '已开票'
-              break
-            default:
-              break
-          }
-          switch (n.dzstate) {
-            case 0:
-              n.dzstateZh = '开票失败'
-              break
-            case 1:
-              n.dzstateZh = '开票成功'
-              break
-            default:
-              break
-          }
-          // 转换d7 d8
-          // n.d7 = JSON.parse(JSON.stringify(n.d7))
-          if (isJSON(n.d7)) {
-            n.d7 = JSON.parse(n.d7)
-          } else {
-            n.d7 = {
-              QF002: ''
-            }
-          }
-          if (isJSON(n.d8)) {
-            n.d8 = JSON.parse(n.d8)
-          }
-          n.swh = n.d7.QF002
-        })
-        this.tableData = tableData
-        this.total = res.Data.TotalCount
+      // this.loading = true
+      // invoicelist(params).then(res => {
+      //   this.$nextTick(() => {
+      //     this.loading = false
+      //   })
+      //   setTimeout(() => {
+      //     this.$refs.tableList.doLayout()
+      //   }, 200)
+      //   const tableData = res.Data.Models
+      //   tableData.forEach(n => {
+      //     n.timestamp = parseTime(n.timestamp)
+      //     n.price = (n.price * 0.01).toFixed(2)
+      //     switch (n.invoicetype) {
+      //       case '0':
+      //         n.invoicetypeZh = '普通发票'
+      //         break
+      //       case '1':
+      //         n.invoicetypeZh = '增值税专用发票'
+      //         break
+      //       default:
+      //         break
+      //     }
+      //     switch (n.state) {
+      //       case 0:
+      //         n.stateZh = '未开票'
+      //         break
+      //       case 1:
+      //         n.stateZh = '已开票'
+      //         break
+      //       default:
+      //         break
+      //     }
+      //     switch (n.dzstate) {
+      //       case 0:
+      //         n.dzstateZh = '开票失败'
+      //         break
+      //       case 1:
+      //         n.dzstateZh = '开票成功'
+      //         break
+      //       default:
+      //         break
+      //     }
+      //     // 转换d7 d8
+      //     // n.d7 = JSON.parse(JSON.stringify(n.d7))
+      //     if (isJSON(n.d7)) {
+      //       n.d7 = JSON.parse(n.d7)
+      //     } else {
+      //       n.d7 = {
+      //         QF002: ''
+      //       }
+      //     }
+      //     if (isJSON(n.d8)) {
+      //       n.d8 = JSON.parse(n.d8)
+      //     }
+      //     n.swh = n.d7.QF002
+      //   })
+      //   this.tableData = tableData
+      //   this.total = res.Data.TotalCount
 
-        // 图片如果存在就销毁
-        this.viewerCase ? this.viewerCase.destroy() : ''
-        this.$nextTick(() => {
-          this.viewerCase = new this.Viewer(this.$refs.tableList.$el, {
-            toolbar: {
-              zoomIn: 2,
-              zoomOut: 2,
-              oneToOne: 2,
-              reset: 2,
-              prev: false,
-              play: {
-                show: false,
-                size: 'large'
-              },
-              next: false,
-              rotateLeft: 2,
-              rotateRight: 2,
-              flipHorizontal: 2,
-              flipVertical: 2
-            },
-            navbar: false
-          })
-        })
-      }).catch((err) => {
-        console.error(err)
-        this.loading = false
-      })
-      getbaseinfo().then(res => {
-        // this.baseInfo = res.Data
-        this.kkjeHolder = '可开票金额' + res.Data.wkpNum + '元'
-        this.kpnumAll = res.Data.wkpNum
-      }).catch(err => {
-        console.error(err)
-      })
+      //   // 图片如果存在就销毁
+      //   this.viewerCase ? this.viewerCase.destroy() : ''
+      //   this.$nextTick(() => {
+      //     this.viewerCase = new this.Viewer(this.$refs.tableList.$el, {
+      //       toolbar: {
+      //         zoomIn: 2,
+      //         zoomOut: 2,
+      //         oneToOne: 2,
+      //         reset: 2,
+      //         prev: false,
+      //         play: {
+      //           show: false,
+      //           size: 'large'
+      //         },
+      //         next: false,
+      //         rotateLeft: 2,
+      //         rotateRight: 2,
+      //         flipHorizontal: 2,
+      //         flipVertical: 2
+      //       },
+      //       navbar: false
+      //     })
+      //   })
+      // }).catch((err) => {
+      //   console.error(err)
+      //   this.loading = false
+      // })
+      // getbaseinfo().then(res => {
+      //   // this.baseInfo = res.Data
+      //   this.kkjeHolder = '可开票金额' + res.Data.wkpNum + '元'
+      //   this.kpnumAll = res.Data.wkpNum
+      // }).catch(err => {
+      //   console.error(err)
+      // })
     },
     /**
      * @description: 获取字典值
@@ -974,7 +974,7 @@ export default {
      */
     getDicsDataList() {
       const data = ['爆破类型', '项目等级', '人员类型', '物资分类']
-      this.loading = true
+      // this.loading = true
       this.$store.dispatch('dics/getDicData', data).then(res => {
         const dics = {}
         for (const key in res) {

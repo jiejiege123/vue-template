@@ -443,36 +443,36 @@ export default {
      */
     getDicsDataList() {
       const data = ['爆破类型', '项目等级', '人员类型', '物资分类']
-      this.loading = true
-      this.$store.dispatch('dics/getDicData', data).then(res => {
-        const dics = {}
-        for (const key in res) {
-          // eslint-disable-next-line no-prototype-builtins
-          if (res.hasOwnProperty(key)) {
-            const element = res[key]
-            switch (key) {
-              case '爆破类型':
-                dics.bptype = element
-                break
-              case '项目等级':
-                dics.QF0032 = element
-                break
-              case '人员类型':
-                dics.UF002 = element
-                break
-              case '物资分类':
-                dics.wzfl = element
-                break
-              default:
-                break
-            }
-          }
-        }
-        this.dics = dics
-        this.getDataList()
-      }).catch(() => {
-        this.loading = false
-      })
+      // this.loading = true
+      // this.$store.dispatch('dics/getDicData', data).then(res => {
+      //   const dics = {}
+      //   for (const key in res) {
+      //     // eslint-disable-next-line no-prototype-builtins
+      //     if (res.hasOwnProperty(key)) {
+      //       const element = res[key]
+      //       switch (key) {
+      //         case '爆破类型':
+      //           dics.bptype = element
+      //           break
+      //         case '项目等级':
+      //           dics.QF0032 = element
+      //           break
+      //         case '人员类型':
+      //           dics.UF002 = element
+      //           break
+      //         case '物资分类':
+      //           dics.wzfl = element
+      //           break
+      //         default:
+      //           break
+      //       }
+      //     }
+      //   }
+      //   this.dics = dics
+      //   this.getDataList()
+      // }).catch(() => {
+      //   this.loading = false
+      // })
     },
     kpiao(formName) {
       this.$refs[formName].validate((valid) => {

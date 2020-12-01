@@ -480,6 +480,42 @@ const actions = {
                 'Type': 1,
                 'Icon': null,
                 'Children': []
+              },
+              {
+                'Id': '976247111765495812',
+                'Name': '发票记录',
+                'ParentId': '976247111765495810',
+                'Url': 'Invoice',
+                'Type': 1,
+                'Icon': null,
+                'Children': []
+              },
+              {
+                'Id': '976247111765495813',
+                'Name': '消费记录',
+                'ParentId': '976247111765495810',
+                'Url': 'ComUse',
+                'Type': 1,
+                'Icon': null,
+                'Children': []
+              },
+              {
+                'Id': '976247111765495814',
+                'Name': '开票信息',
+                'ParentId': '976247111765495810',
+                'Url': 'Invoicelist',
+                'Type': 1,
+                'Icon': null,
+                'Children': []
+              },
+              {
+                'Id': '976247111765495815',
+                'Name': '快递信息',
+                'ParentId': '976247111765495810',
+                'Url': 'Expresslist',
+                'Type': 1,
+                'Icon': null,
+                'Children': []
               }
               // {
               //   'Id': '976247111765495811',
