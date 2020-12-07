@@ -310,17 +310,21 @@ export default {
   },
   created() {
     const IMEI = this.$route.query.IMEI
+    console.log(IMEI)
     if (IMEI) {
       const index = this.queryList.findIndex(n => n.prop === 'IMEI')
-      this.$set(this.queryList, index, {
+      const queryList = deepClone(this.queryList)
+      queryList[index] = {
         label: '设备IMEI',
         prop: 'IMEI',
         holder: '请输入设备IMEI',
         queryType: false,
         default: IMEI
-      })
+      }
+      this.queryList = queryList
     }
-    this.onSearch({})
+    const query = IMEI ? { IMEI: IMEI } : {}
+    this.onSearch(query)
     // 获取单位名
     this.getCompanyData()
     // this.getDicsList()

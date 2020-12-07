@@ -430,17 +430,17 @@ const actions = {
                 'Icon': null,
                 'Children': []
               },
-              {
-                'Id': '976229042405838849',
-                'Name': '问题反馈',
-                'ParentId': '976247111765495809',
-                'Type': 1,
-                'Url': 'Query',
-                'Icon': null,
-                'SortCode': 20,
-                'Children': [],
-                'Btns': ['User01', 'User02', 'User03']
-              },
+              // {
+              //   'Id': '976229042405838849',
+              //   'Name': '问题反馈',
+              //   'ParentId': '976247111765495809',
+              //   'Type': 1,
+              //   'Url': 'Query',
+              //   'Icon': null,
+              //   'SortCode': 20,
+              //   'Children': [],
+              //   'Btns': ['User01', 'User02', 'User03']
+              // },
               {
                 'Id': '976229042405838850',
                 'Name': '系统消息',
@@ -472,6 +472,15 @@ const actions = {
             'Type': 4,
             'Icon': 'zifei',
             'Children': [
+              {
+                'Id': '976247111765495816',
+                'Name': '产品管理',
+                'ParentId': '976247111765495810',
+                'Url': 'Product',
+                'Type': 1,
+                'Icon': null,
+                'Children': []
+              },
               {
                 'Id': '976247111765495811',
                 'Name': '充值记录',

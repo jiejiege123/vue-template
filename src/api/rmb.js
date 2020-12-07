@@ -194,3 +194,47 @@ export function comkuqulist(params) {
     params
   })
 }
+
+// 产品列表 /api/product/search
+export function getProduct(data) {
+  return request({
+    url: '/api/product/search',
+    method: 'post',
+    data
+  })
+}
+
+// 添加产品
+export function addProduct(data) {
+  return request({
+    url: '/api/product/add',
+    method: 'post',
+    data
+  })
+}
+// 编辑产品
+export function updateProduct(data) {
+  return request({
+    url: '/api/product/update',
+    method: 'post',
+    data
+  })
+}
+
+// 删除产品
+export function delProduct(params) {
+  return request({
+    url: '/api/product/delete',
+    method: 'get',
+    params
+  })
+}
+
+// 批量删除 /api/product/batch/delete
+export function batchDelProduct(params) {
+  return request({
+    url: '/api/product/batch/delete',
+    method: 'get',
+    params
+  })
+}

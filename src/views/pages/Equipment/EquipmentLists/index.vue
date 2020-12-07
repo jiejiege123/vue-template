@@ -58,6 +58,11 @@ div(style="width:100%; height:100%")
             el-button(v-else type="primary" size="small" @click.stop='showBangding(scope.row)') 绑定
             //- svg vue-qr(:text="scope.row.IMEI" :size="25")
       template(v-slot:outOperate)
+        //- el-button(
+        //-   type="primary"
+        //-   size="small"
+        //-   plain
+        //-   @click='showPayDlg') 购买
         el-button(
           type="primary"
           size="small"
@@ -239,6 +244,7 @@ div(style="width:100%; height:100%")
       @onCloseDialog="onCloseDialog"
       @onSubmitForm="onSubmitFormBangDing"
     )
+
 </template>
 <script >
 import Query from '@/components/Query'
@@ -607,6 +613,7 @@ export default {
       usersOptions: [],
       isIndeterminate: false,
       oldCheckedUsers: []
+      //
     }
   },
   computed: {
@@ -1363,6 +1370,9 @@ export default {
       )
     },
     goWorder() {
+
+    },
+    showPayDlg() {
 
     }
 

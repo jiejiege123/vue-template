@@ -110,22 +110,7 @@
       :before-close="handleClose"
       :close-on-click-modal='false'
       @open="open('ruleForm')")
-      //- 如果是生产，销售，显示公司库区
-      //- .layout-row.align-center
-      //-   span.chioes(style="margin-right: 15px") 选择库区
-      //-   el-select(
-      //-     v-model="kqid"
-      //-     placeholder="请选择充值库区"
-      //-     filterable
-      //-     style="padding-right:15px; width:160px"
-      //-     size="small"
-      //-     clearable
-      //-     @change="kqSelect")
-      //-     el-option(
-      //-       v-for="(item,index) in kqData"
-      //-       :key="index"
-      //-       :label="item.label"
-      //-       :value="item.value")
+
       el-tabs.eltabs(v-model="activeName")
         el-tab-pane(label="线上充值" name="xs")
           //- 充值数量
@@ -138,21 +123,21 @@
                 label='充值金额(元)'
                 :rules="[{ required: true }]"
                 style='width:100%' prop="rmb")
-                el-input(
-                  :disabled="userInfo.UserType === 'Company' && (userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '1' || userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '2')"
-                  size="small"
-                  placeholder="请选择充值金额(整数)"
-                  oninput="value=value.replace(/[^\\d]/g,'')"
-                  v-model='ruleForm.rmb')
-                //- el-select(
-                //-   v-model="ruleForm.rmb"
-                //-   placeholder="请选择充值金额"
-                //-   size="small")
-                //-   el-option(
-                //-     v-for="item in czOption"
-                //-     :key="item.value"
-                //-     :label="item.label"
-                //-     :value="item.value")
+                //- el-input(
+                //-   :disabled="userInfo.UserType === 'Company' && (userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '1' || userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '2')"
+                //-   size="small"
+                //-   placeholder="请选择充值金额(整数)"
+                //-   oninput="value=value.replace(/[^\\d]/g,'')"
+                //-   v-model='ruleForm.rmb')
+                el-select(
+                  v-model="ruleForm.rmb"
+                  placeholder="请选择产品"
+                  size="small")
+                  el-option(
+                    v-for="item in czOption"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value")
               el-form-item.pt10(
                 label='备注'
                 style='width:100%'

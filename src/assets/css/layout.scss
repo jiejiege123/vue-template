@@ -138,6 +138,9 @@
 .layout-column__around{
   @include column-around;
 }
+.layout-column__center{
+  @include column-center;
+}
 .layout-column__scroll {
   -ms-flex-direction: column;
           -webkit-box-orient: vertical;
