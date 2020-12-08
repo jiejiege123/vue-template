@@ -57,7 +57,6 @@ import {
   batchDelProduct } from '@/api/rmb'
 import { getDicsByName } from '@/api/commom'
 
-import { checkPhone, toTree } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
   name: 'User',
@@ -69,15 +68,6 @@ export default {
 
   },
   data() {
-    var isPhone = (rule, value, callback) => {
-      if (value) {
-        if (!checkPhone(value)) {
-          callback(new Error('请输入正确的电话号码'))
-        } else {
-          callback()
-        }
-      }
-    }
     return {
       /**
        * 查询

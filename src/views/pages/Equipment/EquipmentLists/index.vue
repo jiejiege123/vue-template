@@ -85,8 +85,10 @@ div(style="width:100%; height:100%")
             el-dropdown-item(command="personalModel" style="width:120px" :disabled="moreOne || moreDisable") 设为个人模式
             el-dropdown-item(command="EngineerModel" style="width:120px" :disabled="moreOne || moreDisable") 设为工程模式
             el-dropdown-item(:disabled="true" command="resetStatus" style="width:120px") 状态复位
+            el-dropdown-item(:disabled="moreOne || moreDisable" command="buysome" style="width:120px") 购买产品
       template(v-slot:operation="{row}")
         svg-icon.clr_b2.hand(icon-class="qr" style="font-size: 18px;vertical-align: middle;" @click.stop="showQr(row.IMEI)")
+        //- el-button.ml_10(type="primary" size="small" @click.stop="goDetail(row)") 购买
         el-button.ml_10(type="primary" size="small" @click.stop="goDetail(row)") 详情
 
         el-button.ml_10(type="success" size="small" @click.stop="showAlarmuser(row)") 接警联系人
@@ -244,11 +246,13 @@ div(style="width:100%; height:100%")
       @onCloseDialog="onCloseDialog"
       @onSubmitForm="onSubmitFormBangDing"
     )
-
+    //- 购买弹窗
+    buy-some(:dialogTitle="buyTitle" :dialogVisible="buyVisible" :deviceid="buyDeviceid" @onClose="buyVisible = false")
 </template>
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
+import BuySome from '@/components/BuySome'
 import BangdDialog from '@/components/BangdDialog'
 import { getToken } from '@/utils/auth'
 import {
@@ -285,7 +289,8 @@ export default {
     Query,
     EditTableForm,
     VueQr,
-    BangdDialog
+    BangdDialog,
+    BuySome
   },
   filters: {
 
@@ -612,8 +617,11 @@ export default {
       checkedUsers: [],
       usersOptions: [],
       isIndeterminate: false,
-      oldCheckedUsers: []
-      //
+      oldCheckedUsers: [],
+      // 购买弹窗
+      buyTitle: '',
+      buyVisible: false,
+      buyDeviceid: ''
     }
   },
   computed: {
@@ -683,7 +691,6 @@ export default {
         names: '公司类型;设备模式;设备类型;设备运行状态;设备安装状态'
       }
       getDicsByName(params).then(res => {
-        // console.log(res)
         const dics = res.Data
         const dicsData = {
           comtype: [],
@@ -775,7 +782,6 @@ export default {
       } else {
         methods = updateEqui
       }
-      // console.log(params)
       methods(params).then(res => {
         this.formLoading = true
         this.getDataList()
@@ -800,7 +806,6 @@ export default {
       // })
     },
     onSelectChange(rows) {
-      console.log(rows)
       this.row = rows
       if (rows.length > 0) {
         this.moreDisable = false
@@ -986,10 +991,8 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.rowStatus === 'add') {
-            console.log(this.ruleForm)
             // TODO: 调用的是添加 addequibyimei 的接口
           } else if (this.rowStatus === 'guohu') {
-            console.log(this.ruleForm)
             const DeviceIds = []
             this.row.forEach(n => {
               DeviceIds.push(n.deviceid)
@@ -1000,12 +1003,11 @@ export default {
             }
             this.formLoadingDia = true
             transferEqui(params).then(res => {
-              console.log(res)
               this.formLoadingDia = false
               this.dialogVisible = false
               this.getDataList()
             }).catch(err => {
-              console.log(err)
+              console.error(err)
               this.formLoadingDia = false
             })
           } else if (this.rowStatus === 'jiejin') {
@@ -1088,7 +1090,6 @@ export default {
             }
           }
           methods(params).then(res => {
-            // console.log();
             this.$message({
               type: 'success',
               message: '删除成功!'
@@ -1116,7 +1117,6 @@ export default {
           // 直接根据查询条件导出数据
           const params = this.query
           exportEqui(params).then(res => {
-            console.log(res.Data)
             const url = res.Data
             let ur
             if (url.includes('http')) {
@@ -1170,7 +1170,6 @@ export default {
           console.error(err)
         })
       } else if (e === 'faultRecord') {
-        console.log(this.rowStatus)
         this.tableDisOperated = false
         this.tableDialogWidth = '80%'
         this.tableDialogTitle = `故障日志(IMEI: ${this.row[0].IMEI})`
@@ -1226,13 +1225,16 @@ export default {
           Mode: Mode
         }
         setModeEqui(params).then(res => {
-          console.log(res)
           this.getDataList()
           this.$message.success('设备模式设置成功')
           // this.
         }).catch(err => {
           console.error(err)
         })
+      } else if (e === 'buysome') {
+        this.buyVisible = true
+        this.buyDeviceid = this.row[0].deviceid
+        this.buyTitle = `设备${this.row[0].IMEI}购买产品`
       }
     },
     handleFileSuccess(res) {
@@ -1281,13 +1283,11 @@ export default {
         // });
         // this.usersOptions = usersOptions
         getAlarmuser({ deviceid: row.deviceid }).then(resA => {
-          console.log(resA)
           const data = resA.Data
           const userList = []
           data.forEach(n => {
             userList.push(n.jjlxrid)
           })
-          console.log(userList)
           this.checkedUsers = userList
           this.oldCheckedUsers = deepClone(userList)
           this.formLoadingDia = false
@@ -1301,7 +1301,6 @@ export default {
       })
     },
     handleCheckAllChange(val) {
-      console.log(val)
       if (val) {
         const checkedUsers = []
         this.usersOptions.forEach(n => {
@@ -1314,7 +1313,6 @@ export default {
       this.isIndeterminate = false
     },
     handleCheckedCitiesChange(value) {
-      console.log(value)
       const checkedCount = value.length
       this.checkAll = checkedCount === this.usersOptions.length
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.usersOptions.length
@@ -1358,9 +1356,6 @@ export default {
       // })
     },
     handleSelectIMEI(e) {
-      console.log(e)
-      console.log(this.ruleForm.IMEI)
-      // this.ruleForm.IMEI = e.IMEI
     },
     goAzd(row) {
       this.$router.push(

@@ -16,10 +16,19 @@
         span {{baseInfo.yeCNum}}元
       //- span.base-info(style="margin-right:15px") 充值总金额:
       //-   span {{baseInfo.czCNum}}元
+
       span.base-info(style="margin-right:15px") 消费总金额:
         span {{baseInfo.xfCNum}}元
       span.base-info(style="margin-right:15px") 待开票金额:
         span {{baseInfo.wkpNum}}元
+      span.base-info(style="margin-right:15px") 短信剩余:
+        span {{baseInfo.wkpNum}}条
+      span.base-info(style="margin-right:15px") 电话剩余:
+        span {{baseInfo.wkpNum}}条
+      span.base-info(style="margin-right:15px") 本月短信使用:
+        span {{baseInfo.wkpNum}}条
+      span.base-info(style="margin-right:15px") 本月电话使用:
+        span {{baseInfo.wkpNum}}条
     .operate
       el-button(type="primary" size="small" @click='createdRow') 充值
       //- el-button(type="primary" size="small" @click='createdRowKq') 续费
@@ -64,43 +73,6 @@
         :page-sizes="[20, 50, 100, 200]"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total")
-    //- 库区列表
-    el-dialog.kq-dialog(
-      :visible.sync='kqDialogVisible'
-      :title='kqDialogTitle'
-      width='1200px'
-      append-to-body
-      :close-on-click-modal='false')
-      .flex1.layout-column
-        el-table.flex1(
-          v-loading="loadingKq"
-          :data='tableDataKq'
-          style='width: 100%'
-          :header-cell-style='headerStyle'
-          height="250"
-          border
-          fit
-          ref="tableList"
-          :cell-class-name="cellClassName"
-          empty-text="没有数据")
-          el-table-column(label="#" align="center" type="index" :index="indexMethod")
-          el-table-column(v-if="userInfo.UserType === 'Admin'" label="企业名称" align="left" prop="comname" width="150px")
-          el-table-column(
-            v-for="(item,index) in tableColumnQk" :key="index"
-            :prop="item.prop"
-            :label="item.label"
-            :align="item.align"
-            :width="item.width"
-            )
-            template(slot-scope='scope')
-              img(
-                v-if="item.type==='img' && scope.row[item.prop]"
-                :src="scope.row[item.prop]"
-                style="width:40px;height:40px;cursor: pointer")
-              span(v-else) {{scope.row[item.prop] || '-'}}
-          el-table-column(label="操作" align="center" width="120")
-            template(slot-scope='scope')
-              el-button(:disabled="scope.row.d1 !== '1'" type="success" plain size="small" @click="showDialog(scope.row)") 续费
     //- 列表弹窗
     el-dialog.dialog-class.list-class(
       :title='dialogTitle',
@@ -120,9 +92,9 @@
             label-width='120px')
             div
               el-form-item.pt10(
-                label='充值金额(元)'
+                label='选择产品'
                 :rules="[{ required: true }]"
-                style='width:100%' prop="rmb")
+                style='width:100%' prop="productid")
                 //- el-input(
                 //-   :disabled="userInfo.UserType === 'Company' && (userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '1' || userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '2')"
                 //-   size="small"
@@ -130,14 +102,14 @@
                 //-   oninput="value=value.replace(/[^\\d]/g,'')"
                 //-   v-model='ruleForm.rmb')
                 el-select(
-                  v-model="ruleForm.rmb"
+                  v-model="ruleForm.productid"
                   placeholder="请选择产品"
                   size="small")
                   el-option(
                     v-for="item in czOption"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value")
+                    :key="item.productid"
+                    :label="item.productname"
+                    :value="item.productid")
               el-form-item.pt10(
                 label='备注'
                 style='width:100%'
@@ -178,12 +150,7 @@
             div(style='font-size:10px; margin-left: 10px') 受银行处理时间影响，采用外汇或者线下汇款方式到账会有延误，强烈建议采用支付宝、网银实时到账。线下汇款直接向阿里的专属账户汇款，系统会将汇款直接匹配到您的阿里云账户。各种方式的到账时间一般为:招行1-2天，跨行2-5天(具体到账时间以银行的实际到账时间为准)。更多详情请避免北京时间21: 00-00: 00进行汇款，否则受银行出账时间影响，可能出现延迟-天到账情况。
           div(v-if="userInfo.UserType === 'Company' && (userInfo.Companys[userInfo.CompanyCodes[0]].QF003 === '3')" style='color: red; padding-top: 15px; font-size: 12px') 汇款成功后请将汇款凭证发到上文邮箱中，并请注明充值账户吗、联系人及联系电话
           div(v-else style='color: red; padding-top: 15px; font-size: 12px') 汇款成功后请将汇款凭证发到上文邮箱中，并请注明续费库区、充值账户、联系人及联系电话
-    //- 图片弹窗
-    image-dialog(
-      :imageTitle="imageTitle"
-      :imageVisible="imageVisible"
-      :imgUrl="imgUrl"
-      @onClose="imageVisible=false")
+
     el-dialog.dialog-class.list-class(
       :visible.sync='dialogEwmVisible'
       width='500px'
@@ -195,23 +162,24 @@
           b 支付完成后请关闭弹窗
         .svg-container1(v-if="radio === 0" style='margin-bottom: 10px')
           svg-icon(icon-class="wxpay" className="svgitem")
-        div#qrCode(ref="qrCodeDiv")
+        vue-qr(:text="qrcode" :size="200")
+
 </template>
 
 <script >
 import {
-  getRechargetlist,
-  getbaseinfo,
-  getweixinpayinfo,
-  getweixinpayinfoByKq,
-  comkuqulist } from '@/api/rmb'
+  getProduct,
+  getPayinfo
+} from '@/api/rmb'
 import { mapGetters } from 'vuex'
-// import QRCode from 'qrcodejs2'
-import { parseTime } from '@/utils/index'
+import VueQr from 'vue-qr'
+
+// import { parseTime } from '@/utils/index'
 
 export default {
   name: 'Index',
   components: {
+    VueQr
   },
   filters: {
     filterImg: (val) => {
@@ -270,76 +238,17 @@ export default {
       total: 1,
       currentPage: 1,
       pageSize: 20,
-      viewerCase: '',
       /** *** 弹窗 *** **/
       dialogTitle: '详情',
       dialogVisible: false,
       ruleForm: {},
-      czOption: [
-        {
-          label: 0.1,
-          value: 0.1
-        },
-        {
-          label: 1,
-          value: 1
-        },
-        {
-          label: 1000,
-          value: 1000
-        },
-        {
-          label: 2000,
-          value: 2000
-        },
-        {
-          label: 5000,
-          value: 5000
-        },
-        {
-          label: 10000,
-          value: 10000
-        }
-      ],
+      czOption: [],
       radio: 0,
       dialogEwmVisible: false,
       activeName: 'xs',
       qrcode: '',
-      baseInfo: {},
-      /** *** 图片弹窗 *** **/
-      imageTitle: '',
-      imageVisible: false,
-      imgUrl: '',
-      kqid: '',
-      kqData: [],
-      startime: '',
-      /** *** k库区列表 *** **/
-      kqDialogVisible: false,
-      loadingKq: false,
-      tableDataKq: [],
-      tableColumnQk: [
-        {
-          label: '库区名称',
-          prop: 'kqname'
-        },
-        {
-          label: '库区说明',
-          prop: 'kqdemo'
-        },
-        {
-          label: '缴费金额(元)',
-          prop: 'rmbnum'
-        },
-        {
-          label: '缴费时间',
-          prop: 'rmbstarttime'
-        },
-        {
-          label: '结束时间',
-          prop: 'rmbsendtime'
-        }
-      ],
-      kqDialogTitle: ''
+      baseInfo: {}
+
     }
   },
   computed: {
@@ -349,8 +258,7 @@ export default {
     }
   },
   created() {
-    // this.getDataList()
-    this.getDicsDataList()
+    this.getProductData()
     this.getBaseData()
   },
   mounted() {
@@ -449,15 +357,7 @@ export default {
     submitForm() {
       this.$refs['ruleForm'].validate((valid) => {
         if (valid) {
-          // const flag = this.userInfo.Companys[this.userInfo.CompanyCodes[0]].QF003 === '1' || this.userInfo.Companys[this.userInfo.CompanyCodes[0]].QF003 === '2'
-          // if ((flag && this.kqid) || !flag) {
-          //   this.getEwm()
-          //   this.$message.success('请扫码')
-          // } else {
-          //   this.$message.error('请将加*内容填写完整')
-          // }
           this.getEwm()
-          this.$message.success('请扫码')
         } else {
           this.$message.error('请将加*内容填写完整')
           console.error('error submit!!')
@@ -524,71 +424,9 @@ export default {
       //   console.error(err)
       // })
     },
-    /**
-     * @description: 获取字典值
-     * @param {type}
-     * @return:
-     */
-    getDicsDataList() {
-      const data = ['爆破类型', '项目等级', '企业性质', '人员类型', '物资分类', '线下充值']
-      // this.loading = true
-      this.$store.dispatch('dics/getDicData', data).then(res => {
-        const dics = {}
-        for (const key in res) {
-          // eslint-disable-next-line no-prototype-builtins
-          if (res.hasOwnProperty(key)) {
-            const element = res[key]
-            switch (key) {
-              case '爆破类型':
-                dics.bptype = element
-                break
-              case '项目等级':
-                dics.QF0032 = element
-                break
-              case '人员类型':
-                dics.UF002 = element
-                break
-              case '物资分类':
-                dics.wzfl = element
-                break
-              case '线下充值':
-                dics.xxcz = element
-                break
-              case '企业性质':
-                dics.QF004 = element
-                break
-              default:
-                break
-            }
-          }
-        }
-        this.dics = dics
-        this.getDataList()
-      }).catch(() => {
-        this.loading = false
-      })
-    },
+
     getBaseData() {
-      const params = {
-        page: 1,
-        pageSize: 2000
-      }
-      this.loadingKq = true
-      // getComKuQuData(params).then(res => {
-      comkuqulist(params).then(res => {
-        const data = res.Data.Models
-        data.forEach(n => {
-          n.value = n.id
-          n.label = n.kqname
-        })
-        this.kqData = data
-        this.tableDataKq = res.Data.Models
-        this.$nextTick(() => {
-          this.loadingKq = false
-        })
-      }).catch(() => {
-        this.loadingKq = false
-      })
+
     },
     /**
      * @description: '确认充值获取二维码'
@@ -596,50 +434,40 @@ export default {
      * @return: ''
      */
     getEwm() {
-      const flag = this.userInfo.Companys[this.userInfo.CompanyCodes[0]].QF003 === '1' || this.userInfo.Companys[this.userInfo.CompanyCodes[0]].QF003 === '2'
-      let params = {}
-      let methods
-      if (flag) {
-        methods = getweixinpayinfoByKq
-        params = {
-          rmb: this.ruleForm.rmb * 1,
-          demo: this.ruleForm.demo,
-          kqid: this.ruleForm.kqid,
-          startime: this.ruleForm.startime,
-          endtime: this.ruleForm.endtime
-        }
-      } else {
-        params = {
-          rmb: this.ruleForm.rmb * 1,
-          demo: this.ruleForm.demo
-        }
-        methods = getweixinpayinfo
+      const product = this.czOption.find(n => n.productid === this.ruleForm.productid)
+      const params = {
+        cztype: 0,
+        czly: 0,
+        comcode: this.userInfo.comcode,
+        codename: this.userInfo.codename,
+        userid: this.userInfo.userid,
+        username: this.userInfo.username,
+        productid: this.ruleForm.productid,
+        productname: product.productname,
+        rmb: product.productprice
       }
-
       // 判断是公司类型
-      methods(params).then(res => {
-        this.dialogEwmVisible = true
+      getPayinfo(params).then(res => {
+        // this.$message.success('请扫码')
         this.$nextTick(() => {
-          if (this.qrcode) {
-            this.qrcode.clear()
-            this.$refs.qrCodeDiv.innerHTML = ''
-          }
-          // window.open(res.Data, '_blank', 'width=1000,height=800,menubar=no,toolbar=no,status=no,scrollbars=yes')
-          this.qrcode = new QRCode(this.$refs.qrCodeDiv, {
-            text: res.Data,
-            width: 200,
-            height: 200,
-            colorDark: '#333333', // 二维码颜色
-            colorLight: '#ffffff', // 二维码背景色
-            correctLevel: QRCode.CorrectLevel.L// 容错率，L/M/H
-          })
+          this.dialogEwmVisible = true
+          this.qrcode = res.Data
         })
-        // params.demo = res.Data
-        // getweixinpayinfo(params).then(res => {
-        //   console.log(res)
-        // })
       }).catch(err => {
         console.error(err)
+      })
+    },
+    getProductData() {
+      const params = {
+        PageIndex: 1,
+        PageSize: 9999
+      }
+      getProduct(params).then(res => {
+        const data = res.Data.Models
+
+        this.czOption = data
+      }).catch((err) => {
+        this.$message.error(err)
       })
     }
     /** *** 获取数据 end *** **/
