@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-20 15:49:08
+ * @LastEditTime: 2020-12-09 18:45:02
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -45,11 +45,11 @@
     :tableData='tableData'
     :columns="tableColumn")
     template(v-slot:operation="{row}")
-      el-switch.pr_10(v-model="row.Status"
+      el-switch.pr_10(v-model="row.status"
         active-color="#13ce66"
         inactive-color="#ff4949"
         :active-value="1"
-        :inactive-value="0"
+        :inactive-value="2"
         @change="statusChange($event, row)")
   //- 权限列表弹出
   el-dialog.add-dialog(
@@ -96,7 +96,7 @@
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getRoleList, addRole, updateRole, enableRole } from '@/api/com'
+import { getRoleList, addRole, updateRole, enableRole, getRoleDic } from '@/api/com'
 // import { getDicsByName } from '@/api/commom'
 
 import { mapGetters } from 'vuex'
@@ -284,6 +284,7 @@ export default {
     console.log(this.preTableData)
     this.onSearch({ Name: '' })
     this.getDicsList()
+    this.getRoleDic()
   },
   activated() {
     // 保持半缓存
@@ -345,6 +346,11 @@ export default {
       //   })
       // })
     },
+    getRoleDic() {
+      getRoleDic().then(res => {
+        console.log(res)
+      })
+    },
     getDataList() {
       const params = {
         PageIndex: this.currentPage,
@@ -357,7 +363,9 @@ export default {
           this.loading = false
         })
         const data = res.Data.Models
-
+        data.forEach(n => {
+          n.status = n.Status
+        })
         this.tableData = data
         this.$set(this.dics, 'pcode', data)
         this.total = res.Data.TotalCount
@@ -391,12 +399,19 @@ export default {
     statusChange(e, row) { // 启用或者停用
       console.log(row)
       const params = Object.assign({}, row)
-      params.Status = e
+      params.status = e
+      const item = this.tableData.find(n => n.Id === row.Id)
       enableRole(params).then(res => {
         console.log(res)
         this.$message.success(res.Data)
         this.getDataList()
       }).catch(err => {
+        console.log(e)
+        if (e === 1) {
+          item.status = 2
+        } else {
+          item.status = 1
+        }
         console.error(err)
       })
     },

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-12 17:27:10
+ * @LastEditTime: 2020-12-09 17:37:30
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -115,6 +115,7 @@ export default {
           prop: 'lcname',
           label: '所在楼层',
           holder: '例: 1楼',
+          editAble: true,
           formOnly: true
         },
 
@@ -122,6 +123,7 @@ export default {
           prop: 'jzwid',
           label: '建筑物名称',
           type: 'select',
+          editAble: true,
           formOnly: true
         },
 
@@ -139,6 +141,7 @@ export default {
           prop: 'pmt',
           label: '平面图',
           type: 'img',
+          editAble: true,
           width: 100
         },
 
@@ -251,7 +254,6 @@ export default {
         this.$nextTick(() => {
           this.loading = false
         })
-
         this.tableData = res.Data.Models
         // this.$set(this.dics, 'pcode', res.Data.Models)
         this.total = res.Data.TotalCount
@@ -272,9 +274,9 @@ export default {
         methods = updateFloor
       }
       methods(params).then(res => {
-        this.formLoading = true
-        this.getDataList()
+        this.formLoading = false
         cb(true)
+        this.getDataList()
       }).catch((err) => {
         this.$message.error(err)
         this.formLoading = false

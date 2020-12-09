@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-20 14:28:56
+ * @LastEditTime: 2020-12-09 18:20:34
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -182,6 +182,7 @@ export default {
           prop: 'userpass',
           label: '用户密码',
           editAble: false,
+          viewDis: true,
           type: 'password',
           formOnly: true
 
@@ -530,8 +531,10 @@ export default {
       this.dialogTitle = '修改状态'
       this.dialogVisible = true
     },
-    updateUserPsd() {
+    updateUserPsd(row) {
       this.dialogType = 'psd'
+      this.ruleForm = Object.assign({}, row)
+
       this.dialogTitle = '修改密码'
       this.dialogVisible = true
     },

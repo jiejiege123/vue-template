@@ -246,7 +246,7 @@ export default {
   },
   created() {
     this.getCompanyData()
-    this.getDataList()
+    // this.getDataList()
   },
   mounted() {
 
@@ -285,10 +285,10 @@ export default {
             n.delDisabled = true
           }
         })
-
         const setData = toTree(data)
         this.comData = setData
         this.$set(this.dics, 'comcode', setData)
+        this.getDataList()
       }).catch((err) => {
         this.$message.error(err)
         this.loading = false
@@ -317,14 +317,14 @@ export default {
       const params = Object.assign({}, ruleForm)
       this.formLoading = true
       let methods
-      if (dialogType === 'add') {
+      if (this.dialogType === 'add') {
         methods = addAlarmuser
       } else {
         methods = updateAlarmuser
       }
       params.comname = this.oldComData.find(n => n.comcode === params.comcode).comname
       methods(params).then(res => {
-        this.formLoading = true
+        this.formLoading = false
         this.getDataList()
         cb(true)
       }).catch((err) => {
@@ -350,13 +350,16 @@ export default {
           jjlxrid: row.jjlxrid
         }
       }
+      this.loading = true
       methods(params).then(res => {
         this.$message({
           type: 'success',
           message: '删除成功!'
         })
+        this.loading = false
         this.getDataList()
       }).catch(err => {
+        this.loading = false
         console.error(err)
       })
     },

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-18 10:51:58
+ * @LastEditTime: 2020-12-09 18:16:51
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -468,7 +468,7 @@ export default {
       } else if (this.dialogType === 'add') {
         return this.columns.filter(n => !n.tableOnly && !n.addDisable)
       } else {
-        return this.columns.filter(n => !n.tableOnly)
+        return this.columns.filter(n => !n.tableOnly && !n.viewDis)
       }
     },
     action() {
@@ -623,7 +623,7 @@ export default {
       })
     },
     batchDel() {
-      this.$confirm('此操作将永久删除该条数据, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除这些数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

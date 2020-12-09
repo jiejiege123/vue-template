@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-03 12:15:16
- * @LastEditTime: 2020-11-11 11:03:56
+ * @LastEditTime: 2020-12-09 18:35:24
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\api\com.js
@@ -129,11 +129,20 @@ export function updateRole(data) {
 }
 
 // 启停角色
-export function enableRole(data) {
+export function enableRole(params) {
   return request({
     url: '/api/role/enable',
-    method: 'post',
-    data
+    method: 'get',
+    params
+  })
+}
+
+// 获取字典列表
+export function getRoleDic(params) {
+  return request({
+    url: '/api/role/dic',
+    method: 'get',
+    params
   })
 }
 

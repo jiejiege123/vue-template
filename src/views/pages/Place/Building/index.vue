@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-12 09:18:34
+ * @LastEditTime: 2020-12-09 17:11:43
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -89,7 +89,7 @@ div(style="width:100%; height:100%")
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getBuildingList, addBuilding, deleteBuilding, updateBuilding, armedBuilding, disarmBuilding } from '@/api/place'
+import { getBuildingList, addBuilding, deleteBuilding, batchDelBuilding, updateBuilding, armedBuilding, disarmBuilding } from '@/api/place'
 import { getDicsByName } from '@/api/commom'
 import { getCompany } from '@/api/com'
 
@@ -146,11 +146,7 @@ export default {
        * 表格
        */
       loading: false,
-      tableData: [
-        {
-          lcsnum: '12'
-        }
-      ],
+      tableData: [],
       tableColumn: [
         // {
         //   prop: 'comname',
@@ -344,12 +340,12 @@ export default {
         this.$nextTick(() => {
           this.loading = false
         })
-        const data = res.Data.Models
-        data.forEach(n => {
-          if (n.comcode === this.userInfo.comcode) {
-            n.delDisabled = true
-          }
-        })
+        // const data = res.Data.Models
+        // data.forEach(n => {
+        //   if (n.comcode === this.userInfo.comcode) {
+        //     n.delDisabled = true
+        //   }
+        // })
         this.tableData = res.Data.Models
         this.$set(this.dics, 'pcode', res.Data.Models)
         this.total = res.Data.TotalCount
@@ -369,18 +365,33 @@ export default {
         methods = updateBuilding
       }
       methods(params).then(res => {
-        this.formLoading = true
+        this.formLoading = false
         cb(true)
+        this.getDataList()
       }).catch((err) => {
         this.$message.error(err)
         this.formLoading = false
       })
     },
     onDeleted(row) {
-      const params = {
-        jzwid: row.jzwid
+      let methods, params
+      if (Array.isArray(row)) {
+        methods = batchDelBuilding
+        const rows = []
+        row.forEach(n => {
+          rows.push(n.jzwid)
+        })
+        params = rows
+      } else {
+        methods = deleteBuilding
+        params = {
+          jzwid: row.jzwid
+        }
       }
-      deleteBuilding(params).then(res => {
+      // const params = {
+      //   jzwid: row.jzwid
+      // }
+      methods(params).then(res => {
         this.$message({
           type: 'success',
           message: '删除成功!'
@@ -401,7 +412,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        disarmBuilding({ jzwid: row.jzwid }).then(res => {
+        disarmBuilding(row.jzwid).then(res => {
           this.$message.success('操作成功')
           this.getDataList()
         })
@@ -464,6 +475,7 @@ export default {
         jzwid: this.nowRow.jzwid,
         TimeRanges: TimeRanges
       }
+      this.dialogLoading = true
       methods(params).then(res => {
         this.dialogLoading = false
         this.dialogVisible = false

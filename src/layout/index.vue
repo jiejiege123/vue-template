@@ -20,6 +20,10 @@ import RightPanel from '@/components/RightPanel'
 import { AppMain, Navbar, Settings, Sidebar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapState } from 'vuex'
+import { getToken } from '@/utils/auth'
+import { createSocket } from '@/utils/websocket'
+import { sendWSPush } from '@/utils/websocket'
+
 // TODO: 添加websocket
 export default {
   name: 'Layout',
@@ -48,6 +52,12 @@ export default {
         mobile: this.device === 'mobile'
       }
     }
+  },
+  created() {
+    // 使用websocket
+    // FIXME: 写死了不太好
+    createSocket('ws://wlw.horncloud.com/ws', getToken())
+    sendWSPush()
   },
   methods: {
     handleClickOutside() {

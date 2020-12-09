@@ -15,12 +15,10 @@ el-dialog.dialog-class.list-class.default-input(
       el-input(
         style="width: 300px"
         v-model="ruleForm.megtitle"
-        @blur="validatedTitle"
-        :disabled="dialogType!=='add'")
+        @blur="validatedTitle")
     .help-tel.layout-row.align-center.ml_20
       label(style="width:70px") 文章类型
       el-select(
-        :disabled="dialogType!=='add'"
         v-model="ruleForm.megtype"
         placeholder="请选择消息类型"
         filterable)

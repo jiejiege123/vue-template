@@ -36,6 +36,14 @@ export function deleteBuilding(params) {
   })
 }
 
+//
+export function batchDelBuilding(data) {
+  return request({
+    url: '/api/building/batch/delete',
+    method: 'post',
+    data
+  })
+}
 // 布防
 export function armedBuilding(data) {
   return request({

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-19 16:32:07
+ * @LastEditTime: 2020-12-09 18:05:19
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -343,6 +343,8 @@ export default {
           this.ruleForm = newVal
           this.getBuildingData(this.ruleForm.comname)
           this.getFloorData(this.ruleForm.jzwname)
+        } else {
+          this.ruleForm = {}
         }
       }
       // deep: true,
@@ -421,7 +423,7 @@ export default {
       this.getBuildingData(comname)
     },
     jzwidChange(e, change) {
-      console.log('123')
+      console.log('123', e)
       let jzwname = ''
       if (change !== 'change') {
         this.lcData = []
@@ -462,6 +464,7 @@ export default {
       })
     },
     getFloorData(jzwname) {
+      console.log(jzwname)
       this.lcLoading = true
       const params = {
         jzwname: jzwname,
@@ -509,7 +512,7 @@ export default {
         addFloor(params).then(res => {
           this.formLoading = false
           cb(true)
-          this.jzwidChange(this.ruleForm.jzwname, 'change')
+          this.jzwidChange(params.jzwname, 'change')
         }).catch((err) => {
           this.$message.error(err)
           this.formLoading = false

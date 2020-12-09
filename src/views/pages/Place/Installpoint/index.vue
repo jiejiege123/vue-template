@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-18 16:52:31
+ * @LastEditTime: 2020-12-09 17:47:02
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -514,12 +514,15 @@ export default {
       })
     },
     addBangding(row) {
+      this.bangform = {}
       this.bangdVisible = true
       this.bangdType = 'add'
+      this.bangdTitle = '新增安装点'
     },
     editBangding(row) {
       this.bangform = row
       this.bangdType = 'edit'
+      this.bangdTitle = '编辑安装点'
       this.bangdVisible = true
     },
     querySearchAsync(queryString, cb) {
