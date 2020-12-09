@@ -15,6 +15,42 @@
       span 设备详情
       //- span.ml_20(style="color: #000") {{comname}}
     el-card.box-card.mb_10
+      div.clr_b2(slot="header")
+        | 资费信息
+        el-button.ml_10(type="primary" size="mini" @click.stop="goBuy(row)") 购买
+      div.layout-row__around.zifei-warp
+        div.layout-row
+          .zifei-title 短信信息
+          .zifei-content.layout-column
+            div.zifei-content-item
+              span 账户短信剩余
+              span.num  {{ ruleForm.zhmsg || 0 }}
+              sapn  条
+            div.zifei-content-item
+              span 当前设备已使用
+              span.num  {{ ruleForm.zhmsg || 0 }}
+              sapn  条
+            div.zifei-content-item
+              span 当前设备剩余
+              span.num  {{ ruleForm.zhmsg || 0 }}
+              sapn  条
+        div.layout-row
+          .zifei-title 语音信息
+          .zifei-content.layout-column
+            div.zifei-content-item
+              span 账户语言剩余
+              span.num  {{ ruleForm.zhmsg || 0 }}
+              sapn  条
+            div.zifei-content-item
+              span 当前设备已使用
+              span.num  {{ ruleForm.zhmsg || 0 }}
+              sapn  条
+            div.zifei-content-item
+              span 当前设备剩余
+              span.num  {{ ruleForm.zhmsg || 0 }}
+              sapn  条
+      //- div 短信信息 账户短信剩余 当前设备已使用 当前设备剩余
+    el-card.box-card.mb_10
       div.clr_b2(slot="header") 设备信息
       //- 数据开始了
       el-form.default-input.inline(
@@ -113,6 +149,8 @@
       :address="ruleForm.dwaddress"
       @closeDialog="dialogMapVisible = false"
     )
+    //- 购买弹窗
+    buy-some(:dialogTitle="buyTitle" :dialogVisible="buyVisible" :deviceid="buyDeviceid" @onClose="buyVisible = false")
 </template>
 <script >
 import Query from '@/components/Query'
@@ -123,6 +161,7 @@ import { getEquiByid } from '@/api/equipment'
 import MsgChart from '@/components/Charts/MsgChart'
 import MsgLineChart from '@/components/Charts/MsgLineChart'
 // import { checkPhone } from '@/utils/index'
+import BuySome from '@/components/BuySome'
 import { mapGetters } from 'vuex'
 export default {
   name: 'EquipmentItem',
@@ -131,7 +170,8 @@ export default {
     EditTableForm,
     MsgChart,
     MsgLineChart,
-    MapDialog
+    MapDialog,
+    BuySome
   },
   filters: {
 
@@ -334,7 +374,11 @@ export default {
       tableDics: {},
       tableLoading: false,
       // 地图
-      dialogMapVisible: false
+      dialogMapVisible: false,
+      // 购买弹窗
+      buyTitle: '',
+      buyVisible: false,
+      buyDeviceid: ''
     }
   },
   computed: {
@@ -414,6 +458,12 @@ export default {
     },
     showMap() {
 
+    },
+    // 购买
+    goBuy(row) {
+      this.buyVisible = true
+      this.buyDeviceid = row.deviceid
+      this.buyTitle = `设备${row.IMEI}购买产品`
     }
   }
 }
@@ -451,6 +501,23 @@ export default {
   height: 320px;
   ::v-deep .el-card__body{
     height: calc(100% - 50px);
+  }
+}
+// 资费
+.zifei-warp{
+  font-size: 14px;
+  .zifei-title{
+    color: #606266;
+    margin-right: 15px;
+  }
+  .zifei-content{
+    .zifei-content-item{
+      margin-bottom: 5px;
+    }
+  }
+  .num{
+    font-size: 14px;
+    color: #000;
   }
 }
 </style>

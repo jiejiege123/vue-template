@@ -238,3 +238,12 @@ export function batchDelProduct(params) {
     params
   })
 }
+
+// 获取支付信息
+export function getPayinfo(data) {
+  return request({
+    url: '/api/common/getPayinfo',
+    method: 'post',
+    data
+  })
+}
