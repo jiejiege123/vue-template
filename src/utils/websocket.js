@@ -4,16 +4,22 @@
  */
 let Socket = ''
 let setIntervalWesocketPush = null
-
+let urlRe, tokenRe, paramsRe
 /**
  * 建立websocket连接
  * @param {string} url ws地址
  */
-export const createSocket = url => {
+export const createSocket = (url, token, params) => {
+  if (url) {
+    urlRe = url
+    tokenRe = token
+    paramsRe = params
+  }
+  console.log(url, token, params)
   Socket && Socket.close()
   if (!Socket) {
     console.log('建立websocket连接')
-    Socket = new WebSocket(url)
+    Socket = new WebSocket(urlRe, tokenRe)
     Socket.onopen = onopenWS
     Socket.onmessage = onmessageWS
     Socket.onerror = onerrorWS
@@ -25,6 +31,7 @@ export const createSocket = url => {
 
 /** 打开WS之后发送心跳 */
 const onopenWS = () => {
+  // connecting(paramsRe) // 是否需要重新发送？后端应该是有机制能拿到所有链接的 send 的内容的最后一次记录 重连之后不需要再send
   sendPing()
 }
 
@@ -35,7 +42,9 @@ const onerrorWS = () => {
   console.log('连接失败重连中')
   if (Socket.readyState !== 3) {
     Socket = null
-    createSocket()
+    setTimeout(() => {
+      createSocket()
+    }, 3000)
   }
 }
 
@@ -83,7 +92,9 @@ const oncloseWS = () => {
   console.log('websocket已断开....正在尝试重连')
   if (Socket.readyState !== 2) {
     Socket = null
-    createSocket()
+    setTimeout(() => {
+      createSocket()
+    }, 3000)
   }
 }
 /** 发送心跳
@@ -97,52 +108,3 @@ export const sendPing = (time = 5000, ping = 'ping') => {
     Socket.send(ping)
   }, time)
 }
-
-// export const sendPing = (time = 5000, ping = 'ping') => {
-//   clearInterval(setIntervalWesocketPush)
-//   Socket.send(ping)
-//   setIntervalWesocketPush = setInterval(() => {
-//     Socket.send(ping)
-//   }, time)
-// }
-
-// ********************************************* 使用
-// 在main.js或需要使用的地方引入并建立连接
-// import { createSocket } from '@sven0706/websocket'
-// createSocket('wss://api.baidu.com')
-
-// // 发送消息
-// import { sendWSPush } from '@sven0706/websocket'
-// sendWSPush(data)
-
-// // 接收消息
-// const getsocketData = e => {  // 创建接收消息函数
-//   const data = e && e.detail.data
-//   console.log(data)
-// }
-// // 注册监听事件
-// window.addEventListener('onmessageWS', getsocketData)
-
-// // 在需要的时候卸载监听事件，比如离开页面
-// window.removeEventListener('onmessageWS', getsocketData)
-
-// ************************************************************* api
-// 仅三个api, 且一般只需要用到`createSocket`, `sendWSPush`
-
-// /**
-//  * 建立websocket连接
-//  * @param {string} url ws地址
-//  */
-// createSocket(url)
-
-// /**
-//  * 发送数据
-//  * @param {any} message 需要发送的数据
-//  */
-//  sendWSPush(message)
-
-// /**发送心跳
-//  * @param {number} time 心跳间隔毫秒 默认5000
-//  * @param {string} ping 心跳名称 默认字符串ping
-//  */
-//  sendPing()

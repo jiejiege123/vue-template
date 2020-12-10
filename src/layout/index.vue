@@ -36,6 +36,11 @@ export default {
     TagsView
   },
   mixins: [ResizeMixin],
+  data() {
+    return {
+      getsocketData: ''
+    }
+  },
   computed: {
     ...mapState({
       sidebar: state => state.app.sidebar,
@@ -56,8 +61,16 @@ export default {
   created() {
     // 使用websocket
     // FIXME: 写死了不太好
-    createSocket('ws://wlw.horncloud.com/ws', getToken())
-    sendWSPush()
+    createSocket('ws://wlw.horncloud.com/ws', getToken(), '123')
+    sendWSPush('123')
+    this.getsocketData = e => { // 创建接收消息函数
+      const data = e && e.detail.data
+      console.log(data)
+    }
+    window.addEventListener('onmessageWS', this.getsocketData)
+  },
+  beforeDestroy() {
+    window.removeEventListener('onmessageWS', this.getsocketData)
   },
   methods: {
     handleClickOutside() {
