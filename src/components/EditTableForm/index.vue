@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-12-09 18:16:51
+ * @LastEditTime: 2020-12-10 17:13:35
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -61,7 +61,7 @@
           el-image(
             v-else-if="item.type==='img'"
             :src="scope.row[item.prop] | filterImg"
-            :preview-src-list="[scope.row[item.prop] | filterImg]"
+            :preview-src-list="[scope.row[item.prop + 'pr']]"
             style="width:40px;height:40px;cursor: pointer")
           span(v-else-if="item.filter") {{dics[item.prop].find(n => n.value === scope.row[item.prop]) ? dics[item.prop].find(n => n.value === scope.row[item.prop]).label : scope.row[item.prop]}}
           slot(v-else-if="item.slot" :name="item.prop" :row="scope.row")
@@ -196,7 +196,7 @@
             div(v-else-if="item.type === 'img'")
               img.avatar(
                 v-if='ruleForm[item.prop] && (dialogType==="view")'
-                :src='ruploaduleForm[item.prop] | filterImg'
+                :src='ruleForm[item.prop] | filterImg'
                 style="margin:10px; cursor: pointer")
               el-upload.avatar-uploader(
                 v-else-if='!ruleForm[item.prop] && (dialogType==="view")')

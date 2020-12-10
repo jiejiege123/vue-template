@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-12-09 17:37:30
+ * @LastEditTime: 2020-12-10 17:15:27
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -254,7 +254,19 @@ export default {
         this.$nextTick(() => {
           this.loading = false
         })
-        this.tableData = res.Data.Models
+        const data = res.Data.Models
+        data.forEach(n => {
+          if (n.pmt) {
+            if (n.pmt.includes('http')) {
+              n.pmtpr = n.pmt
+            } else {
+              n.pmtpr = process.env.VUE_APP_BASE_API + n.pmt
+            }
+          } else {
+            n.pmtpr = n.pmt
+          }
+        })
+        this.tableData = data
         // this.$set(this.dics, 'pcode', res.Data.Models)
         this.total = res.Data.TotalCount
       }).catch((err) => {
