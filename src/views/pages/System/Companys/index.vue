@@ -348,7 +348,6 @@ export default {
         })
 
         const setData = toTree(data)
-        console.log(setData)
         this.tableData = setData
         this.$set(this.dics, 'pcode', setData)
         this.total = res.Data.TotalCount

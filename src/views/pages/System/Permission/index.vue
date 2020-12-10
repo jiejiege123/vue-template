@@ -14,7 +14,7 @@
     edit-table-form(
       :loading='loading'
       :inline="true"
-      operateWidth='280'
+      operateWidth='220'
       :hasPages="false"
       :currentPage="currentPage"
       :total="total"
@@ -25,12 +25,16 @@
       has02="Company02"
       has03="Company03"
       :formStyle={width: '220px'}
-      :showSelection="false"
-      :showBatchDel="false"
+      :showSelection="true"
+      :showBatchDel="true"
       :showIndex='true'
+      rowKey="Id"
+      :showDel="false"
+      :treeProps="{ children: 'Children', hasChildren: 'hasChildren' }"
       :cellClassName="cellClassName"
       @onHandleCurrentChange="handleCurrentChange"
       @onHandleSizeChange="handleSizeChange"
+      @onDeleted="onDeleted"
       @onSubmitForm="onSubmitForm"
       :formLoading="formLoading"
       :formRules="formRules"
@@ -47,7 +51,7 @@
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getRoleList, addCom, updateRole, enableRole } from '@/api/com'
+import { getPermissionAll, getPermission, addPermission, updatePermission, batchDelPermission } from '@/api/com'
 // import { getDicsByName } from '@/api/commom'
 
 import { mapGetters } from 'vuex'
@@ -90,16 +94,17 @@ export default {
       ],
       tableColumn: [
         {
-          prop: 'Pcode',
+          prop: 'ParentId',
           label: '上级',
           formOnly: true,
           type: 'cascader',
           showAllLevels: false,
           props: {
             emitPath: false,
-            children: 'children',
-            value: 'value',
-            label: 'label'
+            checkStrictly: true,
+            children: 'Children',
+            value: 'Id',
+            label: 'Name'
           },
           editAble: true
         },
@@ -108,11 +113,7 @@ export default {
           label: '权限名称',
           editAble: true
         },
-        {
-          prop: 'Code',
-          label: '权限码',
-          editAble: true
-        },
+
         {
           prop: 'Type',
           label: '权限类型',
@@ -124,7 +125,12 @@ export default {
           prop: 'Url',
           label: '连接',
           editAble: true
-
+        },
+        {
+          prop: 'SortCode',
+          label: '排序',
+          editAble: true,
+          inputFilter: "value=value.replace(/[^\\d]/g,'')"
         },
         {
           prop: 'Icon',
@@ -132,38 +138,32 @@ export default {
           editAble: true
         },
         {
-          prop: 'Order',
-          label: '排序',
+          prop: 'Code',
+          label: '权限码',
           editAble: true
+        },
+        {
+          prop: 'Description',
+          label: '描述',
+          type: 'textarea',
+          editAble: true,
+          // formOnly: true,
+          online: true,
+          formStyle: {
+            width: '600px'
+          }
         }
 
       ],
       formRules: {
-        Pcode: [{ required: true, message: '请选择上级', trigger: 'change' }],
+        ParentId: [{ required: true, message: '请选择上级', trigger: 'change' }],
         Name: [{ required: true, message: '请输入权限名称', trigger: 'blur' }],
-        Code: [{ required: true, message: '请输入权限码', trigger: 'blur' }],
+        SortCode: [{ required: true, message: '请输入排序', trigger: 'blur' }],
         Type: [{ required: true, message: '请选择权限类型', trigger: 'change' }],
-        Url: [{ required: true, message: '请输入权限码', trigger: 'blur' }]
+        Url: [{ required: true, message: '请输入访问地址', trigger: 'blur' }]
       },
       dics: {
-        Type: [
-          {
-            label: '节点组',
-            value: 4
-          },
-          {
-            label: '权限菜单',
-            value: 1
-          },
-          {
-            label: '权限项',
-            value: 3
-          },
-          {
-            label: '公共菜单',
-            value: 2
-          }
-        ]
+        Type: []
       },
       currentPage: 1,
       pageSize: 9000,
@@ -172,11 +172,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo', 'permissionType'])
   },
   created() {
-    // this.onSearch({})
-    // this.getDicsList()
+    this.onSearch({})
+    this.getDicsList()
+    // this.dics
+    this.$set(this.dics, 'Type', this.permissionType)
   },
   activated() {
     // 保持半缓存
@@ -233,6 +235,26 @@ export default {
       //     }
       //   })
       // })
+      getPermissionAll().then(res => {
+        const data = res.Data
+        data.unshift({ Id: '0', Name: '无' })
+        // 递归如果 Children.length === 0 删除
+        const delChildren = (array) => {
+          console.log(array)
+          array.forEach(n => {
+            if (n.Children && n.Children.length === 0) {
+              delete n.Children
+            } else if (n.Children) {
+              delChildren(n.Children)
+            }
+          })
+        }
+        delChildren(data)
+        console.log(data)
+        this.$set(this.dics, 'ParentId', data)
+      }).catch((err) => {
+        this.$message.error(err)
+      })
     },
     getDataList() {
       const params = {
@@ -241,18 +263,17 @@ export default {
         ...this.query
       }
       this.loading = true
-      getRoleList(params).then(res => {
+      getPermission(params).then(res => {
         this.$nextTick(() => {
           this.loading = false
         })
         const data = res.Data.Models
         data.forEach(n => {
-          if (n.comcode === this.userInfo.comcode) {
-            n.delDisabled = true
+          if (!n.ParentId) {
+            n.ParentId = '0'
           }
         })
         this.tableData = res.Data.Models
-        this.$set(this.dics, 'pcode', res.Data.Models)
         this.total = res.Data.TotalCount
       }).catch((err) => {
         this.$message.error(err)
@@ -261,30 +282,54 @@ export default {
     },
     onSubmitForm(ruleForm, dialogType, cb) {
       const params = Object.assign({}, ruleForm)
-      params.comTypeZh = this.dics.comType.find(n => n.value === params.comType) ? this.dics.comType.find(n => n.value === params.comType).label : ''
-      params.pcodename = this.tableData.find(n => n.comcode === params.pcode) ? this.tableData.find(n => n.comcode === params.pcode).comname : ''
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
-        methods = addCom
+        // TODO: 新增无效
+        methods = addPermission
       } else {
-        methods = updateRole
+        methods = updatePermission
       }
+      if (params.ParentId === '0') {
+        params.ParentId = ''
+      }
+      params.SortCode = parseInt(params.SortCode)
       methods(params).then(res => {
         console.log(res)
-        this.formLoading = true
+        this.formLoading = false
         cb(true)
+        this.getDataList()
+        this.getDicsList()
       }).catch((err) => {
         this.$message.error(err)
         this.formLoading = false
       })
     },
-
-    goCompany() {
-      this.$router.push('/System/Companys')
-    },
-    statusChange(e) {
-      enableRole().then(res => {})
+    onDeleted(row) {
+      let methods, params
+      if (Array.isArray(row)) {
+        methods = batchDelPermission
+        const rows = []
+        row.forEach(n => {
+          rows.push(n.Id)
+        })
+        params = rows
+      } else {
+        methods = ''
+        params = {
+          ids: row.Id
+        }
+      }
+      methods(params).then(res => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+        this.getDataList()
+        this.getDicsList()
+      }).catch(err => {
+        console.error(err)
+      })
     }
   }
 }

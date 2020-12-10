@@ -155,6 +155,13 @@ export function getPermission(data) {
   })
 }
 
+export function getPermissionAll(params) {
+  return request({
+    url: '/api/permission/getall',
+    method: 'get',
+    params
+  })
+}
 export function addPermission(data) {
   return request({
     url: '/api/permission/add',
@@ -172,6 +179,14 @@ export function updatePermission(data) {
 export function delPermission(data) {
   return request({
     url: '/api/permission/delete',
+    method: 'post',
+    data
+  })
+}
+
+export function batchDelPermission(data) {
+  return request({
+    url: '/api/permission/batch/delete',
     method: 'post',
     data
   })

@@ -60,35 +60,46 @@
     @open="open"
     :close-on-click-modal="false"
     :append-to-body="true")
-    el-table.flex1(
-      :data='preTableData'
-      style='width: 100%'
-      :header-cell-style='headerStyle'
-      height="350"
-      border
-      ref="reftable"
-      row-key="Id"
-      default-expand-all
-      :tree-props="{children: 'Children'}"
-      @row-click="rowClick"
-      @selection-change="selectionChange"
-      empty-text="没有数据")
-      el-table-column(
-        type="selection"
-        align="center"
-        width="55")
-      el-table-column(
-        v-for="(item,index) in preTableColumns"
-        :key="index"
-        :prop="item.prop"
-        :label="item.label"
-        :align="item.align"
+    //- el-table.flex1(
+    //-   :data='preTreeData'
+    //-   style='width: 100%'
+    //-   :header-cell-style='headerStyle'
+    //-   height="350"
+    //-   border
+    //-   ref="reftable"
+    //-   row-key="Id"
+    //-   default-expand-all
+    //-   :tree-props="{children: 'Children'}"
+    //-   @row-click="rowClick"
+    //-   @selection-change="selectionChange"
+    //-   empty-text="没有数据")
+    //-   el-table-column(
+    //-     type="selection"
+    //-     align="center"
+    //-     width="55")
+    //-   el-table-column(
+    //-     v-for="(item,index) in preTableColumns"
+    //-     :key="index"
+    //-     :prop="item.prop"
+    //-     :label="item.label"
+    //-     :align="item.align"
 
-        :min-width="item.minWidth"
-        :width="item.width")
-        template(slot-scope='scope')
-          span(v-if="item.prop === 'Type'") {{preType.find(n => n.value === scope.row[item.prop]).label}}
-          span(v-else) {{scope.row[item.prop]}}
+    //-     :min-width="item.minWidth"
+    //-     :width="item.width")
+    //-     template(slot-scope='scope')
+    //-       span(v-if="item.prop === 'Type'") {{preType.find(n => n.value === scope.row[item.prop]).label}}
+    //-       span(v-else) {{scope.row[item.prop]}}
+    //- 弄成树权限比较好
+    div.tree-warp
+      el-tree(
+        :data="preTreeData"
+        show-checkbox
+        node-key="Id"
+        :expand-on-click-node="false"
+        check-on-click-node
+        default-expand-all
+        :default-checked-keys="treeCheckedArr"
+        :props="defaultProps")
     .footer
       el-button(@click="visible = false" size="small") 取消
       el-button(type='primary', @click="submitPre" size="small") 提交
@@ -96,7 +107,7 @@
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getRoleList, addRole, updateRole, enableRole, getRoleDic } from '@/api/com'
+import { getRoleList, addRole, updateRole, enableRole, getRoleDic, getPermission } from '@/api/com'
 // import { getDicsByName } from '@/api/commom'
 
 import { mapGetters } from 'vuex'
@@ -223,7 +234,14 @@ export default {
       // 权限
       preTitle: '',
       visible: false,
-      preTableData: [],
+      preTreeData: [],
+      treeCheckedArr: [],
+      defaultProps: {
+        children: 'Children',
+        label(data, node) {
+          return `${node.data.Name}[${node.data.type}]`
+        }
+      },
       preTableColumns: [
         {
           prop: 'Name',
@@ -275,16 +293,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['userInfo'])
+    ...mapGetters(['userInfo', 'permissionType'])
   },
   created() {
     this.comname = this.$route.query.comname
     this.comcode = this.$route.query.comcode
-    this.preTableData = JSON.parse(localStorage.getItem('routers'))
-    console.log(this.preTableData)
+    // this.preTreeData = JSON.parse(localStorage.getItem('routers'))
+    // console.log(this.preTreeData)
     this.onSearch({ Name: '' })
     this.getDicsList()
     this.getRoleDic()
+    this.getPermissionData()
   },
   activated() {
     // 保持半缓存
@@ -348,7 +367,7 @@ export default {
     },
     getRoleDic() {
       getRoleDic().then(res => {
-        console.log(res)
+        // console.log(res)
       })
     },
     getDataList() {
@@ -384,7 +403,7 @@ export default {
         methods = updateRole
       }
       methods(params).then(res => {
-        console.log(res)
+        // console.log(res)
         this.formLoading = true
         cb(true)
       }).catch((err) => {
@@ -402,7 +421,7 @@ export default {
       params.status = e
       const item = this.tableData.find(n => n.Id === row.Id)
       enableRole(params).then(res => {
-        console.log(res)
+        // console.log(res)
         this.$message.success(res.Data)
         this.getDataList()
       }).catch(err => {
@@ -424,7 +443,9 @@ export default {
     },
     // 权限弹出
     open() {
-      this.$refs.reftable.clearSelection()
+      this.$nextTick(() => {
+        this.$refs.reftable.clearSelection()
+      })
       // TODO: 获取值
       // this.$refs.reftable.toggleRowSelection(row, true)
     },
@@ -441,7 +462,39 @@ export default {
       })
       this.$refs.editTable.setPermissionIds(ids)
       this.visible = false
+    },
+    getPermissionData() {
+      const params = {
+        PageIndex: 1,
+        PageSize: 9999
+      }
+      getPermission(params).then(res => {
+        const data = res.Data.Models
+        data.forEach(n => {
+          if (!n.ParentId) {
+            n.ParentId = '0'
+          }
+          // n.type = this.permissionType.find(e => e.value === n.Type).label
+        })
+        // 递归了
+        const dgType = (arr) => {
+          arr.forEach(n => {
+            if (!n.ParentId) {
+              n.ParentId = '0'
+            }
+            n.type = this.permissionType.find(e => e.value === n.Type).label
+            if (n.Children && n.Children.length > 0) {
+              dgType(n.Children)
+            }
+          })
+        }
+        dgType(data)
+        this.preTreeData = data
+      }).catch((err) => {
+        this.$message.error(err)
+      })
     }
+
   }
 }
 </script>
@@ -474,5 +527,9 @@ export default {
 .footer{
   text-align: right;
   margin-top: 15px;
+}
+.tree-warp{
+  height: calc(100% - 50px);
+  overflow-y: auto;
 }
 </style>

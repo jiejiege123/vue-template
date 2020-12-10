@@ -34,8 +34,8 @@
       border
       ref="reftable"
       default-expand-all
-      row-key="comid"
-      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+      :row-key="rowKey"
+      :tree-props="treeProps"
       :cell-class-name="cellClassName"
       @row-click="rowClick"
       @selection-change="selectionChange"
@@ -375,6 +375,16 @@ export default {
     has03: {
       type: String,
       default: ''
+    },
+    rowKey: {
+      type: String,
+      default: 'comid'
+    },
+    treeProps: {
+      type: Object,
+      default() {
+        return { children: 'children', hasChildren: 'hasChildren' }
+      }
     },
     // 分页
     hasPages: {

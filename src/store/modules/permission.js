@@ -47,7 +47,25 @@ import { findItem } from '@/utils/index'
 const state = {
   routes: [],
   addRoutes: [],
-  btns: []
+  btns: [],
+  permissionType: [
+    {
+      label: '节点组',
+      value: 4
+    },
+    {
+      label: '权限菜单',
+      value: 1
+    },
+    {
+      label: '权限项',
+      value: 3
+    },
+    {
+      label: '公共菜单',
+      value: 2
+    }
+  ]
 }
 
 const mutations = {
