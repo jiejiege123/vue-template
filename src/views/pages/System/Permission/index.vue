@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-12 08:34:00
+ * @LastEditTime: 2020-12-11 17:51:32
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -21,9 +21,9 @@
       :pageSize="pageSize"
       :dics="dics"
       dialogWidth='800px'
-      has01="Company01"
-      has02="Company02"
-      has03="Company03"
+      has01="Permission01"
+      has02="Permission02"
+      has03="Permission03"
       :formStyle={width: '220px'}
       :showSelection="true"
       :showBatchDel="true"
@@ -32,6 +32,7 @@
       :showDel="false"
       :treeProps="{ children: 'Children', hasChildren: 'hasChildren' }"
       :cellClassName="cellClassName"
+      @selectChange="selectChange"
       @onHandleCurrentChange="handleCurrentChange"
       @onHandleSizeChange="handleSizeChange"
       @onDeleted="onDeleted"
@@ -111,9 +112,9 @@ export default {
         {
           prop: 'Name',
           label: '权限名称',
+          width: '200px',
           editAble: true
         },
-
         {
           prop: 'Type',
           label: '权限类型',
@@ -133,13 +134,13 @@ export default {
           inputFilter: "value=value.replace(/[^\\d]/g,'')"
         },
         {
-          prop: 'Icon',
-          label: '图标',
+          prop: 'Code',
+          label: '权限码',
           editAble: true
         },
         {
-          prop: 'Code',
-          label: '权限码',
+          prop: 'Icon',
+          label: '图标',
           editAble: true
         },
         {
@@ -160,7 +161,8 @@ export default {
         Name: [{ required: true, message: '请输入权限名称', trigger: 'blur' }],
         SortCode: [{ required: true, message: '请输入排序', trigger: 'blur' }],
         Type: [{ required: true, message: '请选择权限类型', trigger: 'change' }],
-        Url: [{ required: true, message: '请输入访问地址', trigger: 'blur' }]
+        Url: [{ required: true, message: '请输入访问地址', trigger: 'blur' }],
+        Code: [{ required: true, message: '请输入权限码', trigger: 'blur' }]
       },
       dics: {
         Type: []
@@ -221,7 +223,6 @@ export default {
       //   names: '公司类型'
       // }
       // getDicsByName(params).then(res => {
-      //   // console.log(res)
       //   const dics = res.Data
       //   dics.forEach(n => {
       //     n.value = n.dicvalue
@@ -240,17 +241,21 @@ export default {
         data.unshift({ Id: '0', Name: '无' })
         // 递归如果 Children.length === 0 删除
         const delChildren = (array) => {
-          console.log(array)
-          array.forEach(n => {
+          for (let i = 0; i < array.length; i++) {
+            const n = array[i]
+            if (n.Type === 3) {
+              // array.splice(i, 1) // 将使后面的元素依次前移，数组长度减1
+              // i-- // 如果不减，将漏掉一个元素
+              n.disabled = true
+            }
             if (n.Children && n.Children.length === 0) {
               delete n.Children
             } else if (n.Children) {
               delChildren(n.Children)
             }
-          })
+          }
         }
         delChildren(data)
-        console.log(data)
         this.$set(this.dics, 'ParentId', data)
       }).catch((err) => {
         this.$message.error(err)
@@ -295,7 +300,6 @@ export default {
       }
       params.SortCode = parseInt(params.SortCode)
       methods(params).then(res => {
-        console.log(res)
         this.formLoading = false
         cb(true)
         this.getDataList()
@@ -330,6 +334,18 @@ export default {
       }).catch(err => {
         console.error(err)
       })
+    },
+    selectChange(e, prop, cb) {
+      if (prop === 'Type') {
+        if (e === 3) {
+          this.$set(this.formRules, 'Code', [{ required: true, message: '请输入权限码', trigger: 'blur' }])
+          this.$set(this.formRules, 'Url', [{ required: false, message: '请输入访问地址', trigger: 'blur' }])
+        } else {
+          this.$set(this.formRules, 'Code', [{ required: false, message: '请输入权限码', trigger: 'blur' }])
+          this.$set(this.formRules, 'Url', [{ required: true, message: '请输入访问地址', trigger: 'blur' }])
+        }
+      }
+      cb()
     }
   }
 }

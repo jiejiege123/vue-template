@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-12-10 17:13:35
+ * @LastEditTime: 2020-12-11 17:38:40
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -10,10 +10,12 @@
   .table-warp.flex1.layout-column(v-show="!hiddenTable" v-loading="loading" style="max-height: 100%;")
     .operate(v-if="hasOutOperat")
       slot(name="outOperate")
+
+      //- v-has="has01"
       el-button(
         v-if="showAdd"
-        v-has="has01"
         type="primary"
+        v-has="has01"
         size="small"
         @click='addRow') 新增
       el-button(
@@ -77,11 +79,12 @@
             plain
             @click.stop="viewRow(scope.row)"
             size="small") 查看
+          //- v-has="has03"
           el-button(
             v-if="showEdit"
             type="success"
-            v-has="has03"
             plain
+            v-has="has03"
             @click.stop="editRow(scope.row)"
             size="small") 编辑
           el-button(
@@ -671,7 +674,10 @@ export default {
       this.$emit('selectFocus', prop, this.ruleForm, cb)
     },
     selectChange(e, prop) {
-      this.$emit('selectFocus', prop, this.ruleForm)
+      const cb = () => {
+        this.$refs['ruleForm'].clearValidate()
+      }
+      this.$emit('selectChange', e, prop, cb)
     },
     // 权限专用
     setPermissionIds(ids) {

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-13 17:25:38
+ * @LastEditTime: 2020-12-11 17:39:59
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\store\modules\permission.js
@@ -96,10 +96,10 @@ const actions = {
       // 应该使用递归来写
       function calleArr(array, fatherUrl, pushAraay) {
         array.forEach((n, index) => {
-          if (n.Type === 4 || n.Type === 1) {
-            if (n.Btns) {
-              btns = btns.concat(n.Btns)
-            }
+          if (n.Type === 4 || n.Type === 1 || n.Type === 2) {
+            // if (n.Btns) {
+            //   btns = btns.concat(n.Btns)
+            // }
             let path, component, hidden, activeMenu, noCache, noTagView, activeTags
             // 找到上一级的 item
             if (n.Type === 4) {
@@ -121,13 +121,8 @@ const actions = {
             if (n.Url === 'User' || n.Url === 'Role') {
               hidden = false
               activeMenu = ''
-              // activeMenu = '/System/Companys'
               noCache = true
               noTagView = false
-              // noTagView = true
-              // findItem(addRoutes, item => {
-              //   return item.name === 'Companys'
-              // }, breadcrumbItem, 'children')
             } else if (n.Url === 'EquipmentItem') {
               hidden = true
               activeMenu = '/Equipment/EquipmentLists'
@@ -172,7 +167,9 @@ const actions = {
             } else {
               activeTags = ''
             }
-
+            if (n.Url === 'dashboard') {
+              return
+            }
             pushAraay.push({
               path: path,
               hidden: hidden, // 侧边栏隐藏
@@ -195,15 +192,17 @@ const actions = {
               children: []
             })
             if (n.Children.length > 0) {
-              calleArr(n.Children, path, pushAraay[index].children)
+              calleArr(n.Children, path, pushAraay[pushAraay.length - 1].children)
             }
+          } else {
+            btns = btns.concat(n.Code)
           }
         })
       }
       calleArr(routesRes, '', addRoutes)
-
       localStorage.setItem('addRoutes', JSON.stringify(addRoutes))
       commit('SET_ROUTES', addRoutes)
+      console.log(btns)
       commit('SET_BTNS', btns)
       resolve(state.routes)
     })

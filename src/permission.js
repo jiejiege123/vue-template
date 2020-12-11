@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2020-11-02 09:00:14
- * @LastEditTime: 2020-11-09 09:10:37
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-11 14:46:04
+ * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\permission.js
  */
@@ -45,8 +45,8 @@ router.beforeEach(async(to, from, next) => {
         try {
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { RoleIds } = await store.dispatch('user/getInfo') // 用户信息里面就包含了 用户角色
-          const routesRes = await store.dispatch('user/getRouters', RoleIds)
+          const { userroleid } = await store.dispatch('user/getInfo') // 用户信息里面就包含了 用户角色
+          const routesRes = await store.dispatch('user/getRouters', userroleid)
           const accessRoutes = await store.dispatch('permission/generateRoutes', routesRes) // 根据角色 去获取菜单和按钮权限
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
