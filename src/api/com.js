@@ -155,6 +155,13 @@ export function getPermission(data) {
   })
 }
 
+export function getPermissionByRoleId(params) {
+  return request({
+    url: '/api/role/get',
+    method: 'get',
+    params
+  })
+}
 export function getPermissionAll(params) {
   return request({
     url: '/api/permission/getall',

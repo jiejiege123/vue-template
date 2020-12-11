@@ -79,17 +79,16 @@
             plain
             @click.stop="viewRow(scope.row)"
             size="small") 查看
-          //- v-has="has03"
           el-button(
             v-if="showEdit"
             type="success"
             plain
-            v-has="has03"
+            v-has="has02"
             @click.stop="editRow(scope.row)"
             size="small") 编辑
           el-button(
             v-if="showDel"
-            v-has="has02"
+            v-has="has03"
             :disabled="scope.row.delDisabled"
             plain
             type="danger"
@@ -671,7 +670,7 @@ export default {
       const cb = () => {
         this.$refs.PermissionIds[0].blur()
       }
-      this.$emit('selectFocus', prop, this.ruleForm, cb)
+      this.$emit('selectFocus', prop, this.ruleForm, cb, this.dialogType)
     },
     selectChange(e, prop) {
       const cb = () => {
@@ -690,12 +689,18 @@ export default {
       this.address = this.ruleForm.address
       this.dialogMapVisible = true
     },
-    mapSure(address, longitude, latitude) {
+    mapSure(address, longitude, latitude, province, provincecode, city, citycode, districe, districeycode) {
       this.dialogMapVisible = false
       console.log(address, longitude, latitude)
       this.$set(this.ruleForm, 'jzwaddress', address)
       this.$set(this.ruleForm, 'longitude', longitude)
       this.$set(this.ruleForm, 'latitude', latitude)
+      this.$set(this.ruleForm, 'province', province)
+      this.$set(this.ruleForm, 'provincecode', provincecode)
+      this.$set(this.ruleForm, 'city', city)
+      this.$set(this.ruleForm, 'citycode', citycode)
+      this.$set(this.ruleForm, 'districe', districe)
+      this.$set(this.ruleForm, 'districeycode', districeycode)
     }
   }
 }

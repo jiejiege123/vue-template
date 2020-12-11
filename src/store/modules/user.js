@@ -1,7 +1,7 @@
 // import { login, logout, getInfo, getRouter } from '@/api/user'
 import { login, logout } from '@/api/user'
 import { getTotalEqui } from '@/api/equipment'
-import { getPermission } from '@/api/com'
+import { getPermissionByRoleId } from '@/api/com'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 // import router, { resetRouter } from '@/router'
 import { resetRouter } from '@/router'
@@ -119,11 +119,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       if (roles) {
         const params = {
-          PageIndex: 1,
-          PageSize: 9999
+          id: roles
         }
-        getPermission(params).then(res => {
-          const router = res.Data.Models
+        getPermissionByRoleId(params).then(res => {
+          const router = res.Data.permissions
           router.forEach(n => {
             // if (!n.ParentId) {
             //   n.ParentId = '0'

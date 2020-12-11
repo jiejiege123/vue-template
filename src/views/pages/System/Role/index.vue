@@ -28,9 +28,9 @@
     :pageSize="pageSize"
     :dics="dics"
     dialogWidth='800px'
-    has01="Company01"
-    has02="Company02"
-    has03="Company03"
+    has01="Role01"
+    has02="Role02"
+    has03="Role03"
     :formStyle={width: '220px'}
     :showSelection="false"
     :showBatchDel="false"
@@ -46,11 +46,13 @@
     :columns="tableColumn")
     template(v-slot:operation="{row}")
       el-switch.pr_10(v-model="row.status"
+        v-has="'RoleSwitch'"
         active-color="#13ce66"
         inactive-color="#ff4949"
         :active-value="1"
         :inactive-value="2"
         @change="statusChange($event, row)")
+
   //- 权限列表弹出
   el-dialog.add-dialog(
     :title='preTitle',
@@ -92,12 +94,14 @@
     //- 弄成树权限比较好
     div.tree-warp
       el-tree(
+        ref="preTree"
         :data="preTreeData"
         show-checkbox
         node-key="Id"
         :expand-on-click-node="false"
         check-on-click-node
         default-expand-all
+        :check-strictly="checkStrictly"
         :default-checked-keys="treeCheckedArr"
         :props="defaultProps")
     .footer
@@ -107,8 +111,8 @@
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getRoleList, addRole, updateRole, enableRole, getRoleDic, getPermission } from '@/api/com'
-// import { getDicsByName } from '@/api/commom'
+import { getRoleList, addRole, updateRole, enableRole, getRoleDic, getPermissionByRoleId, getPermission } from '@/api/com'
+import { deepClone } from '@/utils/index'
 
 import { mapGetters } from 'vuex'
 export default {
@@ -236,6 +240,7 @@ export default {
       visible: false,
       preTreeData: [],
       treeCheckedArr: [],
+      checkStrictly: true,
       defaultProps: {
         children: 'Children',
         label(data, node) {
@@ -289,7 +294,9 @@ export default {
           value: 1,
           label: '权限菜单'
         }
-      ]
+      ],
+      perIds: [],
+      perRowIds: []
     }
   },
   computed: {
@@ -384,6 +391,10 @@ export default {
         const data = res.Data.Models
         data.forEach(n => {
           n.status = n.Status
+          // n.delDisabled
+          if (n.Id === '1326533864654508032') {
+            n.delDisabled = true
+          }
         })
         this.tableData = data
         this.$set(this.dics, 'pcode', data)
@@ -404,8 +415,9 @@ export default {
       }
       methods(params).then(res => {
         // console.log(res)
-        this.formLoading = true
+        this.formLoading = false
         cb(true)
+        this.getDataList()
       }).catch((err) => {
         this.$message.error(err)
         this.formLoading = false
@@ -434,20 +446,27 @@ export default {
         console.error(err)
       })
     },
-    selectFocus(prop, ruleForm, cb) {
+    selectFocus(prop, ruleForm, cb, dialogType) {
       if (prop === 'PermissionIds') {
-        cb()
         this.preTitle = `权限设置 【${ruleForm.Name}】`
         this.visible = true
+        cb()
+        if (dialogType === 'add') {
+          this.perRowIds = deepClone(this.perIds)
+          console.log('123')
+          this.$nextTick(() => {
+            this.$refs.preTree.setCheckedKeys(this.perRowIds)
+          })
+        } else {
+          this.getPermissionData(ruleForm.Id)
+        }
       }
     },
     // 权限弹出
     open() {
       this.$nextTick(() => {
-        this.$refs.reftable.clearSelection()
+        this.$refs.preTree.setCheckedKeys([])
       })
-      // TODO: 获取值
-      // this.$refs.reftable.toggleRowSelection(row, true)
     },
     rowClick(row) {
       this.$refs.reftable.toggleRowSelection(row)
@@ -456,29 +475,51 @@ export default {
       this.preIds = rows
     },
     submitPre() {
-      let ids = ''
-      this.preIds.forEach(n => {
-        ids = ids + n.Id
-      })
+      const ids = this.$refs.preTree.getCheckedKeys()
       this.$refs.editTable.setPermissionIds(ids)
       this.visible = false
     },
-    getPermissionData() {
-      const params = {
-        PageIndex: 1,
-        PageSize: 9999
+    getPermissionData(id) {
+      let methods, params
+      if ((id && id === '1326533864654508032') || (!id && this.userInfo.userroleid === '1326533864654508032')) {
+        methods = getPermission
+        params = {
+          PageIndex: 1,
+          PageSize: 9999
+        }
+      } else {
+        methods = getPermissionByRoleId
+        params = {
+          id: id
+        }
       }
-      getPermission(params).then(res => {
-        const data = res.Data.Models
+
+      this.perRowIds = []
+      methods(params).then(res => {
+        let data
+        // if (id === '1326533864654508032') {
+        //   data = res.Data.Models
+        // } else {
+        //   data = res.Data.permissions
+        // }
+        if ((id && id === '1326533864654508032') || (!id && this.userInfo.userroleid === '1326533864654508032')) {
+          data = res.Data.Models
+        } else {
+          data = res.Data.permissions
+        }
         data.forEach(n => {
           if (!n.ParentId) {
             n.ParentId = '0'
           }
-          // n.type = this.permissionType.find(e => e.value === n.Type).label
         })
         // 递归了
         const dgType = (arr) => {
           arr.forEach(n => {
+            if (id) {
+              this.perRowIds.push(n.Id)
+            } else {
+              this.perIds.push(n.Id)
+            }
             if (!n.ParentId) {
               n.ParentId = '0'
             }
@@ -489,7 +530,14 @@ export default {
           })
         }
         dgType(data)
-        this.preTreeData = data
+        if (id) {
+          this.$nextTick(() => {
+            this.$refs.preTree.setCheckedKeys([])
+            this.$refs.preTree.setCheckedKeys(this.perRowIds)
+          })
+        } else {
+          this.preTreeData = data
+        }
       }).catch((err) => {
         this.$message.error(err)
       })

@@ -94,7 +94,14 @@ export default {
       addressIn: '',
       lnglat: '',
       longitudeIn: '',
-      latitudeIn: ''
+      latitudeIn: '',
+      // 省市县名称和编码
+      province: '',
+      provincecode: '',
+      city: '',
+      citycode: '',
+      districe: '',
+      districeycode: ''
     }
   },
   computed: {
@@ -122,7 +129,7 @@ export default {
     /** *** 按钮点击 start ******/
     onSure() {
       this.map = null
-      this.$emit('onSure', this.addressIn, this.longitudeIn, this.latitudeIn)
+      this.$emit('onSure', this.addressIn, this.longitudeIn, this.latitudeIn, this.province, this.provincecode, this.city, this.citycode, this.districe, this.districeycode)
     },
     closeDialog() {
       this.map = null
@@ -250,6 +257,7 @@ export default {
         })
 
         AMap.event.addListener(placeSearch, 'selectChanged', (e) => {
+          console.log(e)
           const data = e.selected.data
           const location = e.selected.data.location
 
@@ -258,6 +266,13 @@ export default {
 
           that.longitudeIn = location.lng
           that.latitudeIn = location.lat
+
+          that.province = data.pname
+          that.provincecode = data.pcode
+          that.citycode = data.citycode
+          that.city = data.cityname
+          that.districe = data.adname
+          that.districeycode = data.adcode
 
           const searchCity = city.find(n => n.name.includes(data.cityname))
           if (searchCity) {

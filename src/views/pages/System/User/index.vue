@@ -28,9 +28,9 @@
       :pageSize="pageSize"
       :dics="dics"
       dialogWidth='800px'
-      has01="Company01"
-      has02="Company02"
-      has03="Company03"
+      has01="User01"
+      has02="User02"
+      has03="User03"
       :formStyle={width: '220px'}
       :showSelection="false"
       :showBatchDel="false"
@@ -46,9 +46,11 @@
       :columns="tableColumn")
       template(v-slot:operation="{row}")
         el-button(
+          v-has="'User05'"
           @click.stop="updateUserState(row)"
           size="small") 状态
         el-button(
+          v-has="'User04'"
           @click.stop="updateUserPsd(row)"
           size="small") 密码
     //- 设置弹窗 用于修改用户状态和密码

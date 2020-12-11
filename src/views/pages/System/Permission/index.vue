@@ -131,6 +131,7 @@ export default {
           prop: 'SortCode',
           label: '排序',
           editAble: true,
+          default: '0',
           inputFilter: "value=value.replace(/[^\\d]/g,'')"
         },
         {
