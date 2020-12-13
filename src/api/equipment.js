@@ -233,3 +233,48 @@ export function getTotalEqui(params) {
     params
   })
 }
+
+// 今日 报警 故障
+export function gettotalnum(params) {
+  return request({
+    url: '/api/monitor/faultandalarm/gettotalnum',
+    method: 'get',
+    params
+  })
+}
+
+// 设备状态曲线图 /
+export function getDevicestatus(params) {
+  return request({
+    url: '/api/monitor/devicestatuscurvefigure/get',
+    method: 'get',
+    params
+  })
+}
+
+// 设备健康指数
+export function getHealth(params) {
+  return request({
+    url: '/api/monitor/healthindex/get',
+    method: 'get',
+    params
+  })
+}
+
+// 设备报警原因
+export function getAlarmortest(params) {
+  return request({
+    url: '/api/monitor/alarmortest/set',
+    method: 'get',
+    params
+  })
+}
+
+// 今日故障或者报警
+export function getTodayfaultandalarm(params) {
+  return request({
+    url: '/api/monitor/todayfaultandalarm/get',
+    method: 'get',
+    params
+  })
+}

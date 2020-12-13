@@ -181,7 +181,8 @@ export default {
                 color: '#b8b7b7',
                 type: 'dotted'
               }
-            }
+            },
+            minInterval: 1
           }
         ],
         series: this.seriesData

@@ -202,7 +202,6 @@ const actions = {
       calleArr(routesRes, '', addRoutes)
       localStorage.setItem('addRoutes', JSON.stringify(addRoutes))
       commit('SET_ROUTES', addRoutes)
-      console.log(btns)
       commit('SET_BTNS', btns)
       resolve(state.routes)
     })

@@ -55,9 +55,9 @@ export default {
   components: { SidebarItem, Logo },
   data() {
     return {
-      shebeiNum: 1111,
-      todayalarm: 64,
-      todaygz: 5464
+      // shebeiNum: 1111,
+      // todayalarm: 64,
+      // todaygz: 5464
     }
   },
   computed: {
@@ -66,7 +66,7 @@ export default {
       'sidebar',
       'userInfo'
     ]),
-    ...mapState('user', ['equiNum']),
+    ...mapState('user', ['equiNum', 'todayalarm', 'todaygz']),
     activeMenu() {
       const route = this.$route
       const { meta, path } = route

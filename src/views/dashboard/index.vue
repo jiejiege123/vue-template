@@ -41,9 +41,10 @@
             el-select.equi-selcet(
               v-model="equiStatus"
               placeholder=""
+              @change="getEquiStatus"
               style="width: 70px")
-              el-option(label='天' value="day")
-              el-option(label='月' value="mouth")
+              el-option(label='天' :value="0")
+              el-option(label='月' :value="1")
         el-col(:span="8")
           //- 产品分类占比
           .charts-warp(style="width:100%; height: 350px")
@@ -73,7 +74,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import EquiStatusChart from '@/components/Charts/EquiStatusChart'
 import PaiChart from '@/components/Charts/PaiChart'
 // 傻逼一样的轮播图
@@ -86,6 +87,7 @@ import {
 } from 'swiper/swiper.esm'
 import getAwesomeSwiper from 'vue-awesome-swiper/dist/exporter'
 import { getSysMessage, getPercent } from '@/api/sys'
+import { getDevicestatus } from '@/api/equipment'
 SwiperClass.use([Pagination, Mousewheel, Autoplay])
 Vue.use(getAwesomeSwiper(SwiperClass))
 const { Swiper, SwiperSlide } = getAwesomeSwiper(SwiperClass)
@@ -100,7 +102,6 @@ export default {
   },
   filters: {
     filterEqui: (val) => {
-      console.log(this.sheOption)
       return this.sheOption.find(n => n.deviceType === val).pcColor
     }
   },
@@ -147,7 +148,7 @@ export default {
       colorListArea: ['#dcfff685', '#ffead485', '#ffddd285'],
 
       seriesData: [],
-      equiStatus: 'mouth',
+      equiStatus: 0,
       // 产品分类
       proColorList: [],
       protypeData: [],
@@ -159,11 +160,12 @@ export default {
   computed: {
     ...mapGetters([
       // 'roles'
-    ])
+    ]),
+    ...mapState('user', ['equiNum', 'todayalarm', 'todaygz'])
+
   },
   created() {
     this.getEquiStatus()
-    this.getProType()
     this.getAlarmData()
     this.getPercentData()
   },
@@ -185,154 +187,49 @@ export default {
       }
     },
     getEquiStatus() {
-      // 调用接口获取到data
-      const ydata = [
-        [23967, 42522, 36069, 49034, 37323, 47031, 38312],
-        [5396, 9203, 17672, 23384, 6711, 6045, 5841],
-        [3535, 14641, 14785, 28869, 20660, 22436, 28183]
-      ]
-      const seriesData = []
-      ydata.forEach((n, index) => {
-        seriesData.push({
-          smooth: true,
-          name: this.legend[index],
-          type: 'line',
-          // stack: '总量',
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [{
-                offset: 0, color: this.colorListArea[index] // 0% 处的颜色
-              }, {
-                offset: 0.6, color: '#ffe' // 100% 处的颜色
-              }],
-              global: false // 缺省为 false
-            }
-          },
-          data: n
+      getDevicestatus({ type: this.equiStatus }).then(res => {
+        const data = res.Data
+        const seriesData = [[], [], []]
+        const seriesDataAll = []
+        const xAxisData = []
+        data.forEach(n => {
+          xAxisData.push(n.Date)
+          seriesData[0].push(n.NormalNum)
+          seriesData[1].push(n.FaultNum)
+          seriesData[2].push(n.AlarmNum)
         })
+        seriesData.forEach((n, index) => {
+          seriesDataAll.push({
+            smooth: true,
+            name: this.legend[index],
+            type: 'line',
+            // stack: '总量',
+            areaStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [{
+                  offset: 0, color: this.colorListArea[index] // 0% 处的颜色
+                }, {
+                  offset: 0.6, color: '#ffe' // 100% 处的颜色
+                }],
+                global: false // 缺省为 false
+              }
+            },
+            data: seriesData[index]
+          })
+        })
+
+        this.seriesData = seriesDataAll
+        this.xAxisData = xAxisData
       })
-      this.seriesData = seriesData
     },
-    getProType() {
+    getProType(shebeiData) {
       var proData = {
-        'total': 40808,
-        'originalData': [
-          {
-            'name': '烟雾报警器',
-            'value': 1246,
-            'pcColor': '#58c08c'
-          },
-          {
-            'name': '燃气报警器',
-            'value': 153,
-            'pcColor': '#f59f5f'
-          },
-          {
-            'name': '消防水压表',
-            'value': 0,
-            'pcColor': '#e7b632'
-          },
-          {
-            'name': '电弧监测',
-            'value': 0,
-            'pcColor': '#99cc2b'
-          },
-          {
-            'name': '手动报警器',
-            'value': 364,
-            'pcColor': '#f2661e'
-          },
-          {
-            'name': '消火栓',
-            'value': 0,
-            'pcColor': '#e05959'
-          },
-          {
-            'name': '智慧用电',
-            'value': 0,
-            'pcColor': '#7d83f9'
-          },
-          {
-            'name': '声光报警器',
-            'value': 30,
-            'pcColor': '#31bbc7'
-          },
-          {
-            'name': '消防液位表',
-            'value': 0,
-            'pcColor': '#c7ce71'
-          },
-          {
-            'name': '温感报警器',
-            'value': 0,
-            'pcColor': '#05c974'
-          },
-          {
-            'name': '门磁',
-            'value': 38720,
-            'pcColor': '#5fa4f5'
-          },
-          {
-            'name': '热解粒子探测器',
-            'value': 0,
-            'pcColor': '#6c73ff'
-          },
-          {
-            'name': '电气火灾',
-            'value': 0,
-            'pcColor': '#dbd41c'
-          },
-          {
-            'name': '水浸',
-            'value': 60,
-            'pcColor': '#b358c0'
-          },
-          {
-            'name': '报警主机',
-            'value': 0,
-            'pcColor': '#7bbed2'
-          },
-          {
-            'name': '红外报警器',
-            'value': 235,
-            'pcColor': '#de8baf'
-          },
-          {
-            'name': '摄像机',
-            'value': 0,
-            'pcColor': '#c287fa'
-          },
-          {
-            'name': '一氧化碳',
-            'value': 0,
-            'pcColor': '#2698da'
-          },
-          {
-            'name': '用户传输装置',
-            'value': 0,
-            'pcColor': '#1ac67b'
-          },
-          {
-            'name': '报警器',
-            'value': 0,
-            'pcColor': '#ffc45d'
-          },
-          {
-            'name': 'NB/433网关',
-            'value': 0,
-            'pcColor': ''
-          },
-          {
-            'name': '吸烟报警器',
-            'value': 0,
-            'pcColor': '#168fff'
-          }
-        ]
+        'total': this.equiNum
       }
       const colorList = []
       const protypeData = [
@@ -374,11 +271,13 @@ export default {
       ]
 
       const serData = []
-      proData.originalData.forEach(n => {
-        colorList.push(n.pcColor)
+
+      shebeiData.forEach(n => {
+        const pcColor = this.sheOption.find(e => e.deviceType === n.DeviceName).pcColor
+        colorList.push(pcColor)
         serData.push({
-          value: n.value,
-          name: n.name
+          value: n.Quantity,
+          name: n.DeviceName
         })
       })
       this.proColorList = colorList
@@ -393,7 +292,6 @@ export default {
       }
       this.alarmList = []
       getSysMessage(params).then(res => {
-        // console.log(res)
         this.alarmList = res.Data.Models
       }).catch(err => {
         console.error(err)
@@ -408,7 +306,7 @@ export default {
     getPercentData() {
       getPercent().then(res => {
         this.shebeiData = res.Data.Items
-        console.log(this.shebeiData)
+        this.getProType(this.shebeiData)
       })
     }
   }

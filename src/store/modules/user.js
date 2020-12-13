@@ -1,6 +1,6 @@
 // import { login, logout, getInfo, getRouter } from '@/api/user'
 import { login, logout } from '@/api/user'
-import { getTotalEqui } from '@/api/equipment'
+import { getTotalEqui, gettotalnum } from '@/api/equipment'
 import { getPermissionByRoleId } from '@/api/com'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 // import router, { resetRouter } from '@/router'
@@ -13,7 +13,9 @@ const state = {
   introduction: '',
   roles: '',
   routers: [],
-  equiNum: ''
+  equiNum: '',
+  todayalarm: '',
+  todaygz: ''
 
 }
 
@@ -41,6 +43,12 @@ const mutations = {
   },
   SET_EQUINUM: (state, equiNum) => {
     state.equiNum = equiNum
+  },
+  SET_FaultNum: (state, num) => {
+    state.todaygz = num
+  },
+  SET_AlarmNum: (state, num) => {
+    state.todayalarm = num
   }
 }
 
@@ -166,6 +174,18 @@ const actions = {
     return new Promise((resolve, reject) => {
       getTotalEqui().then(res => {
         commit('SET_EQUINUM', res.Data)
+        resolve()
+      }).catch(err => {
+        console.error(err)
+        reject(err)
+      })
+    })
+  },
+  gettotalnum({ commit }) {
+    return new Promise((resolve, reject) => {
+      gettotalnum().then(res => {
+        commit('SET_FaultNum', res.Data.FaultNum)
+        commit('SET_AlarmNum', res.Data.AlarmNum)
         resolve()
       }).catch(err => {
         console.error(err)

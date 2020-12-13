@@ -54,6 +54,7 @@ router.beforeEach(async(to, from, next) => {
 
           const toPath = localStorage.getItem('router')
           await store.dispatch('user/getTotalEqui') // 侧边栏统计数据
+          await store.dispatch('user/gettotalnum') // 侧边栏统计数据
           next({ path: toPath || '/' })
           NProgress.done()
           // next({ ...to, replace: true })

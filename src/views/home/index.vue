@@ -65,16 +65,16 @@
         .layout-row__between
           .layout-column
             .handle-title 今日报警
-            .alarm-color {{ alarmInfo.todayAlarm }}起
+            .alarm-color {{ todayfaultandalarm.AlarmNum }}起
           .layout-column
-            .handle-title 已处理({{ alarmInfo.handleAlarmB }}%)
-            .alarm-color {{ alarmInfo.handleAlarm }}起
+            .handle-title 已处理({{ todayfaultandalarm.AlarmBen}}%)
+            .alarm-color {{ todayfaultandalarm.AlarmProcessedNum }}起
           .layout-column
             .handle-title 今日故障
-            .false-color {{ alarmInfo.todayFalse }}起
+            .false-color {{ todayfaultandalarm.FaultNum }}起
           .layout-column
-            .handle-title 已处理({{ alarmInfo.handleFalseB }}%)
-            .false-color {{ alarmInfo.handleFalse }}起
+            .handle-title 已处理({{ todayfaultandalarm.FaultBen}}%)
+            .false-color {{ todayfaultandalarm.FaultProcessedNum }}起
       .handle-list.flex1.layout-row__around
         .alarm-list.layout-column(style="width:49%")
           .title 未处理报警
@@ -141,9 +141,14 @@
 import TodayStatusChart from '@/components/Charts/TodayStatusChart'
 import MouthStatusChart from '@/components/Charts/MouthStatusChart'
 import PaiChart from '@/components/Charts/PaiChart'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
-import { getLefttopdata } from '@/api/sys'
+import { getLefttopdata, getPercent } from '@/api/sys'
+import {
+  getHealth,
+  getDevicestatus,
+  // getAlarmortest,
+  getTodayfaultandalarm } from '@/api/equipment'
 
 export default {
   name: 'Home',
@@ -230,7 +235,7 @@ export default {
           id: '123444'
         },
         {
-          address: '某某某某地方啊啊啊啊',
+          address: '某某某某地方啊asdfasdfasfd啊啊啊',
           id: '123444'
         },
         {
@@ -246,6 +251,7 @@ export default {
           id: '123444'
         }
       ],
+      todayfaultandalarm: {},
       // 每日设备状态
       // 设备状态
       lineGrid: {
@@ -328,26 +334,30 @@ export default {
         }
       },
       alarmColorList: [],
-      alarmtypeData: []
+      alarmtypeData: [],
+      sheOption: require('@/assets/equi.json')
     }
   },
   computed: {
-    ...mapGetters(['sysInfo', 'userInfo'])
+    ...mapGetters(['sysInfo', 'userInfo']),
+    ...mapState('user', ['equiNum', 'todayalarm', 'todaygz'])
   },
   created() {
     // 获取设备数据
     this.getLefttopData()
     this.nowTimes()
-    // 获取饼状图数据
+    // 设备健康指数
     this.getEquiHealthy()
     // 每日设备状态
     this.getEquiStatus()
     // 每月设备状态
     this.getMouthEquiStatus()
     // 产品分类占比
-    this.getProType()
+    this.getPercentData()
     // 设备报警原因
     this.getAlarmReason()
+    // 今日报警故障
+    this.getTodayfaultandalarmData()
   },
   methods: {
     timeFormate(timeStamp) {
@@ -403,212 +413,111 @@ export default {
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     },
     getEquiHealthy() {
-      const protypeData = [
-        {
-          name: '设备健康指数',
-          type: 'pie',
-          radius: ['32%', '52%'],
-          // avoidLabelOverlap: false,
-          label: {
-            show: true,
-            formatter: `{b}: \n{c} ({d}%)`,
-            color: '#999'
+      getHealth().then(res => {
+        const data = res.Data
+        const protypeData = [
+          {
+            name: '设备健康指数',
+            type: 'pie',
+            radius: ['32%', '52%'],
+            // avoidLabelOverlap: false,
+            label: {
+              show: true,
+              formatter: `{b}: \n{c} ({d}%)`,
+              color: '#999'
             // rotate: 45
-          },
-          labelLine: {
-            show: true
-          },
-          data: [
-            {
-              value: 9058,
-              name: '正常'
             },
-            {
-              value: 55,
-              name: '故障'
-            }
-          ]
-        }
-      ]
+            labelLine: {
+              show: true
+            },
+            data: [
+              {
+                value: data.NormalNum,
+                name: '正常'
+              },
+              {
+                value: data.FaultNum,
+                name: '故障'
+              }
+            ]
+          }
+        ]
 
-      this.healthytypeData = protypeData
+        this.healthytypeData = protypeData
+      })
     },
+
     getEquiStatus() {
-      // 调用接口获取到data
-      const ydata = [
-        [16387, 16841, 16483, 16255, 16283, 16457, 16526],
-        [1554, 1554, 1555, 1555, 1553, 1552, 1551],
-        [7560, 7606, 7623, 7645, 7616, 7936, 7831]
-      ]
-      const seriesData = []
-      ydata.forEach((n, index) => {
-        seriesData.push({
-          smooth: true,
-          name: this.legend[index],
-          type: 'line',
-          showSymbol: false,
-          // stack: '总量',
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                {
-                  offset: 0,
-                  color: this.colorListArea[index] // 0% 处的颜色
+      getDevicestatus({ type: 0 }).then(res => {
+        const data = res.Data
+        const seriesData = [[], [], []]
+        const seriesDataAll = []
+        const xAxisData = []
+        data.forEach(n => {
+          xAxisData.push(n.Date)
+          seriesData[0].push(n.NormalNum)
+          seriesData[1].push(n.FaultNum)
+          seriesData[2].push(n.AlarmNum)
+        })
+        seriesData.forEach((n, index) => {
+          seriesDataAll.push({
+            smooth: true,
+            name: this.legend[index],
+            type: 'line',
+            // stack: '总量',
+            areaStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [{
+                  offset: 0, color: this.colorListArea[index] // 0% 处的颜色
                 },
                 {
                   offset: 1,
                   color: '#00000000' // 100% 处的颜色
-                }
-              ],
-              global: false // 缺省为 false
-            }
-          },
-          data: n
+                }],
+                global: false // 缺省为 false
+              }
+            },
+            data: seriesData[index]
+          })
         })
+
+        this.seriesData = seriesDataAll
+        this.xAxisData = xAxisData
       })
-      this.seriesData = seriesData
     },
     getMouthEquiStatus() {
-      // 调用接口获取到data
-      const ydata = [
-        [17514, 20796, 18501, 18361, 16454],
-        [4326, 5770, 1704, 1563, 1552],
-        [4126, 7236, 5484, 5913, 7939]
-      ]
-      const seriesData = []
-      ydata.forEach((n, index) => {
-        seriesData.push({
-          name: this.legend[index],
-          type: 'bar',
-          barGap: 0,
-          barWidth: 12,
-          // stack: '总量',
-          data: n
+      getDevicestatus({ type: 1 }).then(res => {
+        const data = res.Data
+        const seriesData = [[], [], []]
+        const seriesDataAll = []
+        const xAxisData = []
+        data.forEach(n => {
+          xAxisData.push(n.Date)
+          seriesData[0].push(n.NormalNum)
+          seriesData[1].push(n.FaultNum)
+          seriesData[2].push(n.AlarmNum)
         })
+        seriesData.forEach((n, index) => {
+          seriesDataAll.push({
+            name: this.legend[index],
+            type: 'bar',
+            barGap: 0,
+            barWidth: 12,
+            // stack: '总量',
+            data: seriesData[index]
+          })
+        })
+
+        this.seriesBarData = seriesDataAll
+        this.barTitleXAxisData = xAxisData
       })
-      this.seriesBarData = seriesData
     },
-    getProType() {
-      var proData = {
-        'total': 40808,
-        'originalData': [
-          {
-            'name': '烟雾报警器',
-            'value': 1246,
-            'pcColor': '#58c08c'
-          },
-          {
-            'name': '燃气报警器',
-            'value': 153,
-            'pcColor': '#f59f5f'
-          },
-          {
-            'name': '消防水压表',
-            'value': 0,
-            'pcColor': '#e7b632'
-          },
-          {
-            'name': '电弧监测',
-            'value': 0,
-            'pcColor': '#99cc2b'
-          },
-          {
-            'name': '手动报警器',
-            'value': 364,
-            'pcColor': '#f2661e'
-          },
-          {
-            'name': '消火栓',
-            'value': 0,
-            'pcColor': '#e05959'
-          },
-          {
-            'name': '智慧用电',
-            'value': 0,
-            'pcColor': '#7d83f9'
-          },
-          {
-            'name': '声光报警器',
-            'value': 30,
-            'pcColor': '#31bbc7'
-          },
-          {
-            'name': '消防液位表',
-            'value': 0,
-            'pcColor': '#c7ce71'
-          },
-          {
-            'name': '温感报警器',
-            'value': 0,
-            'pcColor': '#05c974'
-          },
-          {
-            'name': '门磁',
-            'value': 38720,
-            'pcColor': '#5fa4f5'
-          },
-          {
-            'name': '热解粒子探测器',
-            'value': 0,
-            'pcColor': '#6c73ff'
-          },
-          {
-            'name': '电气火灾',
-            'value': 0,
-            'pcColor': '#dbd41c'
-          },
-          {
-            'name': '水浸',
-            'value': 60,
-            'pcColor': '#b358c0'
-          },
-          {
-            'name': '报警主机',
-            'value': 0,
-            'pcColor': '#7bbed2'
-          },
-          {
-            'name': '红外报警器',
-            'value': 235,
-            'pcColor': '#de8baf'
-          },
-          {
-            'name': '摄像机',
-            'value': 0,
-            'pcColor': '#c287fa'
-          },
-          {
-            'name': '一氧化碳',
-            'value': 0,
-            'pcColor': '#2698da'
-          },
-          {
-            'name': '用户传输装置',
-            'value': 0,
-            'pcColor': '#1ac67b'
-          },
-          {
-            'name': '报警器',
-            'value': 0,
-            'pcColor': '#ffc45d'
-          },
-          {
-            'name': 'NB/433网关',
-            'value': 0,
-            'pcColor': ''
-          },
-          {
-            'name': '吸烟报警器',
-            'value': 0,
-            'pcColor': '#168fff'
-          }
-        ]
-      }
+    getProType(shebeiData) {
       const colorList = []
       const protypeData = [
         {
@@ -631,16 +540,23 @@ export default {
       ]
 
       const serData = []
-      proData.originalData.forEach(n => {
-        colorList.push(n.pcColor)
+      shebeiData.forEach(n => {
+        const pcColor = this.sheOption.find(e => e.deviceType === n.DeviceName).pcColor
+        colorList.push(pcColor)
         serData.push({
-          value: n.value === 0 ? null : n.value,
-          name: n.name
+          value: n.Quantity,
+          name: n.DeviceName
         })
       })
       this.proColorList = colorList
       protypeData[0].data = serData
       this.protypeData = protypeData
+    },
+    getPercentData() {
+      getPercent().then(res => {
+        // this.shebeiData = res.Data.Items
+        this.getProType(res.Data.Items)
+      })
     },
     getAlarmReason() {
       var proData = {
@@ -701,8 +617,18 @@ export default {
     },
     getLefttopData() {
       getLefttopdata().then(res => {
-        // console.log(res)
         this.equiData = res.Data
+      })
+    },
+    getTodayfaultandalarmData() {
+      getTodayfaultandalarm().then(res => {
+        console.log(res)
+        const data = res.Data
+        data.FaultBen = parseInt(data.FaultProcessedNum / data.FaultNum * 100) || 0
+        data.AlarmBen = parseInt(data.AlarmProcessedNum / data.AlarmNum * 100) || 0
+        this.todayfaultandalarm = data
+        this.handleAlarm = data.AlarmEventList
+        this.handleFalse = data.FaultList
       })
     }
   }
@@ -835,12 +761,18 @@ export default {
         .handle-item {
           // line-height: 40px;
           font-size: 14px;
+          padding: 10px;
           padding-left: 10px;
           padding-right: 20px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           cursor: pointer;
+          &:hover{
+            color: #b3dcec;
+            cursor: pointer;
+            background: rgba(95,164,245,.2);
+          }
         }
       }
     }
