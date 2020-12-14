@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-03 15:12:58
- * @LastEditTime: 2020-11-12 14:19:10
+ * @LastEditTime: 2020-12-14 19:24:21
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\components\EditTableForm\index.vue
@@ -14,6 +14,8 @@
     v-loading="dialogLoading"
     @open="open('ruleForm')"
     :close-on-click-modal="false"
+    @close="closeDialog"
+
     :append-to-body="true")
     div.bufang-content
       div.title 1、一键布防将对该建筑物下所有安装点进行布防，确认后将重置建筑物下所有安装点布防状态。
@@ -107,6 +109,9 @@ export default {
         })
       })
       this.$emit('onArmed', TimeRanges)
+    },
+    closeDialog() {
+      this.$emit('onCloseDialog')
     }
   }
 }

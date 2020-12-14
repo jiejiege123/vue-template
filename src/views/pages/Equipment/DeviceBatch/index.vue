@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-13 12:46:01
+ * @LastEditTime: 2020-12-14 15:37:48
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\User\index.vue
@@ -38,8 +38,8 @@
     :showEdit='false'
     :showAdd="false"
     :showView="false"
-    :showSelection="false"
-    :showBatchDel="false"
+    :showSelection="true"
+    :showBatchDel="true"
     :showIndex='true'
     :cellClassName="cellClassName"
     @onHandleCurrentChange="handleCurrentChange"
@@ -111,7 +111,7 @@
 <script >
 import Query from '@/components/Query'
 import EditTableForm from '@/components/EditTableForm'
-import { getPiciList, updatePici, addPici, delPici } from '@/api/equipment'
+import { getPiciList, updatePici, addPici, delPici, batchDelPici } from '@/api/equipment'
 import { parseTime } from '@/utils/index'
 import { mapGetters } from 'vuex'
 export default {
@@ -304,10 +304,21 @@ export default {
       })
     },
     onDeleted(row) {
-      const params = {
-        piciid: row.piciid
+      let methods, params
+      if (Array.isArray(row)) {
+        methods = batchDelPici
+        const rows = []
+        row.forEach(n => {
+          rows.push(n.piciid)
+        })
+        params = rows
+      } else {
+        methods = delPici
+        params = {
+          piciid: row.piciid
+        }
       }
-      delPici(params).then(res => {
+      methods(params).then(res => {
         this.$message({
           type: 'success',
           message: '删除成功!'
@@ -322,10 +333,11 @@ export default {
       this.preTitle = '添加批次'
     },
     editRow(row) {
-      const pici = row.pici.split('-')
-      console.log(pici)
+      // this.ruleForm = Object.assign({}, row)
+      const pici = row.piciname.split('-')
       this.ruleForm.date = pici[1]
       this.ruleForm.index = pici[2]
+      this.ruleForm.piciid = row.piciid
       this.visible = true
       this.preTitle = '修改批次'
     },

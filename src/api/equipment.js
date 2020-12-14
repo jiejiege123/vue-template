@@ -169,6 +169,13 @@ export function delPici(params) {
   })
 }
 
+export function batchDelPici(data) {
+  return request({
+    url: '/api/batchno/batch/delete',
+    method: 'post',
+    data
+  })
+}
 // 型号管理
 export function getModelList(data) {
   return request({

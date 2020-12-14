@@ -2,11 +2,10 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-01 16:37:15
- * @LastEditTime: 2019-11-11 17:39:58
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-14 19:20:51
+ * @LastEditors: zzz
  */
 import request from '@/utils/request'
-import qs from 'qs'
 
 // 获取缴费系统组织机构
 export function getComCodelist(params) {
@@ -88,27 +87,35 @@ export function getComUselist(params) {
 }
 
 // 开票信息列表
-export function getInvoiceList(params) {
+export function getInvoiceList(data) {
   return request({
-    url: '/Com/Rmb/GetInvoiceList',
-    method: 'get',
-    params
+    url: '/api/kaipiao/search',
+    method: 'post',
+    data
   })
 }
 
 // 添加开票信息
 export function addInvoice(data) {
   return request({
-    url: '/Com/Rmb/AddInvoice',
+    url: '/api/kaipiao/add',
     method: 'post',
     data
   })
 }
 
 // 删除开票信息
-export function delInvoice(data) {
+export function delInvoice(params) {
   return request({
-    url: '/Com/Rmb/DelInvoice',
+    url: '/api/kaipiao/delete',
+    method: 'get',
+    params
+  })
+}
+
+export function batchDelInvoice(data) {
+  return request({
+    url: '/api/kaipiao/batch/delete',
     method: 'post',
     data
   })
@@ -117,25 +124,25 @@ export function delInvoice(data) {
 // 编辑开票信息
 export function editInvoice(data) {
   return request({
-    url: '/Com/Rmb/EditInvoice',
+    url: '/api/kaipiao/update',
     method: 'post',
     data
   })
 }
 
 // 快递信息列表
-export function getExpressList(params) {
+export function getExpressList(data) {
   return request({
-    url: '/Com/Rmb/GetExpressList',
-    method: 'get',
-    params
+    url: '/api/express/search',
+    method: 'post',
+    data
   })
 }
 
 // 快递信息列表
 export function addExpress(data) {
   return request({
-    url: '/Com/Rmb/AddExpress',
+    url: '/api/express/add',
     method: 'post',
     data
   })
@@ -144,18 +151,26 @@ export function addExpress(data) {
 // 快递信息列表
 export function editExpress(data) {
   return request({
-    url: '/Com/Rmb/EditExpress',
+    url: '/api/express/update',
     method: 'post',
     data
   })
 }
 
 // 快递信息列表
-export function delExpress(data) {
+export function batchDelExpress(data) {
   return request({
-    url: '/Com/Rmb/DelExpress',
+    url: '/api/express/batch/delete',
     method: 'post',
     data
+  })
+}
+
+export function delExpress(params) {
+  return request({
+    url: '/api/express/delete',
+    method: 'get',
+    params
   })
 }
 

@@ -228,7 +228,7 @@ export default {
       title: '',
       visible: false,
       dialogWidth: '600px',
-      dialogType: 'add',
+      dialogType: '',
       labelWidth: '120px',
       comData: [],
       oldComData: [],
@@ -317,7 +317,7 @@ export default {
       const params = Object.assign({}, ruleForm)
       this.formLoading = true
       let methods
-      if (this.dialogType === 'add') {
+      if (dialogType === 'add') {
         methods = addAlarmuser
       } else {
         methods = updateAlarmuser
@@ -325,6 +325,7 @@ export default {
       params.comname = this.oldComData.find(n => n.comcode === params.comcode).comname
       methods(params).then(res => {
         this.formLoading = false
+        this.$message.success('操作成功')
         this.getDataList()
         cb(true)
       }).catch((err) => {
@@ -409,12 +410,13 @@ export default {
     },
     closeDialog() {
       this.ruleForm = {}
+      this.dialogType = ''
       this.visible = false
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.onSubmitForm(this.ruleForm, 'add', (pd) => {
+          this.onSubmitForm(this.ruleForm, this.dialogType, (pd) => {
             if (pd) {
               this.visible = false
             }
@@ -434,7 +436,7 @@ export default {
         } else {
           tip = '关闭电话接收，此联系人将无法收到平台发出的报警或故障电话，请您知晓该操作带来的影响？'
         }
-      } else if (prop === 'issmsnotice') {
+      } else if (prop === 'isgzhnotice') {
         if (e) {
           tip = '开启公众号通知，此联系人可通过微信端收到平台发出的报警或故障消息通知，请您确保关注微信公众号“消防物联网云平台”，并至少登录过一次微信小程序“消防物联网云助手”。'
         } else {
@@ -460,9 +462,8 @@ export default {
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: '已取消删除'
+          message: '已取消'
         })
-        // e = !e
         row[prop] = !e
       })
     }

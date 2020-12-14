@@ -28,6 +28,10 @@ export default {
     height: {
       type: String,
       default: '200px'
+    },
+    data: {
+      type: String,
+      default: '1.5'
     }
   },
   data() {
@@ -54,7 +58,7 @@ export default {
           left: '3%',
           right: '3%',
           bottom: '4%',
-          top: '4%',
+          top: '10%',
           containLabel: true
         },
         tooltip: {
@@ -65,12 +69,13 @@ export default {
           {
             name: '电压',
             type: 'gauge',
-            radius: '50%',
+            center: ['50%', '65%'],
+            radius: '90%',
             min: 0,
-            max: 7,
+            max: 5,
             startAngle: 180,
             endAngle: 0,
-            splitNumber: 7,
+            splitNumber: 5,
             axisLine: { // 坐标轴线
               lineStyle: { // 属性lineStyle控制线条样式
                 width: 2
@@ -99,7 +104,7 @@ export default {
               // 其余属性默认使用全局文本样式，详见TEXTSTYLE
               // fontWeight: 'bolder'
             },
-            data: [{ value: 1.5, name: 'V' }]
+            data: [{ value: this.data, name: 'V' }]
           }
         ]
       })

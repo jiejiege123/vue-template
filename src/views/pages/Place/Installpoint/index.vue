@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-12-09 17:47:02
+ * @LastEditTime: 2020-12-14 19:24:38
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -117,7 +117,7 @@ div(style="width:100%; height:100%")
     //- 布防弹出
     armed-dialog(
       :dialogVisible="dialogVisibleArmed" :dialogLoading="dialogLoadingArmed"
-      @onArmed="submitFormArmed")
+      @onArmed="submitFormArmed" @onCloseDialog="dialogVisibleArmed = false")
 </template>
 <script >
 import Query from '@/components/Query'

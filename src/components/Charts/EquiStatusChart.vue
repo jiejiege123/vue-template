@@ -156,7 +156,9 @@ export default {
                 color: '#b8b7b7',
                 type: 'dashed'
               }
-            }
+            },
+            minInterval: 1
+
           }
         ],
         series: this.seriesData

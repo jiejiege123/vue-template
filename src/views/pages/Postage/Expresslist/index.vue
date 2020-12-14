@@ -2,8 +2,8 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-17 23:54:33
- * @LastEditTime: 2019-12-12 16:32:23
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-14 19:01:24
+ * @LastEditors: zzz
  -->
 <template lang="pug">
 .index.layout-column
@@ -12,7 +12,7 @@
       el-input.input-search(placeholder='请输入关键字' v-model='search' size="small" clearable @clear="getDataList")
         el-button(slot="append" icon="el-icon-search" type="primary" size="small" @click="doSearch")
     .operate
-      el-button(v-if="userInfo.UserType === 'Company'" type="primary" size="small" @click='showDialog') 添加
+      el-button(v-has="'Expresslist01'" type="primary" size="small" @click='showDialog') 添加
 
   .table-warp.flex1.layout-column
     el-table.flex1(
@@ -27,7 +27,7 @@
       :cell-class-name="cellClassName"
       empty-text="没有数据")
       el-table-column(label="#" align="center" type="index" :index="indexMethod")
-      el-table-column(v-if="userInfo.UserType === 'Admin'" label="企业名称" align="left" prop="comname" width="150px")
+      el-table-column(label="企业名称" align="left" prop="comname" width="150px")
       el-table-column(
         v-for="(item,index) in tableColumn" :key="index"
         :prop="item.prop"
@@ -43,7 +43,7 @@
           span.name(v-if="item.prop === 'QF000Zh'" @click="viewRow(scope.row)") {{scope.row[item.prop]}}
 
           span(v-else) {{scope.row[item.prop]}}
-      el-table-column(v-if="userInfo.UserType === 'Company'" label="操作" align="center" width="150")
+      el-table-column(label="操作" align="center" width="150")
         template(slot-scope='scope')
           el-button(
             type="primary"
@@ -277,8 +277,8 @@ export default {
     }
   },
   created() {
-    // this.getDataList()
-    this.getDicsDataList()
+    this.getDataList()
+    // this.getDicsDataList()
   },
   mounted() {
 

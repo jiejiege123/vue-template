@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-02 14:47:25
- * @LastEditTime: 2020-11-20 10:02:36
+ * @LastEditTime: 2020-12-14 11:29:53
  * @LastEditors: zzz
  * @Description: In User Settings Edit
  * @FilePath: \bpsp-uie:\doit\vue admin\vue-template\src\views\pages\System\Companys\index.vue
@@ -25,30 +25,30 @@
             div.zifei-content-item
               span 账户短信剩余
               span.num  {{ ruleForm.zhmsg || 0 }}
-              sapn  条
+              span  条
             div.zifei-content-item
               span 当前设备已使用
               span.num  {{ ruleForm.zhmsg || 0 }}
-              sapn  条
+              span  条
             div.zifei-content-item
               span 当前设备剩余
               span.num  {{ ruleForm.zhmsg || 0 }}
-              sapn  条
+              span  条
         div.layout-row
           .zifei-title 语音信息
           .zifei-content.layout-column
             div.zifei-content-item
               span 账户语言剩余
               span.num  {{ ruleForm.zhmsg || 0 }}
-              sapn  条
+              span  条
             div.zifei-content-item
               span 当前设备已使用
               span.num  {{ ruleForm.zhmsg || 0 }}
-              sapn  条
+              span  条
             div.zifei-content-item
               span 当前设备剩余
               span.num  {{ ruleForm.zhmsg || 0 }}
-              sapn  条
+              span  条
       //- div 短信信息 账户短信剩余 当前设备已使用 当前设备剩余
     el-card.box-card.mb_10
       div.clr_b2(slot="header") 设备信息
@@ -77,23 +77,29 @@
         :model='ruleForm'
         ref='ruleForm'
         label-width='120px')
-        .layout-row.flex-wrap
-          div.card-form(style="width: 360px")
+        .layout-row__around.flex-wrap
+          div.card-form(style="")
             el-form-item(
-               v-if="ruleForm.devicetype === 11"
+              v-if="ruleForm.devicetype === 11"
               prop='menciType'
               label="门磁状态")
               span {{ruleForm.menciType}}
-          div.card-form(style="width: 360px")
+          div.card-form(style="")
             el-form-item(
               prop='xinhaozh'
               label="信号强度")
               span {{ruleForm.xinhaozh}}
-          div.card-form(style="width: 360px")
+          div.card-form(style="")
             el-form-item(
               prop='dianya'
               label="电池电压")
               span {{ruleForm.dianya}}V
+          div.card-form(style="")
+            el-form-item(
+              prop='protectvaluezh'
+              label="布防状态")
+              span {{ruleForm.protectvaluezh}}
+
     //- 型号强度
     el-radio-group.mb_10(v-model="radio1")
       el-radio-button(label="信号强度")
@@ -104,12 +110,13 @@
           el-card.box-card.mb_10.chart-warp(style="height: 320px")
             div.clr_b2(slot="header") {{radio1}}
             //- 数据开始了
-            msg-chart(id="msg-chart" width="100%" height="100%")
+            msg-chart(v-if="radio1 === '信号强度'" id="msg-chart" width="100%" height="100%")
+            voltage-chart(v-else id="vol-chart" width="100%" height="100%" :data="parseFloat(ruleForm.dianya) + ''")
         el-col(:span="16")
           el-card.box-card.mb_10.chart-warp
             div.clr_b2(slot="header") {{radio1}}
             //- 数据开始了
-            msg-Line-chart(id="msg-line-chart" width="100%" height="100%")
+            msg-line-chart(id="msg-line-chart" width="100%" height="100%")
     .layout-column(style="height: 100%")
       .header.layout-row__between
         .query
@@ -160,6 +167,8 @@ import { getEquiByid } from '@/api/equipment'
 // import { getDicsByName } from '@/api/commom'
 import MsgChart from '@/components/Charts/MsgChart'
 import MsgLineChart from '@/components/Charts/MsgLineChart'
+import VoltageChart from '@/components/Charts/VoltageChart'
+import VoltageLineChart from '@/components/Charts/VoltageLineChart'
 // import { checkPhone } from '@/utils/index'
 import BuySome from '@/components/BuySome'
 import { mapGetters } from 'vuex'
@@ -171,6 +180,8 @@ export default {
     MsgChart,
     MsgLineChart,
     MapDialog,
+    VoltageChart,
+    VoltageLineChart,
     BuySome
   },
   filters: {
@@ -440,13 +451,13 @@ export default {
           this.loading = false
         })
         const data = res.Data
-
+        console.log(data)
         this.ruleForm = data
         // TODO: 测试 设置地址 经纬度
 
-        this.$set(this.ruleForm, 'dwaddress', '四川省成都市武侯区益州大道中段1800号')
-        this.$set(this.ruleForm, 'latitude', '30.538572')
-        this.$set(this.ruleForm, 'longitude', '104.056046')
+        // this.$set(this.ruleForm, 'dwaddress', '四川省成都市武侯区益州大道中段1800号')
+        // this.$set(this.ruleForm, 'latitude', '30.538572')
+        // this.$set(this.ruleForm, 'longitude', '104.056046')
       }).catch((err) => {
         this.$message.error(err)
         this.loading = false
