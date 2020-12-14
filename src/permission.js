@@ -38,26 +38,26 @@ router.beforeEach(async(to, from, next) => {
     } else {
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
+      console.log(hasRoles)
       if (hasRoles) {
         next()
         NProgress.done()
       } else {
         try {
-          // get user info
-          // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          const { userroleid } = await store.dispatch('user/getInfo') // 用户信息里面就包含了 用户角色
-          const routesRes = await store.dispatch('user/getRouters', userroleid)
+          // const { userroleid } = await store.dispatch('user/getInfo') // 用户信息里面就包含了 用户角色
+          const userInfo = await store.dispatch('user/getInfo') // 用户信息里面就包含了 用户角色
+          const routesRes = await store.dispatch('user/getRouters', userInfo.userroleid)
           const accessRoutes = await store.dispatch('permission/generateRoutes', routesRes) // 根据角色 去获取菜单和按钮权限
-          // dynamically add accessible routes
+
           router.addRoutes(accessRoutes)
           router.options.routes = accessRoutes
 
           const toPath = localStorage.getItem('router')
           await store.dispatch('user/getTotalEqui') // 侧边栏统计数据
           await store.dispatch('user/gettotalnum') // 侧边栏统计数据
+          await store.dispatch('user/getInfo')
           next({ path: toPath || '/' })
           NProgress.done()
-          // next({ ...to, replace: true })
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')

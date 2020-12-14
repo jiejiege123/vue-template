@@ -25,7 +25,7 @@ div(style="width:100%; height:100%")
       has02="Company02"
       has03="Company03"
       :formStyle={width: '220px'}
-      :showAdd="true"
+      :showAdd="showAdd"
       :showView="false"
       :showEdit="false"
       :showDel="false"
@@ -121,11 +121,15 @@ div(style="width:100%; height:100%")
           v-if="rowStatus === 'add'"
           prop='IMEI'
           label="IMEI")
-          el-autocomplete(
+          //- el-autocomplete(
+          //-   style="width: 400px"
+          //-   v-model='ruleForm.IMEI'
+          //-   :fetch-suggestions="querySearchAsync"
+          //-   @select="handleSelectIMEI"
+          //-   placeholder="请输入要添加的IMEI号")
+          el-input(
             style="width: 400px"
             v-model='ruleForm.IMEI'
-            :fetch-suggestions="querySearchAsync"
-            @select="handleSelectIMEI"
             placeholder="请输入要添加的IMEI号")
         el-form-item(
           v-if="rowStatus === 'guohu'"
@@ -271,7 +275,8 @@ import {
   setModeEqui,
   exportEqui,
   getEquiFalseList,
-  getEquiAlarmList
+  getEquiAlarmList,
+  imeiAddEqui
   // addEquiByImei
   // importEqui
 } from '@/api/equipment.js'
@@ -310,6 +315,7 @@ export default {
        * 查询
        */
       input: '',
+      showAdd: false,
       queryList: [
         {
           label: 'IMEI',
@@ -648,6 +654,8 @@ export default {
 
     this.getDicsList()
     this.onSearch({ CompanyLimit: 0 })
+
+    this.showAdd = !!(this.userInfo.comtype === 1 || this.userInfo.comtype === 6)
   },
   activated() {
     // 保持半缓存
@@ -819,7 +827,7 @@ export default {
       }
     },
     addRow() {
-      this.dialogTitle = '新增'
+      this.dialogTitle = '添加'
       this.rowStatus = 'add'
       this.dialogVisible = true
       this.ruleForm = {}
@@ -990,8 +998,14 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          console.log(this.rowStatus, this.dialogType)
           if (this.rowStatus === 'add') {
-            // TODO: 调用的是添加 addequibyimei 的接口
+            imeiAddEqui({ imei: this.ruleForm.IMEI }).then(res => {
+              this.$message.success('添加成功')
+              this.getDataList()
+            }).catch(err => {
+              console.error(err)
+            })
           } else if (this.rowStatus === 'guohu') {
             const DeviceIds = []
             this.row.forEach(n => {

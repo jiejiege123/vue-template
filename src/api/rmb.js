@@ -53,23 +53,23 @@ export function getbaseinfo(params) {
 }
 
 // 发票记录
-export function invoicelist(params) {
+export function invoicelist(data) {
   return request({
-    url: '/Com/Rmb/invoicelist',
-    method: 'get',
-    params
+    url: '/api/kaipiao/search',
+    method: 'post',
+    data
   })
 }
 
 // 申请开票
 export function sqkaipiao(data) {
   return request({
-    url: '/Com/Rmb/sqkaipiao',
+    url: '/api/kaipiao/add',
     method: 'post',
     data
   })
 }
-// /Com/Rmb/newkaipiao
+
 export function newkaipiao(data) {
   return request({
     url: '/Com/Rmb/newkaipiao',
@@ -89,7 +89,8 @@ export function getComUselist(params) {
 // 开票信息列表
 export function getInvoiceList(data) {
   return request({
-    url: '/api/kaipiao/search',
+    // url: '/api/kaipiao/search',
+    url: '/api/invoice/search',
     method: 'post',
     data
   })
@@ -98,7 +99,7 @@ export function getInvoiceList(data) {
 // 添加开票信息
 export function addInvoice(data) {
   return request({
-    url: '/api/kaipiao/add',
+    url: '/api/invoice/add',
     method: 'post',
     data
   })
@@ -107,7 +108,7 @@ export function addInvoice(data) {
 // 删除开票信息
 export function delInvoice(params) {
   return request({
-    url: '/api/kaipiao/delete',
+    url: '/api/invoice/delete',
     method: 'get',
     params
   })
@@ -115,7 +116,7 @@ export function delInvoice(params) {
 
 export function batchDelInvoice(data) {
   return request({
-    url: '/api/kaipiao/batch/delete',
+    url: '/api/invoice/batch/delete',
     method: 'post',
     data
   })
@@ -124,7 +125,7 @@ export function batchDelInvoice(data) {
 // 编辑开票信息
 export function editInvoice(data) {
   return request({
-    url: '/api/kaipiao/update',
+    url: '/api/invoice/update',
     method: 'post',
     data
   })

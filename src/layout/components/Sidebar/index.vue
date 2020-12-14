@@ -63,10 +63,9 @@ export default {
   computed: {
     ...mapGetters([
       'permission_routes',
-      'sidebar',
-      'userInfo'
+      'sidebar'
     ]),
-    ...mapState('user', ['equiNum', 'todayalarm', 'todaygz']),
+    ...mapState('user', ['equiNum', 'todayalarm', 'todaygz', 'userInfo']),
     activeMenu() {
       const route = this.$route
       const { meta, path } = route
@@ -85,6 +84,8 @@ export default {
     isCollapse() {
       return !this.sidebar.opened
     }
+  },
+  created() {
   }
 }
 </script>

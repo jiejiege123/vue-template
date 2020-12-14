@@ -12,7 +12,7 @@
       el-input.input-search(placeholder='请输入关键字' v-model='search' size="small" clearable @clear="getDataList")
         el-button(slot="append" icon="el-icon-search" type="primary" size="small" @click="doSearch")
     .operate
-      el-button(v-if="userInfo.UserType === 'Company'" type="primary" size="small" @click='showDialog') 添加
+      el-button(v-has="'Invoicelist01'" type="primary" size="small" @click='showDialog') 添加
 
   .table-warp.flex1.layout-column
     el-table.flex1(
@@ -27,7 +27,7 @@
       :cell-class-name="cellClassName"
       empty-text="没有数据")
       el-table-column(label="#" align="center" type="index" :index="indexMethod")
-      el-table-column(v-if="userInfo.UserType === 'Admin'" label="企业名称" align="left" prop="comname" width="150px")
+      el-table-column(label="企业名称" align="left" prop="comname" width="150px")
       el-table-column(
         v-for="(item,index) in tableColumn" :key="index"
         :prop="item.prop"
@@ -43,14 +43,16 @@
           span.name(v-if="item.prop === 'QF000Zh'" @click="viewRow(scope.row)") {{scope.row[item.prop]}}
 
           span(v-else) {{scope.row[item.prop]}}
-      el-table-column(v-if="userInfo.UserType === 'Company'" label="操作" align="center" width="150")
+      el-table-column(label="操作" align="center" width="150")
         template(slot-scope='scope')
           el-button(
+            v-has="'Invoicelist02'"
             type="primary"
             plain
             @click="updateRow(scope.row)"
             size="small") 编辑
           el-button(
+            v-has="'Invoicelist03'"
             type="danger"
             plain
             @click="delRow(scope.row)"
@@ -156,7 +158,7 @@
             :before-upload='beforeAvatarUpload')
             img.avatar(v-if='ruleForm.QF006' :src='ruleForm.QF006 | filterImg')
             i.el-icon-plus.avatar-uploader-icon(v-else)
-        el-form-item.dia-footer()
+        el-form-item.dia-footer(v-if="dialogType !== 'view'")
           el-button(type='primary', @click="kpiao('ruleForm')" size="small") 提交
           el-button(@click="closeDialog" size="small") 取消
 
@@ -315,8 +317,8 @@ export default {
     }
   },
   created() {
-    // this.getDataList()
-    this.getDicsDataList()
+    this.getDataList()
+    // this.getDicsDataList()
   },
   mounted() {
 
@@ -410,7 +412,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delInvoice({ ID: row.id }).then(res => {
+        delInvoice({ invoiceid: row.invoiceid }).then(res => {
           this.$message({
             type: 'success',
             message: '删除成功!'

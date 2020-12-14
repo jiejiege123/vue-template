@@ -74,6 +74,14 @@ export function updateUser(data) {
   })
 }
 
+export function delUser(params) {
+  return request({
+    url: '/api/user/delete',
+    method: 'get',
+    params
+  })
+}
+
 // 更新状态
 export function changeUserState(params) {
   return request({

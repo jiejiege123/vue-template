@@ -61,14 +61,8 @@ const actions = {
         const { Data } = response
         commit('SET_TOKEN', Data.token)
         setToken(Data.token)
-
-        if (!Data.user.RoleIds) {
-          Data.user.RoleIds = ['admin']
-        }
-        commit('SET_USERINFO', Data.user)
-
         localStorage.setItem('userInfo', JSON.stringify(Data.user))
-
+        // commit('SET_USERINFO', Data.user)
         resolve()
       }).catch(error => {
         reject(error)
@@ -81,12 +75,13 @@ const actions = {
     return new Promise((resolve, reject) => {
       if (localStorage.getItem('userInfo')) {
         const user = JSON.parse(localStorage.getItem('userInfo'))
+        commit('SET_USERINFO', user)
         const { userroleid, Name, HeadIcon, Description } = user
         commit('SET_ROLES', userroleid)
         commit('SET_NAME', Name)
         commit('SET_AVATAR', HeadIcon)
         commit('SET_INTRODUCTION', Description)
-        commit('SET_USERINFO', user)
+        console.log('123')
         resolve(user)
       } else {
         reject('getInfo error')

@@ -40,12 +40,13 @@
             v-if="item.type==='img' && scope.row[item.prop]"
             :src="scope.row[item.prop]"
             style="width:40px;height:40px;cursor: pointer")
-          span.name(v-if="item.prop === 'QF000Zh'" @click="viewRow(scope.row)") {{scope.row[item.prop]}}
+          span.name(v-if="item.prop === 'lxr'" @click="viewRow(scope.row)") {{scope.row[item.prop]}}
 
           span(v-else) {{scope.row[item.prop]}}
       el-table-column(label="操作" align="center" width="150")
         template(slot-scope='scope')
           el-button(
+            v-has="'Expresslist01'"
             type="primary"
             plain
             @click="updateRow(scope.row)"
@@ -148,7 +149,7 @@
               autocomplete = "new-password"
               :placeholder='item.horder || "请输入"'
               :disabled="dialogType==='view' || dialogType==='approve'")
-        el-form-item.dia-footer()
+        el-form-item.dia-footer(v-if="dialogType !== 'view'")
           el-button(type='primary', @click="kpiao('ruleForm')" size="small") 提交
           el-button(@click="closeDialog" size="small") 取消
     //- 图片弹窗
@@ -203,15 +204,15 @@ export default {
       tableData: [],
       tableColumn: [
         {
-          prop: 'QF001',
+          prop: 'lxr',
           label: '联系人'
         },
         {
-          prop: 'QF002',
+          prop: 'lxrtel',
           label: '联系电话'
         },
         {
-          prop: 'QF003',
+          prop: 'lxaddress',
           label: '邮寄地址'
         },
         {
@@ -234,17 +235,17 @@ export default {
       },
       formItems: [
         {
-          prop: 'QF001',
+          prop: 'lxr',
           label: '联系人',
           validator: true
         },
         {
-          prop: 'QF002',
+          prop: 'lxrtel',
           label: '联系电话',
           validator: true
         },
         {
-          prop: 'QF003',
+          prop: 'lxaddress',
           label: '邮寄地址',
           validator: true
         },
@@ -255,9 +256,9 @@ export default {
         }
       ],
       rules: {
-        QF001: [{ required: true, trigger: 'blur' }],
-        QF002: [{ validator: isPhone, required: true, trigger: 'blur' }],
-        QF003: [{ required: true, trigger: 'blur' }],
+        lxr: [{ required: true, trigger: 'blur' }],
+        lxrtel: [{ validator: isPhone, required: true, trigger: 'blur' }],
+        lxaddress: [{ required: true, trigger: 'blur' }],
         QF004: [{ required: false }]
       },
       dialogType: 'view',

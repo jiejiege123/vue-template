@@ -440,10 +440,11 @@ export default {
       })
     },
     onSubmitForm(ruleForm, dialogType, cb) {
+      console.log(ruleForm)
       const params = Object.assign({}, ruleForm)
       params.userrole = this.dics.userroleid.find(n => n.Id === params.userroleid).Name
-
-      params.comcode = this.comcode || this.userInfo.comcode
+      console.log(this.comcode)
+      params.comcode = this.comcode || ruleForm.comcode
       this.formLoading = true
       let methods
       if (dialogType === 'add') {
@@ -451,6 +452,7 @@ export default {
       } else {
         methods = updateUser
       }
+      console.log(params)
       methods(params).then(res => {
         cb(true)
         this.formLoading = false
@@ -462,7 +464,7 @@ export default {
     },
     onDeleted(row) {
       const params = {
-        cid: row.id
+        uid: row.userid
       }
       delUser(params).then(res => {
         this.$message({

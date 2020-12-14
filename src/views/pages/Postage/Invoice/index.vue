@@ -12,7 +12,7 @@
       el-input.input-search(placeholder='请输入关键字' v-model='search' size="small" clearable @clear="getDataList")
         el-button(slot="append" icon="el-icon-search" type="primary" size="small" @click="doSearch")
     .operate
-      el-button(type="primary" size="small" @click='showDialog') 开票
+      el-button(v-has="'Invoice01'" type="primary" size="small" @click='showDialog') 开票
 
   .table-warp.flex1.layout-column
     el-table.flex1(
